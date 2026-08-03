@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}{{ t('prep_title') }} - Meeting Ledger{% endblock %}
+{% block content %}
+  <div class="page-head">
+    <div>
+      <div class="crumb"><a href="{{ url_for('dashboard') }}">{{ t('crumb_meetings') }}</a> / {{ t('nav_prep') }}</div>
+      <h1>{{ t('prep_title') }}</h1>
+      <p class="page-sub">{{ t('prep_sub') }}</p>
+    </div>
+  </div>
+
+  <div class="card" style="padding: 24px 26px;">
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label for="attendees">{{ t('label_attendees') }}</label>
+      <input type="text" id="attendees" name="attendees" required autofocus
+             placeholder="{{ t('prep_placeholder') }}" value="{{ entered_attendees }}">
+      <button type="submit">{{ t('btn_find_context') }}</button>
+    </form>
+  </div>
+
+  {% if entered_attendees %}
+    <div class="section">
+      {% if context %}
+        <h2>{{ t('prep_last_time') }} — {{ context.meeting['title'] }}
+          <span class="mono" style="font-weight: 400; font-size: 0.8rem;">({{ context.meeting['meeting_date'] }})</span>
+        </h2>
+        <div class="summary-block">{{ context.meeting['summary'] or t('no_summary') }}</div>
+
+        <h2 style="margin-top: 24px;">{{ t('prep_open_items') }}</h2>
+        {% if context.open_items %}
+          <div class="card">
+            {% for a in context.open_items %}
+              <div class="action-item">
+                <span class="checkbox"></span>
+                <span class="desc">{{ a['description'] }}</span>
+                {% if a['owner'] %}<span class="owner">{{ a['owner'] }}</span>{% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p style="color: var(--ink-soft);">{{ t('prep_all_done') }}</p>
+        {% endif %}
+      {% else %}
+        <div class="empty-state">
+          <p>{{ t('prep_no_history') }}</p>
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ t('nav_upcoming') }} - Meeting Ledger{% endblock %}
+{% block content %}
+  <div class="page-head">
+    <div>
+      <h1>{{ t('nav_upcoming') }}</h1>
+      <p class="page-sub">{{ t('upcoming_sub') }}</p>
+    </div>
+    <a class="btn" href="{{ url_for('schedule_meeting') }}">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      {{ t('crumb_schedule') }}
+    </a>
+  </div>
+
+  {% if scheduled %}
+    <div class="ledger">
+      {% for s in scheduled %}
+        <a class="ledger-entry" href="{{ url_for('scheduled_detail', scheduled_id=s['id']) }}">
+          <span class="avatar">{{ s['title'][0]|upper }}</span>
+          <span class="body">
+            <div class="title">{{ s['title'] }}</div>
+            {% if s['attendees'] %}<div class="meta">{{ s['attendees'] }}</div>{% endif %}
+          </span>
+          <span class="status-badge {{ s['status'] }}">{{ t('status_' + s['status']) }}</span>
+          <span class="date">{{ s['scheduled_at'][:16].replace('T', ' ') }}</span>
+          <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <svg width="46" height="46" viewBox="0 0 24 24" fill="none" style="margin-bottom: 14px;"><rect x="3" y="5" width="18" height="16" rx="2" stroke="var(--amber)" stroke-width="1.6"/><path d="M3 10h18M8 3v4M16 3v4" stroke="var(--amber)" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <p>{{ t('upcoming_empty') }}</p>
+      <p style="font-size: 0.88rem; margin-bottom: 22px; color: var(--ink-soft);">{{ t('schedule_sub') }}</p>
+      <a class="btn" href="{{ url_for('schedule_meeting') }}">{{ t('btn_schedule') }}</a>
+    </div>
+  {% endif %}
+{% endblock %}

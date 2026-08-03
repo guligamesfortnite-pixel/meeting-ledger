@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}{{ meeting['title'] }} - Meeting Ledger{% endblock %}
+{% block content %}
+  <div class="page-head">
+    <div>
+      <div class="crumb"><a href="{{ url_for('dashboard') }}">{{ t('crumb_meetings') }}</a> / {{ meeting['title'] }}</div>
+      <h1>{{ meeting['title'] }}</h1>
+      <p class="page-sub">{{ meeting['meeting_date'] }}{% if meeting['attendees'] %} · {{ meeting['attendees'] }}{% endif %}</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>{{ t('section_summary') }}</h2>
+    <div class="summary-block">{{ meeting['summary'] or t('no_summary') }}</div>
+  </div>
+
+  <div class="section">
+    <h2>{{ t('section_action_items') }}</h2>
+    {% if action_items %}
+      <div class="card">
+        {% for a in action_items %}
+          <form method="post" action="{{ url_for('toggle_action_item', meeting_id=meeting['id'], action_item_id=a['id']) }}" class="action-item">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" aria-label="Toggle done">
+              <span class="checkbox {% if a['done'] %}done{% endif %}"></span>
+            </button>
+            <span class="desc {% if a['done'] %}done{% endif %}">{{ a['description'] }}</span>
+            {% if a['owner'] %}<span class="owner">{{ a['owner'] }}</span>{% endif %}
+          </form>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="color: var(--ink-soft);">{{ t('no_action_items') }}</p>
+    {% endif %}
+  </div>
+
+  {% if meeting['transcript'] %}
+    <div class="section">
+      <h2>{{ t('section_transcript') }}</h2>
+      <div class="transcript-block">{{ meeting['transcript'] }}</div>
+    </div>
+  {% endif %}
+{% endblock %}

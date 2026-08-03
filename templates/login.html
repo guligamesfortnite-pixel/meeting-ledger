@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ t('login_title') }} - Meeting Ledger{% endblock %}
+{% block auth_content %}
+  <div class="auth-card">
+    <h1>{{ t('login_title') }}</h1>
+    <p class="tag">{{ t('login_tag') }}</p>
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label for="email">{{ t('label_email') }}</label>
+      <input type="email" id="email" name="email" required autofocus>
+      <label for="password">{{ t('label_password') }}</label>
+      <input type="password" id="password" name="password" required>
+      <button type="submit">{{ t('btn_login') }}</button>
+    </form>
+    <p class="form-foot">{{ t('no_account_yet') }} <a href="{{ url_for('register') }}">{{ t('register_link') }}</a></p>
+  </div>
+{% endblock %}

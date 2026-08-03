@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{{ t('dashboard_title') }} - Meeting Ledger{% endblock %}
+{% block content %}
+  <div class="page-head">
+    <div>
+      <h1>{{ t('dashboard_title') }}</h1>
+      <p class="page-sub">{{ t('dashboard_sub') }}</p>
+    </div>
+    <a class="btn" href="{{ url_for('new_meeting') }}">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      {{ t('nav_log_meeting') }}
+    </a>
+  </div>
+
+  {% if meetings %}
+    <div class="ledger">
+      {% for m in meetings %}
+        <a class="ledger-entry" href="{{ url_for('meeting_detail', meeting_id=m['id']) }}">
+          <span class="avatar">{{ m['title'][0]|upper }}</span>
+          <span class="body">
+            <div class="title">{{ m['title'] }}</div>
+            {% if m['attendees'] %}<div class="meta">{{ m['attendees'] }}</div>{% endif %}
+          </span>
+          {% if m['total_items'] and m['total_items'] > 0 %}
+            <span class="progress-pill {{ 'complete' if m['done_items'] == m['total_items'] else '' }}">
+              {% if m['done_items'] == m['total_items'] %}
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              {% endif %}
+              {{ m['done_items'] }}/{{ m['total_items'] }} {{ t('done_label') }}
+            </span>
+          {% endif %}
+          <span class="date">{{ m['meeting_date'] }}</span>
+          <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <svg width="46" height="46" viewBox="0 0 24 24" fill="none" style="margin-bottom: 14px;"><rect x="3" y="4" width="18" height="14" rx="2" stroke="var(--amber)" stroke-width="1.6"/><path d="M3 9h18M8 13h8M8 16h5" stroke="var(--amber)" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <p>{{ t('empty_title') }}</p>
+      <p style="font-size: 0.88rem; margin-bottom: 22px; color: var(--ink-soft);">{{ t('empty_sub') }}</p>
+      <a class="btn" href="{{ url_for('new_meeting') }}">{{ t('btn_log_first_meeting') }}</a>
+    </div>
+  {% endif %}
+{% endblock %}

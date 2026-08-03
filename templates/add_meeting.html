@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ t('new_meeting_title') }} - Meeting Ledger{% endblock %}
+{% block content %}
+  <div class="page-head">
+    <div>
+      <div class="crumb"><a href="{{ url_for('dashboard') }}">{{ t('crumb_meetings') }}</a> / {{ t('crumb_new') }}</div>
+      <h1>{{ t('new_meeting_title') }}</h1>
+      <p class="page-sub">{{ t('new_meeting_sub') }}</p>
+    </div>
+  </div>
+
+  <div class="card" style="padding: 28px 30px;">
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label for="title">{{ t('label_title') }}</label>
+      <input type="text" id="title" name="title" required autofocus placeholder="{{ t('placeholder_title') }}" value="{{ prefill_title }}">
+
+      <label for="meeting_date">{{ t('label_date') }}</label>
+      <input type="date" id="meeting_date" name="meeting_date" required>
+
+      <label for="attendees">{{ t('label_attendees') }}</label>
+      <input type="text" id="attendees" name="attendees" placeholder="{{ t('placeholder_attendees') }}" value="{{ prefill_attendees }}">
+
+      <label for="transcript">{{ t('label_transcript') }}</label>
+      <textarea id="transcript" name="transcript" placeholder="{{ t('placeholder_transcript') }}"></textarea>
+
+      <button type="submit">{{ t('btn_save_summarize') }}</button>
+    </form>
+  </div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{{ t('schedule_title') }} - Meeting Ledger{% endblock %}
+{% block content %}
+  <div class="page-head">
+    <div>
+      <div class="crumb"><a href="{{ url_for('upcoming') }}">{{ t('crumb_upcoming') }}</a> / {{ t('crumb_schedule') }}</div>
+      <h1>{{ t('schedule_title') }}</h1>
+      <p class="page-sub">{{ t('schedule_sub') }}</p>
+    </div>
+  </div>
+
+  <div class="card" style="padding: 28px 30px;">
+    <form method="post" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label for="title">{{ t('label_title') }}</label>
+      <input type="text" id="title" name="title" required autofocus placeholder="{{ t('placeholder_title') }}" value="{{ prefill_title }}">
+
+      <label for="scheduled_at">{{ t('label_datetime') }}</label>
+      <input type="datetime-local" id="scheduled_at" name="scheduled_at" required>
+
+      <label for="attendees">{{ t('label_attendees') }}</label>
+      <input type="text" id="attendees" name="attendees" placeholder="{{ t('placeholder_attendees') }}" value="{{ prefill_attendees }}">
+
+      <label for="documents">{{ t('label_upload_documents') }}</label>
+      <div class="file-input-wrap">
+        <input type="file" id="documents" name="documents" multiple style="width: 100%;">
+      </div>
+
+      <button type="submit">{{ t('btn_schedule') }}</button>
+    </form>
+  </div>
+{% endblock %}

@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="{{ current_lang }}" dir="{{ text_dir }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Meeting Ledger{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  {% macro lang_switcher(quiet=False) %}
+    <div class="lang-switcher {{ 'quiet' if quiet else '' }}">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M3 12h18M12 3c2.5 2.5 3.8 5.7 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-5.7-3.8-9s1.3-6.5 3.8-9z" stroke="currentColor" stroke-width="1.6"/></svg>
+      <select onchange="window.location.href='/set-language/' + this.value">
+        {% for code, label in SUPPORTED_LANGUAGES.items() %}
+          <option value="{{ code }}" {{ 'selected' if code == current_lang else '' }}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  {% endmacro %}
+
+  {% if user %}
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <span class="mark">M</span>
+          <span>Meeting Ledger</span>
+        </div>
+        <nav class="sidebar-nav">
+          <a class="{{ 'active' if request.endpoint == 'dashboard' else '' }}" href="{{ url_for('dashboard') }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M3 9h18" stroke="currentColor" stroke-width="1.8"/></svg>
+            {{ t('nav_meetings') }}
+          </a>
+          <a class="{{ 'active' if request.endpoint == 'new_meeting' else '' }}" href="{{ url_for('new_meeting') }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            {{ t('nav_log_meeting') }}
+          </a>
+          <a class="{{ 'active' if request.endpoint == 'prep' else '' }}" href="{{ url_for('prep') }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 11l3 3L22 4M20 12v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            {{ t('nav_prep') }}
+          </a>
+          <a class="{{ 'active' if request.endpoint in ['upcoming', 'schedule_meeting', 'scheduled_detail', 'scheduled_ready'] else '' }}" href="{{ url_for('upcoming') }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            {{ t('nav_upcoming') }}
+          </a>
+        </nav>
+        {{ lang_switcher(quiet=True) }}
+        <div class="sidebar-account">
+          <div class="account-avatar">{{ user['name'][0]|upper }}</div>
+          <div class="account-info">
+            <div class="account-name">{{ user['name'] }}</div>
+            <div class="account-email">{{ user['email'] }}</div>
+          </div>
+          <a class="logout" href="{{ url_for('logout') }}" title="{{ t('logout') }}">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+      </aside>
+      <main class="main-area">
+        <div class="main-inner">
+          {% with messages = get_flashed_messages() %}
+            {% if messages %}
+              {% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}
+            {% endif %}
+          {% endwith %}
+          {% for n in pending_notifications %}
+            <div class="notif-banner">
+              <span>{{ n['message'] }}</span>
+              <div class="notif-actions">
+                <form method="post" action="{{ url_for('respond_notification', notification_id=n['id']) }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="answer" value="yes">
+                  <button type="submit" class="notif-yes">{{ t('notif_yes') }}</button>
+                </form>
+                <form method="post" action="{{ url_for('respond_notification', notification_id=n['id']) }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="answer" value="no">
+                  <button type="submit" class="notif-no">{{ t('notif_no') }}</button>
+                </form>
+              </div>
+            </div>
+          {% endfor %}
+          {% block content %}{% endblock %}
+        </div>
+      </main>
+    </div>
+  {% else %}
+    <div class="auth-shell">
+      <div class="auth-top">
+        <div class="auth-brand"><span class="mark">M</span> Meeting Ledger</div>
+        {{ lang_switcher() }}
+      </div>
+      <div class="shell shell-narrow">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}
+          {% endif %}
+        {% endwith %}
+        {% block auth_content %}{% endblock %}
+      </div>
+    </div>
+  {% endif %}
+</body>
+</html>
