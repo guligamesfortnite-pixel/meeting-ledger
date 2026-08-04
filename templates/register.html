@@ -12,6 +12,12 @@
       <input type="email" id="email" name="email" required>
       <label for="password">{{ t('label_password') }}</label>
       <input type="password" id="password" name="password" minlength="8" required>
+      <label for="access_code">{{ t('label_access_code') }}</label>
+      <input type="text" id="access_code" name="access_code" placeholder="{{ t('placeholder_access_code') }}" value="{{ prefill_code }}">
+      <label style="display: flex; align-items: center; gap: 8px; margin-top: 14px; font-size: 0.85rem; font-weight: 400; color: var(--ink);">
+        <input type="checkbox" name="agree_terms" value="1" required style="width: auto;">
+        {{ t('agree_terms_label') }} <a href="{{ url_for('terms') }}" target="_blank">{{ t('terms_link_label') }}</a> {{ t('and_label') }} <a href="{{ url_for('privacy') }}" target="_blank">{{ t('privacy_link_label') }}</a>
+      </label>
       <button type="submit">{{ t('btn_create_account') }}</button>
     </form>
     <p class="form-foot">{{ t('already_have_account') }} <a href="{{ url_for('login') }}">{{ t('login_link') }}</a></p>

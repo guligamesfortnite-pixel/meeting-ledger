@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}{{ t('edit_meeting_title') }} - Meeting Ledger{% endblock %}
+{% block content %}
+  <div class="page-head">
+    <div>
+      <div class="crumb"><a href="{{ url_for('meeting_detail', meeting_id=meeting['id']) }}">{{ meeting['title'] }}</a> / {{ t('btn_edit') }}</div>
+      <h1>{{ t('edit_meeting_title') }}</h1>
+    </div>
+  </div>
+
+  <div class="card" style="padding: 28px 30px;">
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label for="title">{{ t('label_title') }}</label>
+      <input type="text" id="title" name="title" required value="{{ meeting['title'] }}">
+
+      <label for="meeting_date">{{ t('label_date') }}</label>
+      <input type="date" id="meeting_date" name="meeting_date" required value="{{ meeting['meeting_date'] }}">
+
+      <label for="attendees">{{ t('label_attendees') }}</label>
+      <input type="text" id="attendees" name="attendees" value="{{ meeting['attendees'] or '' }}">
+
+      <label for="summary">{{ t('label_summary') }}</label>
+      <textarea id="summary" name="summary" style="min-height: 90px;">{{ meeting['summary'] or '' }}</textarea>
+
+      <label for="transcript">{{ t('label_transcript') }}</label>
+      <textarea id="transcript" name="transcript">{{ meeting['transcript'] or '' }}</textarea>
+
+      <label style="display: flex; align-items: center; gap: 8px; margin-top: 14px;">
+        <input type="checkbox" name="regenerate_summary" value="1" style="width: auto;">
+        {{ t('btn_regenerate_summary') }}
+      </label>
+
+      <button type="submit">{{ t('btn_save_changes') }}</button>
+    </form>
+  </div>
+{% endblock %}

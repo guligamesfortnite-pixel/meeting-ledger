@@ -115,6 +115,7 @@ def init_db():
                 user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
                 title TEXT NOT NULL,
                 scheduled_at TEXT NOT NULL,
+                timezone_offset_minutes INTEGER NOT NULL DEFAULT 0,
                 attendees TEXT,
                 status TEXT NOT NULL DEFAULT 'scheduled',
                 reminder_sent INTEGER NOT NULL DEFAULT 0,
@@ -136,6 +137,30 @@ def init_db():
                 scheduled_meeting_id INTEGER REFERENCES scheduled_meetings(id) ON DELETE CASCADE,
                 message TEXT NOT NULL,
                 status TEXT NOT NULL DEFAULT 'pending',
+                created_at TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS password_resets (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                token TEXT NOT NULL UNIQUE,
+                expires_at TEXT NOT NULL,
+                used INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS login_attempts (
+                id SERIAL PRIMARY KEY,
+                identifier TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS redemption_codes (
+                id SERIAL PRIMARY KEY,
+                code TEXT NOT NULL UNIQUE,
+                description TEXT,
+                max_uses INTEGER NOT NULL DEFAULT 1,
+                uses_count INTEGER NOT NULL DEFAULT 0,
                 created_at TEXT NOT NULL
             );
             """
@@ -179,6 +204,7 @@ def init_db():
                 user_id INTEGER NOT NULL,
                 title TEXT NOT NULL,
                 scheduled_at TEXT NOT NULL,
+                timezone_offset_minutes INTEGER NOT NULL DEFAULT 0,
                 attendees TEXT,
                 status TEXT NOT NULL DEFAULT 'scheduled',
                 reminder_sent INTEGER NOT NULL DEFAULT 0,
@@ -206,6 +232,31 @@ def init_db():
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
                 FOREIGN KEY (scheduled_meeting_id) REFERENCES scheduled_meetings(id) ON DELETE CASCADE
             );
+
+            CREATE TABLE IF NOT EXISTS password_resets (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                token TEXT NOT NULL UNIQUE,
+                expires_at TEXT NOT NULL,
+                used INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            );
+
+            CREATE TABLE IF NOT EXISTS login_attempts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                identifier TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS redemption_codes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                code TEXT NOT NULL UNIQUE,
+                description TEXT,
+                max_uses INTEGER NOT NULL DEFAULT 1,
+                uses_count INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL
+            );
             """
         )
     conn.commit()
@@ -214,6 +265,47 @@ def init_db():
     # `language` column existed, add it now instead of crashing.
     try:
         cur.execute(_q("ALTER TABLE users ADD COLUMN language TEXT NOT NULL DEFAULT 'en'"))
+        conn.commit()
+    except Exception:
+        conn.rollback()
+
+    # Same idea for `plan` - tracks whether an account is on trial, or has
+    # free access via a redeemed code. Nothing restricts features based on
+    # this yet; it's the groundwork for when billing gets added.
+    try:
+        cur.execute(_q("ALTER TABLE users ADD COLUMN plan TEXT NOT NULL DEFAULT 'trial'"))
+        conn.commit()
+    except Exception:
+        conn.rollback()
+
+    # A private token used to build each person's calendar subscription
+    # link (/calendar/<token>.ics) - generated lazily the first time
+    # they visit the sync page, not at signup, so existing accounts get
+    # one automatically too.
+    try:
+        cur.execute(_q("ALTER TABLE users ADD COLUMN calendar_token TEXT"))
+        conn.commit()
+    except Exception:
+        conn.rollback()
+
+    try:
+        cur.execute(_q("ALTER TABLE scheduled_meetings ADD COLUMN timezone_offset_minutes INTEGER NOT NULL DEFAULT 0"))
+        conn.commit()
+    except Exception:
+        conn.rollback()
+
+    # Lets an emailed reminder include one-click "yes/no" links that work
+    # without being logged in - the token is the proof it's really them.
+    try:
+        cur.execute(_q("ALTER TABLE notifications ADD COLUMN token TEXT"))
+        conn.commit()
+    except Exception:
+        conn.rollback()
+
+    # Groups the occurrences of a repeating meeting together (not used
+    # for anything yet beyond tagging them as related).
+    try:
+        cur.execute(_q("ALTER TABLE scheduled_meetings ADD COLUMN recurrence_group TEXT"))
         conn.commit()
     except Exception:
         conn.rollback()
@@ -344,13 +436,13 @@ def toggle_action_item(action_item_id, meeting_id):
 
 # ---------- scheduled meetings (planned in advance, confirmed closer to the time) ----------
 
-def create_scheduled_meeting(user_id, title, scheduled_at, attendees):
+def create_scheduled_meeting(user_id, title, scheduled_at, attendees, timezone_offset_minutes=0, recurrence_group=None):
     conn = get_db()
     scheduled_id = _insert_and_get_id(
         conn,
-        "INSERT INTO scheduled_meetings (user_id, title, scheduled_at, attendees, status, reminder_sent, created_at) "
-        "VALUES (?, ?, ?, ?, 'scheduled', 0, ?)",
-        (user_id, title, scheduled_at, attendees, now_iso()),
+        "INSERT INTO scheduled_meetings (user_id, title, scheduled_at, timezone_offset_minutes, attendees, status, reminder_sent, recurrence_group, created_at) "
+        "VALUES (?, ?, ?, ?, ?, 'scheduled', 0, ?, ?)",
+        (user_id, title, scheduled_at, timezone_offset_minutes, attendees, recurrence_group, now_iso()),
     )
     conn.close()
     return scheduled_id
@@ -384,17 +476,13 @@ def set_scheduled_meeting_status(scheduled_id, status):
     conn.close()
 
 
-def find_due_reminders(window_end_iso, now_iso_value):
-    """System-wide (not scoped to one user) - finds every scheduled
-    meeting, for any account, that starts within the reminder window and
-    hasn't had a reminder sent yet. This is what the periodic check calls."""
+def find_scheduled_reminder_candidates():
+    """All not-yet-reminded scheduled meetings, across every account.
+    Filtering by the actual time window happens in Python (app.py) since
+    each row can have a different timezone offset - plain SQL string
+    comparison on scheduled_at alone can't account for that correctly."""
     conn = get_db()
-    rows = _fetchall(
-        conn,
-        "SELECT * FROM scheduled_meetings WHERE status = 'scheduled' AND reminder_sent = 0 "
-        "AND scheduled_at >= ? AND scheduled_at <= ?",
-        (now_iso_value, window_end_iso),
-    )
+    rows = _fetchall(conn, "SELECT * FROM scheduled_meetings WHERE status = 'scheduled' AND reminder_sent = 0")
     conn.close()
     return rows
 
@@ -449,13 +537,13 @@ def get_document_for_user(document_id, user_id):
 
 # ---------- notifications (the "is this still happening?" prompts) ----------
 
-def create_notification(user_id, scheduled_meeting_id, message):
+def create_notification(user_id, scheduled_meeting_id, message, token=None):
     conn = get_db()
     _execute(
         conn,
-        "INSERT INTO notifications (user_id, scheduled_meeting_id, message, status, created_at) "
-        "VALUES (?, ?, ?, 'pending', ?)",
-        (user_id, scheduled_meeting_id, message, now_iso()),
+        "INSERT INTO notifications (user_id, scheduled_meeting_id, message, status, token, created_at) "
+        "VALUES (?, ?, ?, 'pending', ?, ?)",
+        (user_id, scheduled_meeting_id, message, token, now_iso()),
     )
     conn.close()
 
@@ -480,7 +568,198 @@ def get_notification_for_user(notification_id, user_id):
     return row
 
 
+def get_pending_notification_by_token(token):
+    conn = get_db()
+    row = _fetchone(conn, "SELECT * FROM notifications WHERE token = ? AND status = 'pending'", (token,))
+    conn.close()
+    return row
+
+
 def mark_notification_answered(notification_id):
     conn = get_db()
     _execute(conn, "UPDATE notifications SET status = 'answered' WHERE id = ?", (notification_id,))
     conn.close()
+
+# ---------- password reset ----------
+
+def create_password_reset(user_id, token, expires_at):
+    conn = get_db()
+    _execute(
+        conn,
+        "INSERT INTO password_resets (user_id, token, expires_at, used, created_at) VALUES (?, ?, ?, 0, ?)",
+        (user_id, token, expires_at, now_iso()),
+    )
+    conn.close()
+
+
+def get_valid_password_reset(token, now_iso_value):
+    conn = get_db()
+    row = _fetchone(
+        conn,
+        "SELECT * FROM password_resets WHERE token = ? AND used = 0 AND expires_at > ?",
+        (token, now_iso_value),
+    )
+    conn.close()
+    return row
+
+
+def mark_password_reset_used(reset_id):
+    conn = get_db()
+    _execute(conn, "UPDATE password_resets SET used = 1 WHERE id = ?", (reset_id,))
+    conn.close()
+
+
+def update_user_password(user_id, password_hash):
+    conn = get_db()
+    _execute(conn, "UPDATE users SET password_hash = ? WHERE id = ?", (password_hash, user_id))
+    conn.close()
+
+
+# ---------- login rate limiting ----------
+
+def record_login_attempt(identifier):
+    conn = get_db()
+    _execute(conn, "INSERT INTO login_attempts (identifier, created_at) VALUES (?, ?)", (identifier, now_iso()))
+    conn.close()
+
+
+def count_recent_login_attempts(identifier, since_iso_value):
+    conn = get_db()
+    row = _fetchone(
+        conn,
+        "SELECT COUNT(*) AS n FROM login_attempts WHERE identifier = ? AND created_at > ?",
+        (identifier, since_iso_value),
+    )
+    conn.close()
+    return row["n"] if row else 0
+
+
+# ---------- redemption codes (free access, e.g. for testers/partners) ----------
+
+def create_redemption_code(code, description, max_uses):
+    conn = get_db()
+    _execute(
+        conn,
+        "INSERT INTO redemption_codes (code, description, max_uses, uses_count, created_at) VALUES (?, ?, ?, 0, ?)",
+        (code, description, max_uses, now_iso()),
+    )
+    conn.close()
+
+
+def list_redemption_codes():
+    conn = get_db()
+    rows = _fetchall(conn, "SELECT * FROM redemption_codes ORDER BY id DESC")
+    conn.close()
+    return rows
+
+
+def get_redeemable_code(code):
+    """Only returns the code if it still has uses left."""
+    conn = get_db()
+    row = _fetchone(
+        conn, "SELECT * FROM redemption_codes WHERE code = ? AND uses_count < max_uses", (code,)
+    )
+    conn.close()
+    return row
+
+
+def redeem_code_for_user(code_id, user_id):
+    conn = get_db()
+    _execute(conn, "UPDATE redemption_codes SET uses_count = uses_count + 1 WHERE id = ?", (code_id,))
+    _execute(conn, "UPDATE users SET plan = 'free_access' WHERE id = ?", (user_id,))
+    conn.close()
+
+# ---------- calendar subscription ----------
+
+def get_user_by_calendar_token(token):
+    conn = get_db()
+    row = _fetchone(conn, "SELECT * FROM users WHERE calendar_token = ?", (token,))
+    conn.close()
+    return row
+
+
+def set_calendar_token(user_id, token):
+    conn = get_db()
+    _execute(conn, "UPDATE users SET calendar_token = ? WHERE id = ?", (token, user_id))
+    conn.close()
+
+# ---------- editing / deleting meetings ----------
+
+def update_meeting(meeting_id, user_id, title, meeting_date, attendees, transcript, summary):
+    """Scoped to user_id so one account can't edit another's meeting even
+    by guessing an id."""
+    conn = get_db()
+    _execute(
+        conn,
+        "UPDATE meetings SET title = ?, meeting_date = ?, attendees = ?, transcript = ?, summary = ? "
+        "WHERE id = ? AND user_id = ?",
+        (title, meeting_date, attendees, transcript, summary, meeting_id, user_id),
+    )
+    conn.close()
+
+
+def delete_meeting(meeting_id, user_id):
+    conn = get_db()
+    _execute(conn, "DELETE FROM meetings WHERE id = ? AND user_id = ?", (meeting_id, user_id))
+    conn.close()
+
+
+def delete_action_item(action_item_id, meeting_id):
+    conn = get_db()
+    _execute(conn, "DELETE FROM action_items WHERE id = ? AND meeting_id = ?", (action_item_id, meeting_id))
+    conn.close()
+
+
+def search_meetings_for_user(user_id, query):
+    conn = get_db()
+    like = f"%{query}%"
+    rows = _fetchall(
+        conn,
+        """
+        SELECT m.*,
+               COUNT(a.id) AS total_items,
+               COALESCE(SUM(CASE WHEN a.done = 1 THEN 1 ELSE 0 END), 0) AS done_items
+        FROM meetings m
+        LEFT JOIN action_items a ON a.meeting_id = m.id
+        WHERE m.user_id = ? AND (m.title LIKE ? OR m.attendees LIKE ? OR m.summary LIKE ?)
+        GROUP BY m.id
+        ORDER BY m.meeting_date DESC, m.id DESC
+        """,
+        (user_id, like, like, like),
+    )
+    conn.close()
+    return rows
+
+
+# ---------- account settings ----------
+
+def update_user_name(user_id, name):
+    conn = get_db()
+    _execute(conn, "UPDATE users SET name = ? WHERE id = ?", (name, user_id))
+    conn.close()
+
+
+def update_user_email(user_id, email):
+    conn = get_db()
+    _execute(conn, "UPDATE users SET email = ? WHERE id = ?", (email, user_id))
+    conn.close()
+
+# ---------- cross-meeting task view ----------
+
+def list_open_action_items_for_user(user_id):
+    """Every open (not done) action item across all of a user's meetings,
+    newest meeting first - the "My Tasks" view."""
+    conn = get_db()
+    rows = _fetchall(
+        conn,
+        """
+        SELECT a.*, m.title AS meeting_title, m.meeting_date AS meeting_date
+        FROM action_items a
+        JOIN meetings m ON m.id = a.meeting_id
+        WHERE m.user_id = ? AND a.done = 0
+        ORDER BY m.meeting_date DESC, a.id
+        """,
+        (user_id,),
+    )
+    conn.close()
+    return rows

@@ -1,0 +1,10 @@
+<div class="auth-card" style="margin: 40px auto 0; width: 380px;">
+  <h1>Admin</h1>
+  <p class="tag">Enter the admin secret to manage access codes.</p>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="admin_secret">Admin secret</label>
+    <input type="password" id="admin_secret" name="admin_secret" required autofocus>
+    <button type="submit">Unlock</button>
+  </form>
+</div>

@@ -34,6 +34,10 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
             {{ t('nav_log_meeting') }}
           </a>
+          <a class="{{ 'active' if request.endpoint == 'my_tasks' else '' }}" href="{{ url_for('my_tasks') }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            {{ t('nav_my_tasks') }}
+          </a>
           <a class="{{ 'active' if request.endpoint == 'prep' else '' }}" href="{{ url_for('prep') }}">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 11l3 3L22 4M20 12v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             {{ t('nav_prep') }}
@@ -42,14 +46,20 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
             {{ t('nav_upcoming') }}
           </a>
+          <a class="{{ 'active' if request.endpoint == 'pricing' else '' }}" href="{{ url_for('pricing') }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            {{ t('nav_pricing') }}
+          </a>
         </nav>
         {{ lang_switcher(quiet=True) }}
         <div class="sidebar-account">
-          <div class="account-avatar">{{ user['name'][0]|upper }}</div>
-          <div class="account-info">
-            <div class="account-name">{{ user['name'] }}</div>
-            <div class="account-email">{{ user['email'] }}</div>
-          </div>
+          <a href="{{ url_for('account') }}" style="display: contents;">
+            <div class="account-avatar">{{ user['name'][0]|upper }}</div>
+            <div class="account-info">
+              <div class="account-name">{{ user['name'] }}</div>
+              <div class="account-email">{{ user['email'] }}</div>
+            </div>
+          </a>
           <a class="logout" href="{{ url_for('logout') }}" title="{{ t('logout') }}">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </a>
@@ -80,6 +90,11 @@
             </div>
           {% endfor %}
           {% block content %}{% endblock %}
+          <div style="margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 0.78rem; color: var(--ink-soft);">
+            <a href="{{ url_for('terms') }}" style="color: var(--ink-soft);">{{ t('terms_link_label') }}</a>
+            &nbsp;·&nbsp;
+            <a href="{{ url_for('privacy') }}" style="color: var(--ink-soft);">{{ t('privacy_link_label') }}</a>
+          </div>
         </div>
       </main>
     </div>
@@ -87,7 +102,10 @@
     <div class="auth-shell">
       <div class="auth-top">
         <div class="auth-brand"><span class="mark">M</span> Meeting Ledger</div>
-        {{ lang_switcher() }}
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <a href="{{ url_for('pricing') }}" style="font-size: 0.88rem; color: var(--ink-soft); font-weight: 500;">{{ t('nav_pricing') }}</a>
+          {{ lang_switcher() }}
+        </div>
       </div>
       <div class="shell shell-narrow">
         {% with messages = get_flashed_messages() %}
@@ -96,6 +114,11 @@
           {% endif %}
         {% endwith %}
         {% block auth_content %}{% endblock %}
+      </div>
+      <div style="margin-top: 30px; font-size: 0.78rem; color: var(--ink-soft);">
+        <a href="{{ url_for('terms') }}" style="color: var(--ink-soft);">{{ t('terms_link_label') }}</a>
+        &nbsp;·&nbsp;
+        <a href="{{ url_for('privacy') }}" style="color: var(--ink-soft);">{{ t('privacy_link_label') }}</a>
       </div>
     </div>
   {% endif %}

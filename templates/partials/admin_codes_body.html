@@ -1,0 +1,33 @@
+<div style="max-width: 640px; {% if not user %}margin: 40px auto 0;{% endif %}">
+  <h1>Access codes</h1>
+  <p class="page-sub">Anyone who registers or redeems one of these gets free access. Each code can be used up to its limit, then it stops working on its own - no need to delete it.</p>
+
+  <div class="card" style="padding: 22px 24px; margin: 20px 0;">
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label for="new_code">Code (leave blank to generate one)</label>
+      <input type="text" id="new_code" name="new_code" placeholder="e.g. FRIENDSANDFAMILY">
+      <label for="description">Description (for your own reference)</label>
+      <input type="text" id="description" name="description" placeholder="e.g. beta testers, October">
+      <label for="max_uses">How many times can it be used</label>
+      <input type="text" id="max_uses" name="max_uses" value="1">
+      <button type="submit">Create code</button>
+    </form>
+  </div>
+
+  {% if codes %}
+    <div class="card">
+      {% for c in codes %}
+        <div class="doc-item">
+          <span class="doc-name mono">{{ c['code'] }}</span>
+          <span style="flex:1; color: var(--ink-soft); font-size: 0.85rem;">{{ c['description'] or '' }}</span>
+          <span class="status-badge {{ 'confirmed' if c['uses_count'] < c['max_uses'] else 'cancelled' }}">
+            {{ c['uses_count'] }} / {{ c['max_uses'] }} used
+          </span>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p style="color: var(--ink-soft);">No codes created yet.</p>
+  {% endif %}
+</div>

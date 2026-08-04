@@ -12,6 +12,16 @@
     </a>
   </div>
 
+  <div class="card" style="padding: 18px 20px; margin-bottom: 24px;">
+    <h2 style="margin-bottom: 4px;">{{ t('calendar_sync_title') }}</h2>
+    <p style="color: var(--ink-soft); font-size: 0.85rem; margin: 0 0 12px;">{{ t('calendar_sync_desc') }}</p>
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <input type="text" id="calendar-url" readonly value="{{ calendar_url }}" style="flex: 1; font-size: 0.8rem; background: var(--paper);">
+      <button type="button" class="btn-quiet" onclick="navigator.clipboard.writeText(document.getElementById('calendar-url').value); this.textContent='{{ t('copied_label') }}';">{{ t('btn_copy_link') }}</button>
+    </div>
+    <p style="color: var(--ink-soft); font-size: 0.78rem; margin: 10px 0 0;">{{ t('calendar_sync_note') }}</p>
+  </div>
+
   {% if scheduled %}
     <div class="ledger">
       {% for s in scheduled %}

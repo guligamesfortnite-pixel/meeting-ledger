@@ -7,6 +7,16 @@
       <h1>{{ meeting['title'] }}</h1>
       <p class="page-sub">{{ meeting['meeting_date'] }}{% if meeting['attendees'] %} · {{ meeting['attendees'] }}{% endif %}</p>
     </div>
+    <div style="display: flex; gap: 8px;">
+      <a class="btn-quiet" href="{{ url_for('export_meeting_pdf', meeting_id=meeting['id']) }}">{{ t('btn_export_pdf') }}</a>
+      <a class="btn-quiet" href="{{ url_for('export_meeting_docx', meeting_id=meeting['id']) }}">{{ t('btn_export_word') }}</a>
+      <a class="btn-quiet" href="{{ url_for('edit_meeting', meeting_id=meeting['id']) }}">{{ t('btn_edit') }}</a>
+      <form method="post" action="{{ url_for('delete_meeting_route', meeting_id=meeting['id']) }}"
+            onsubmit="return confirm('{{ t('confirm_delete_meeting') }}');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn-quiet">{{ t('btn_delete') }}</button>
+      </form>
+    </div>
   </div>
 
   <div class="section">
@@ -19,19 +29,32 @@
     {% if action_items %}
       <div class="card">
         {% for a in action_items %}
-          <form method="post" action="{{ url_for('toggle_action_item', meeting_id=meeting['id'], action_item_id=a['id']) }}" class="action-item">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button type="submit" aria-label="Toggle done">
-              <span class="checkbox {% if a['done'] %}done{% endif %}"></span>
-            </button>
-            <span class="desc {% if a['done'] %}done{% endif %}">{{ a['description'] }}</span>
+          <div class="action-item">
+            <form method="post" action="{{ url_for('toggle_action_item', meeting_id=meeting['id'], action_item_id=a['id']) }}" style="display: contents;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" aria-label="Toggle done">
+                <span class="checkbox {% if a['done'] %}done{% endif %}"></span>
+              </button>
+            </form>
+            <span class="desc {% if a['done'] %}done{% endif %}" style="flex: 1;">{{ a['description'] }}</span>
             {% if a['owner'] %}<span class="owner">{{ a['owner'] }}</span>{% endif %}
-          </form>
+            <form method="post" action="{{ url_for('delete_action_item_route', meeting_id=meeting['id'], action_item_id=a['id']) }}" style="margin: 0;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" aria-label="Delete" style="all: unset; cursor: pointer; color: var(--ink-soft); margin-inline-start: 10px; font-size: 0.85rem;">✕</button>
+            </form>
+          </div>
         {% endfor %}
       </div>
     {% else %}
       <p style="color: var(--ink-soft);">{{ t('no_action_items') }}</p>
     {% endif %}
+
+    <form method="post" action="{{ url_for('add_action_item_route', meeting_id=meeting['id']) }}" style="display: flex; gap: 8px; margin-top: 12px;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="text" name="description" placeholder="{{ t('placeholder_action_item') }}" style="flex: 2;" required>
+      <input type="text" name="owner" placeholder="{{ t('placeholder_owner') }}" style="flex: 1;">
+      <button type="submit" style="margin-top: 0;">{{ t('btn_add_action_item') }}</button>
+    </form>
   </div>
 
   {% if meeting['transcript'] %}

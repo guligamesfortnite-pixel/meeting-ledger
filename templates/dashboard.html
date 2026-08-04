@@ -12,6 +12,10 @@
     </a>
   </div>
 
+  <form method="get" style="margin-bottom: 20px;">
+    <input type="text" name="q" value="{{ query }}" placeholder="{{ t('placeholder_search') }}" onchange="this.form.submit()">
+  </form>
+
   {% if meetings %}
     <div class="ledger">
       {% for m in meetings %}
@@ -37,9 +41,13 @@
   {% else %}
     <div class="empty-state">
       <svg width="46" height="46" viewBox="0 0 24 24" fill="none" style="margin-bottom: 14px;"><rect x="3" y="4" width="18" height="14" rx="2" stroke="var(--amber)" stroke-width="1.6"/><path d="M3 9h18M8 13h8M8 16h5" stroke="var(--amber)" stroke-width="1.6" stroke-linecap="round"/></svg>
-      <p>{{ t('empty_title') }}</p>
-      <p style="font-size: 0.88rem; margin-bottom: 22px; color: var(--ink-soft);">{{ t('empty_sub') }}</p>
-      <a class="btn" href="{{ url_for('new_meeting') }}">{{ t('btn_log_first_meeting') }}</a>
+      {% if query %}
+        <p>{{ t('no_search_results') }}</p>
+      {% else %}
+        <p>{{ t('empty_title') }}</p>
+        <p style="font-size: 0.88rem; margin-bottom: 22px; color: var(--ink-soft);">{{ t('empty_sub') }}</p>
+        <a class="btn" href="{{ url_for('new_meeting') }}">{{ t('btn_log_first_meeting') }}</a>
+      {% endif %}
     </div>
   {% endif %}
 {% endblock %}

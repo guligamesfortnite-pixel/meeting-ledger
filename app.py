@@ -12,6 +12,8 @@ from werkzeug.utils import secure_filename
 
 import database as db
 from ai_service import summarize_transcript
+from email_service import send_reset_email, send_reminder_email, is_configured as email_is_configured, base_url as email_base_url
+from export_service import build_meeting_pdf, build_meeting_docx
 from translations import t, is_rtl, SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE
 
 app = Flask(__name__)
@@ -31,7 +33,15 @@ LIVE_NOTES_WEBHOOK_SECRET = os.environ.get("LIVE_NOTES_WEBHOOK_SECRET")
 REMINDER_CHECK_SECRET = os.environ.get("REMINDER_CHECK_SECRET")
 
 MAX_DOCUMENT_BYTES = 5 * 1024 * 1024  # 5 MB per file, keeps things reasonable stored in the database
-REMINDER_WINDOW_MINUTES = 5
+REMINDER_WINDOW_MINUTES = 60  # ask "is this still happening?" 1 hour before start
+
+# Protects the /admin/codes page where redemption codes get created.
+# Set this as a real env var once deployed - without it, the admin page
+# refuses to unlock for anyone.
+ADMIN_SECRET = os.environ.get("ADMIN_SECRET")
+
+LOGIN_RATE_LIMIT = 8          # max attempts...
+LOGIN_RATE_LIMIT_MINUTES = 15  # ...within this many minutes, per email+IP
 
 db.init_db()
 
@@ -57,6 +67,21 @@ def get_csrf_token():
     if "csrf_token" not in session:
         session["csrf_token"] = secrets.token_hex(16)
     return session["csrf_token"]
+
+
+def _try_redeem_pending_code(user_id):
+    """If the person tried to redeem a code before logging in, it's
+    parked in session['pending_code'] - apply it now that we know who
+    they are, then clear it either way so it doesn't linger."""
+    code = session.pop("pending_code", None)
+    if not code:
+        return
+    code_row = db.get_redeemable_code(code)
+    if code_row:
+        db.redeem_code_for_user(code_row["id"], user_id)
+        flash(tr("redeem_success"))
+    else:
+        flash(tr("redeem_invalid"))
 
 
 def check_csrf():
@@ -121,12 +146,24 @@ def set_language(lang):
 def register():
     if request.method == "POST":
         check_csrf()
+
+        identifier = f"register:{request.remote_addr}"
+        cutoff = (datetime.now(timezone.utc) - timedelta(minutes=LOGIN_RATE_LIMIT_MINUTES)).isoformat()
+        if db.count_recent_login_attempts(identifier, cutoff) >= LOGIN_RATE_LIMIT:
+            flash(tr("too_many_attempts"))
+            return render_template("register.html")
+        db.record_login_attempt(identifier)
+
         name = request.form.get("name", "").strip()
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
+        access_code = request.form.get("access_code", "").strip()
 
         if not name or not email or not password:
             flash("Fill in your name, email, and password.")
+            return render_template("register.html")
+        if not request.form.get("agree_terms"):
+            flash("Please agree to the Terms and Privacy Policy to continue.")
             return render_template("register.html")
         if len(password) < 8:
             flash("Password needs to be at least 8 characters.")
@@ -136,11 +173,26 @@ def register():
             return render_template("register.html")
 
         user_id = db.create_user(name, email, generate_password_hash(password), current_language())
+        pending_code = session.get("pending_code")
         session.clear()
         session["user_id"] = user_id
+
+        if access_code:
+            code_row = db.get_redeemable_code(access_code)
+            if code_row:
+                db.redeem_code_for_user(code_row["id"], user_id)
+                flash(tr("redeem_success"))
+            else:
+                flash(tr("redeem_invalid"))
+        elif pending_code:
+            session["pending_code"] = pending_code
+            _try_redeem_pending_code(user_id)
+
         return redirect(url_for("dashboard"))
 
-    return render_template("register.html")
+    return render_template(
+        "register.html", prefill_code=request.args.get("code", "") or session.get("pending_code", "")
+    )
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -149,14 +201,26 @@ def login():
         check_csrf()
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
+
+        identifier = f"login:{email}:{request.remote_addr}"
+        cutoff = (datetime.now(timezone.utc) - timedelta(minutes=LOGIN_RATE_LIMIT_MINUTES)).isoformat()
+        if db.count_recent_login_attempts(identifier, cutoff) >= LOGIN_RATE_LIMIT:
+            flash(tr("too_many_attempts"))
+            return render_template("login.html")
+        db.record_login_attempt(identifier)
+
         user = db.get_user_by_email(email)
 
         if user is None or not check_password_hash(user["password_hash"], password):
             flash("Incorrect email or password.")
             return render_template("login.html")
 
+        pending_code = session.get("pending_code")
         session.clear()
         session["user_id"] = user["id"]
+        if pending_code:
+            session["pending_code"] = pending_code
+        _try_redeem_pending_code(user["id"])
         return redirect(request.args.get("next") or url_for("dashboard"))
 
     return render_template("login.html")
@@ -166,6 +230,104 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for("login"))
+
+
+@app.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    if request.method == "POST":
+        check_csrf()
+        email = request.form.get("email", "").strip().lower()
+        user = db.get_user_by_email(email)
+
+        if user is not None and email_is_configured():
+            token = secrets.token_urlsafe(32)
+            expires_at = (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()
+            db.create_password_reset(user["id"], token, expires_at)
+            reset_url = f"{email_base_url()}{url_for('reset_password', token=token)}"
+            send_reset_email(email, reset_url)
+        elif user is not None and not email_is_configured():
+            flash(tr("reset_email_not_configured"))
+            return render_template("forgot_password.html")
+
+        # Same message whether or not the account exists - otherwise this
+        # page could be used to check which emails have accounts.
+        flash(tr("reset_sent"))
+        return redirect(url_for("login"))
+
+    return render_template("forgot_password.html")
+
+
+@app.route("/reset-password/<token>", methods=["GET", "POST"])
+def reset_password(token):
+    now_iso_value = datetime.now(timezone.utc).isoformat()
+    reset_row = db.get_valid_password_reset(token, now_iso_value)
+
+    if reset_row is None:
+        flash(tr("reset_invalid"))
+        return redirect(url_for("forgot_password"))
+
+    if request.method == "POST":
+        check_csrf()
+        password = request.form.get("password", "")
+        if len(password) < 8:
+            flash("Password needs to be at least 8 characters.")
+            return render_template("reset_password.html", token=token)
+
+        db.update_user_password(reset_row["user_id"], generate_password_hash(password))
+        db.mark_password_reset_used(reset_row["id"])
+        flash(tr("reset_success"))
+        return redirect(url_for("login"))
+
+    return render_template("reset_password.html", token=token)
+
+
+@app.route("/account", methods=["GET", "POST"])
+@login_required
+def account():
+    user = current_user()
+
+    if request.method == "POST":
+        check_csrf()
+        action = request.form.get("action")
+
+        if action == "update_profile":
+            name = request.form.get("name", "").strip()
+            email = request.form.get("email", "").strip().lower()
+            if not name or not email:
+                flash("Name and email can't be empty.")
+            else:
+                existing = db.get_user_by_email(email)
+                if existing and existing["id"] != user["id"]:
+                    flash("Another account already uses that email.")
+                else:
+                    db.update_user_name(user["id"], name)
+                    db.update_user_email(user["id"], email)
+                    flash("Profile updated.")
+
+        elif action == "change_password":
+            current_password = request.form.get("current_password", "")
+            new_password = request.form.get("new_password", "")
+            if not check_password_hash(user["password_hash"], current_password):
+                flash("Current password is incorrect.")
+            elif len(new_password) < 8:
+                flash("New password needs to be at least 8 characters.")
+            else:
+                db.update_user_password(user["id"], generate_password_hash(new_password))
+                flash("Password updated.")
+
+        return redirect(url_for("account"))
+
+    return render_template("account.html")
+
+
+@app.route("/terms")
+def terms():
+    return render_template("terms.html")
+
+
+@app.route("/privacy")
+def privacy():
+    return render_template("privacy.html")
 
 
 # ---------------- app routes ----------------
@@ -178,8 +340,12 @@ def index():
 @app.route("/dashboard")
 @login_required
 def dashboard():
-    meetings = db.list_meetings_with_stats_for_user(session["user_id"])
-    return render_template("dashboard.html", meetings=meetings)
+    query = request.args.get("q", "").strip()
+    if query:
+        meetings = db.search_meetings_for_user(session["user_id"], query)
+    else:
+        meetings = db.list_meetings_with_stats_for_user(session["user_id"])
+    return render_template("dashboard.html", meetings=meetings, query=query)
 
 
 def _create_meeting_with_ai(user_id, title, meeting_date, attendees, transcript, language):
@@ -228,6 +394,43 @@ def meeting_detail(meeting_id):
     return render_template("meeting_detail.html", meeting=meeting, action_items=action_items)
 
 
+@app.route("/meetings/<int:meeting_id>/export.pdf")
+@login_required
+def export_meeting_pdf(meeting_id):
+    meeting = db.get_meeting_for_user(meeting_id, session["user_id"])
+    if meeting is None:
+        abort(404)
+    action_items = db.list_action_items_for_meeting(meeting_id)
+    pdf_bytes = build_meeting_pdf(meeting, action_items)
+    return Response(
+        pdf_bytes,
+        mimetype="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{meeting["title"]}.pdf"'},
+    )
+
+
+@app.route("/meetings/<int:meeting_id>/export.docx")
+@login_required
+def export_meeting_docx(meeting_id):
+    meeting = db.get_meeting_for_user(meeting_id, session["user_id"])
+    if meeting is None:
+        abort(404)
+    action_items = db.list_action_items_for_meeting(meeting_id)
+    docx_bytes = build_meeting_docx(meeting, action_items)
+    return Response(
+        docx_bytes,
+        mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        headers={"Content-Disposition": f'attachment; filename="{meeting["title"]}.docx"'},
+    )
+
+
+@app.route("/my-tasks")
+@login_required
+def my_tasks():
+    items = db.list_open_action_items_for_user(session["user_id"])
+    return render_template("my_tasks.html", items=items)
+
+
 @app.route("/meetings/<int:meeting_id>/action-items/<int:action_item_id>/toggle", methods=["POST"])
 @login_required
 def toggle_action_item(meeting_id, action_item_id):
@@ -236,13 +439,113 @@ def toggle_action_item(meeting_id, action_item_id):
     if meeting is None:
         abort(404)
     db.toggle_action_item(action_item_id, meeting_id)
+    if request.form.get("redirect_to") == "my_tasks":
+        return redirect(url_for("my_tasks"))
     return redirect(url_for("meeting_detail", meeting_id=meeting_id))
+
+
+@app.route("/meetings/<int:meeting_id>/action-items/<int:action_item_id>/delete", methods=["POST"])
+@login_required
+def delete_action_item_route(meeting_id, action_item_id):
+    check_csrf()
+    meeting = db.get_meeting_for_user(meeting_id, session["user_id"])
+    if meeting is None:
+        abort(404)
+    db.delete_action_item(action_item_id, meeting_id)
+    return redirect(url_for("meeting_detail", meeting_id=meeting_id))
+
+
+@app.route("/meetings/<int:meeting_id>/action-items/new", methods=["POST"])
+@login_required
+def add_action_item_route(meeting_id):
+    check_csrf()
+    meeting = db.get_meeting_for_user(meeting_id, session["user_id"])
+    if meeting is None:
+        abort(404)
+    description = request.form.get("description", "").strip()
+    owner = request.form.get("owner", "").strip() or "unassigned"
+    if description:
+        db.add_action_item(meeting_id, description, owner)
+    return redirect(url_for("meeting_detail", meeting_id=meeting_id))
+
+
+@app.route("/meetings/<int:meeting_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_meeting(meeting_id):
+    meeting = db.get_meeting_for_user(meeting_id, session["user_id"])
+    if meeting is None:
+        abort(404)
+
+    if request.method == "POST":
+        check_csrf()
+        title = request.form.get("title", "").strip()
+        meeting_date = request.form.get("meeting_date", "").strip()
+        attendees = request.form.get("attendees", "").strip()
+        transcript = request.form.get("transcript", "").strip()
+        summary = request.form.get("summary", "").strip()
+
+        if not title or not meeting_date:
+            flash("A title and date are required.")
+            return render_template("edit_meeting.html", meeting=meeting)
+
+        if request.form.get("regenerate_summary"):
+            summary, _ = summarize_transcript(transcript, title, current_language())
+
+        db.update_meeting(meeting_id, session["user_id"], title, meeting_date, attendees, transcript, summary)
+        return redirect(url_for("meeting_detail", meeting_id=meeting_id))
+
+    return render_template("edit_meeting.html", meeting=meeting)
+
+
+@app.route("/meetings/<int:meeting_id>/delete", methods=["POST"])
+@login_required
+def delete_meeting_route(meeting_id):
+    check_csrf()
+    meeting = db.get_meeting_for_user(meeting_id, session["user_id"])
+    if meeting is None:
+        abort(404)
+    db.delete_meeting(meeting_id, session["user_id"])
+    return redirect(url_for("dashboard"))
 
 
 # ---------------- prep ----------------
 
 def _split_names(text):
     return {name.strip().lower() for name in text.split(",") if name.strip()}
+
+
+def _scheduled_utc_datetime(scheduled_row):
+    """scheduled_at is stored as the naive local date/time exactly as the
+    person typed it (e.g. '2026-08-04T14:00'), plus a separate timezone
+    offset captured from their browser at scheduling time. This combines
+    the two into a real UTC-aware datetime for comparisons and calendar
+    export - naive string comparison alone can't account for timezone."""
+    naive = datetime.strptime(scheduled_row["scheduled_at"][:16], "%Y-%m-%dT%H:%M")
+    offset_minutes = scheduled_row["timezone_offset_minutes"] or 0
+    return (naive + timedelta(minutes=offset_minutes)).replace(tzinfo=timezone.utc)
+
+
+def _add_months(naive_dt, months):
+    """timedelta doesn't support months (they're not a fixed length), so
+    this does simple calendar-aware month arithmetic - clamping the day
+    if the target month is shorter (e.g. Jan 31 + 1 month -> Feb 28)."""
+    month_index = naive_dt.month - 1 + months
+    year = naive_dt.year + month_index // 12
+    month = month_index % 12 + 1
+    day = min(naive_dt.day, [31, 29 if year % 4 == 0 and (year % 100 != 0 or year % 400 == 0) else 28,
+                             31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1])
+    return naive_dt.replace(year=year, month=month, day=day)
+
+
+def _next_occurrence(scheduled_at_str, repeat, n):
+    """Returns the naive local datetime string for the nth future
+    occurrence (n=1 is the first repeat after the original)."""
+    naive = datetime.strptime(scheduled_at_str[:16], "%Y-%m-%dT%H:%M")
+    if repeat == "weekly":
+        result = naive + timedelta(weeks=n)
+    else:  # monthly
+        result = _add_months(naive, n)
+    return result.strftime("%Y-%m-%dT%H:%M")
 
 
 @app.route("/prep", methods=["GET", "POST"])
@@ -275,13 +578,123 @@ def prep():
     return render_template("prep.html", context=context, entered_attendees=entered_attendees)
 
 
+# ---------------- pricing & redemption codes ----------------
+
+PRICING_TIERS = [
+    {"key": "plan_base", "price": 49},
+    {"key": "plan_5", "price": 169},
+    {"key": "plan_10", "price": 279},
+]
+
+
+@app.route("/pricing")
+def pricing():
+    return render_template("pricing.html", tiers=PRICING_TIERS)
+
+
+@app.route("/redeem", methods=["POST"])
+def redeem():
+    check_csrf()
+    code = request.form.get("code", "").strip()
+
+    if "user_id" not in session:
+        session["pending_code"] = code
+        flash(tr("redeem_login_required"))
+        return redirect(url_for("login", next=url_for("pricing")))
+
+    code_row = db.get_redeemable_code(code)
+    if code_row is None:
+        flash(tr("redeem_invalid"))
+    else:
+        db.redeem_code_for_user(code_row["id"], session["user_id"])
+        flash(tr("redeem_success"))
+
+    return redirect(url_for("pricing"))
+
+
+@app.route("/admin/codes", methods=["GET", "POST"])
+def admin_codes():
+    if not ADMIN_SECRET:
+        abort(404)
+
+    if session.get("is_admin") is not True:
+        if request.method == "POST" and request.form.get("admin_secret"):
+            check_csrf()
+            if request.form.get("admin_secret") == ADMIN_SECRET:
+                session["is_admin"] = True
+                return redirect(url_for("admin_codes"))
+            flash("Incorrect secret.")
+        return render_template("admin_unlock.html")
+
+    if request.method == "POST":
+        check_csrf()
+        new_code = request.form.get("new_code", "").strip() or secrets.token_hex(4).upper()
+        description = request.form.get("description", "").strip()
+        max_uses = request.form.get("max_uses", "1").strip()
+        try:
+            max_uses_int = max(1, int(max_uses))
+        except ValueError:
+            max_uses_int = 1
+        db.create_redemption_code(new_code, description, max_uses_int)
+        return redirect(url_for("admin_codes"))
+
+    codes = db.list_redemption_codes()
+    return render_template("admin_codes.html", codes=codes)
+
+
 # ---------------- scheduled meetings, documents, and reminders ----------------
+
+def _ensure_calendar_token(user):
+    if user["calendar_token"]:
+        return user["calendar_token"]
+    token = secrets.token_urlsafe(24)
+    db.set_calendar_token(user["id"], token)
+    return token
+
 
 @app.route("/upcoming")
 @login_required
 def upcoming():
     scheduled = db.list_upcoming_scheduled_meetings_for_user(session["user_id"])
-    return render_template("upcoming.html", scheduled=scheduled)
+    token = _ensure_calendar_token(current_user())
+    calendar_url = url_for("calendar_feed", token=token, _external=True)
+    return render_template("upcoming.html", scheduled=scheduled, calendar_url=calendar_url)
+
+
+def _ics_escape(text):
+    return (text or "").replace("\\", "\\\\").replace(",", "\\,").replace(";", "\\;").replace("\n", "\\n")
+
+
+@app.route("/calendar/<token>.ics")
+def calendar_feed(token):
+    user = db.get_user_by_calendar_token(token)
+    if user is None:
+        abort(404)
+
+    meetings = db.list_upcoming_scheduled_meetings_for_user(user["id"])
+    lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Meeting Ledger//EN", "CALSCALE:GREGORIAN"]
+
+    for m in meetings:
+        try:
+            start = _scheduled_utc_datetime(m)
+        except ValueError:
+            continue
+        end = start + timedelta(hours=1)  # meetings don't currently record a duration, so this is a placeholder
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        description = f"Attendees: {m['attendees']}" if m["attendees"] else ""
+        lines += [
+            "BEGIN:VEVENT",
+            f"UID:meeting-ledger-{m['id']}@meeting-ledger",
+            f"DTSTAMP:{stamp}",
+            f"DTSTART:{start.strftime('%Y%m%dT%H%M%SZ')}",
+            f"DTEND:{end.strftime('%Y%m%dT%H%M%SZ')}",
+            f"SUMMARY:{_ics_escape(m['title'])}",
+            f"DESCRIPTION:{_ics_escape(description)}",
+            "END:VEVENT",
+        ]
+
+    lines.append("END:VCALENDAR")
+    return Response("\r\n".join(lines), mimetype="text/calendar")
 
 
 @app.route("/scheduled/new", methods=["GET", "POST"])
@@ -292,13 +705,24 @@ def schedule_meeting():
         title = request.form.get("title", "").strip()
         scheduled_at = request.form.get("scheduled_at", "").strip()
         attendees = request.form.get("attendees", "").strip()
+        repeat = request.form.get("repeat", "none")
+        try:
+            tz_offset = int(request.form.get("timezone_offset_minutes", "0"))
+        except ValueError:
+            tz_offset = 0
+        try:
+            repeat_count = max(1, min(52, int(request.form.get("repeat_count", "1"))))
+        except ValueError:
+            repeat_count = 1
 
         if not title or not scheduled_at:
             flash("A title and a date & time are required.")
             return render_template("schedule_meeting.html", prefill_title=title, prefill_attendees=attendees)
 
-        scheduled_id = db.create_scheduled_meeting(session["user_id"], title, scheduled_at, attendees)
-
+        # Read every uploaded file into memory once, so the same set can
+        # be attached to every occurrence of a repeating meeting without
+        # re-reading the upload stream (which only works once).
+        documents = []
         for file in request.files.getlist("documents"):
             if not file or not file.filename:
                 continue
@@ -306,12 +730,21 @@ def schedule_meeting():
             if len(content) > MAX_DOCUMENT_BYTES:
                 flash(f"Skipped {file.filename} - files must be under 5 MB.")
                 continue
-            db.add_scheduled_document(
-                scheduled_id,
-                secure_filename(file.filename),
-                file.content_type,
-                base64.b64encode(content).decode("ascii"),
+            documents.append((secure_filename(file.filename), file.content_type, base64.b64encode(content).decode("ascii")))
+
+        recurrence_group = secrets.token_hex(8) if repeat != "none" and repeat_count > 1 else None
+        occurrence_count = repeat_count if repeat != "none" else 1
+
+        first_id = None
+        for n in range(occurrence_count):
+            occurrence_at = scheduled_at if n == 0 else _next_occurrence(scheduled_at, repeat, n)
+            scheduled_id = db.create_scheduled_meeting(
+                session["user_id"], title, occurrence_at, attendees, tz_offset, recurrence_group
             )
+            if first_id is None:
+                first_id = scheduled_id
+            for filename, content_type, content_b64 in documents:
+                db.add_scheduled_document(scheduled_id, filename, content_type, content_b64)
 
         return redirect(url_for("upcoming"))
 
@@ -367,6 +800,14 @@ def download_document(document_id):
     )
 
 
+def _apply_notification_response(notification_id, scheduled_id, answer):
+    db.mark_notification_answered(notification_id)
+    if scheduled_id and answer == "yes":
+        db.set_scheduled_meeting_status(scheduled_id, "confirmed")
+    elif scheduled_id:
+        db.set_scheduled_meeting_status(scheduled_id, "cancelled")
+
+
 @app.route("/notifications/<int:notification_id>/respond", methods=["POST"])
 @login_required
 def respond_notification(notification_id):
@@ -376,35 +817,77 @@ def respond_notification(notification_id):
         abort(404)
 
     answer = request.form.get("answer")
-    db.mark_notification_answered(notification_id)
+    scheduled_id = notification["scheduled_meeting_id"]
+    _apply_notification_response(notification_id, scheduled_id, answer)
+
+    if scheduled_id and answer == "yes":
+        return redirect(url_for("scheduled_ready", scheduled_id=scheduled_id))
+    return redirect(request.referrer or url_for("dashboard"))
+
+
+@app.route("/n/<token>/<answer>")
+def respond_notification_by_token(token, answer):
+    """The one-click link from a reminder email - works without being
+    logged in, since the token itself proves it's a legitimate response
+    to that specific reminder. Shows a simple standalone confirmation
+    rather than the full app, since the person may not be signed in on
+    this device."""
+    notification = db.get_pending_notification_by_token(token)
+    if notification is None or answer not in ("yes", "no"):
+        abort(404)
 
     scheduled_id = notification["scheduled_meeting_id"]
-    if scheduled_id and answer == "yes":
-        db.set_scheduled_meeting_status(scheduled_id, "confirmed")
-        return redirect(url_for("scheduled_ready", scheduled_id=scheduled_id))
-    elif scheduled_id:
-        db.set_scheduled_meeting_status(scheduled_id, "cancelled")
+    _apply_notification_response(notification["id"], scheduled_id, answer)
 
-    return redirect(request.referrer or url_for("dashboard"))
+    user = db.get_user_by_id(notification["user_id"])
+    lang = user["language"]
+    ready_url = url_for("scheduled_ready", scheduled_id=scheduled_id) if answer == "yes" and scheduled_id else None
+    return render_template(
+        "notification_response.html",
+        heading=t("notif_response_yes_heading" if answer == "yes" else "notif_response_no_heading", lang),
+        body=t("notif_response_yes_body" if answer == "yes" else "notif_response_no_body", lang),
+        ready_url=ready_url,
+        ready_label=t("btn_view_documents", lang),
+        rtl=is_rtl(lang),
+    )
 
 
 def _run_reminder_check():
     """Finds every scheduled meeting (across all accounts) starting within
     the reminder window and creates the "is this still happening?"
-    notification for it. Safe to call repeatedly - reminder_sent stops it
-    from firing twice for the same meeting."""
+    notification for it - both in-app and, if email is configured, by
+    email with one-click links (since an in-app banner is useless if
+    nobody has the app open when it fires). Safe to call repeatedly -
+    reminder_sent stops it from firing twice for the same meeting."""
     now = datetime.now(timezone.utc)
-    now_iso_value = now.isoformat()
-    window_end = (now + timedelta(minutes=REMINDER_WINDOW_MINUTES)).isoformat()
+    window_end = now + timedelta(minutes=REMINDER_WINDOW_MINUTES)
 
-    due = db.find_due_reminders(window_end, now_iso_value)
-    for meeting in due:
-        message = t("notif_question", db.get_user_by_id(meeting["user_id"])["language"]).format(
-            title=meeting["title"]
-        )
-        db.create_notification(meeting["user_id"], meeting["id"], message)
-        db.mark_reminder_sent(meeting["id"])
-    return len(due)
+    created = 0
+    for meeting in db.find_scheduled_reminder_candidates():
+        try:
+            meeting_time = _scheduled_utc_datetime(meeting)
+        except ValueError:
+            continue  # malformed/legacy row - skip rather than crash the whole check
+        if now <= meeting_time <= window_end:
+            user = db.get_user_by_id(meeting["user_id"])
+            language = user["language"]
+            message = t("notif_question", language).format(title=meeting["title"])
+            token = secrets.token_urlsafe(24)
+            db.create_notification(meeting["user_id"], meeting["id"], message, token)
+            db.mark_reminder_sent(meeting["id"])
+            created += 1
+
+            if email_is_configured():
+                yes_url = f"{email_base_url()}{url_for('respond_notification_by_token', token=token, answer='yes')}"
+                no_url = f"{email_base_url()}{url_for('respond_notification_by_token', token=token, answer='no')}"
+                subject = t("email_reminder_subject", language).format(title=meeting["title"])
+                body = (
+                    f"{message}\n\n"
+                    f"{t('email_reminder_yes_text', language)}: {yes_url}\n\n"
+                    f"{t('email_reminder_no_text', language)}: {no_url}"
+                )
+                send_reminder_email(user["email"], subject, body)
+    return created
 
 
 @app.route("/tasks/check-reminders", methods=["POST"])

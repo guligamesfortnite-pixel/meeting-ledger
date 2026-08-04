@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}{{ t('my_tasks_title') }} - Meeting Ledger{% endblock %}
+{% block content %}
+  <div class="page-head">
+    <div>
+      <h1>{{ t('my_tasks_title') }}</h1>
+      <p class="page-sub">{{ t('my_tasks_sub') }}</p>
+    </div>
+  </div>
+
+  {% if items %}
+    <div class="card">
+      {% for a in items %}
+        <div class="action-item">
+          <form method="post" action="{{ url_for('toggle_action_item', meeting_id=a['meeting_id'], action_item_id=a['id']) }}" style="display: contents;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="redirect_to" value="my_tasks">
+            <button type="submit" aria-label="Toggle done">
+              <span class="checkbox"></span>
+            </button>
+          </form>
+          <span class="desc" style="flex: 1;">
+            {{ a['description'] }}
+            <a href="{{ url_for('meeting_detail', meeting_id=a['meeting_id']) }}" class="mono" style="margin-inline-start: 8px; font-size: 0.78rem;">{{ a['meeting_title'] }}</a>
+          </span>
+          {% if a['owner'] %}<span class="owner">{{ a['owner'] }}</span>{% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <p>{{ t('my_tasks_empty') }}</p>
+    </div>
+  {% endif %}
+{% endblock %}

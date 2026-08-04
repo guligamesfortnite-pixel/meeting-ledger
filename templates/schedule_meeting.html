@@ -12,6 +12,8 @@
   <div class="card" style="padding: 28px 30px;">
     <form method="post" enctype="multipart/form-data">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" id="timezone_offset_minutes" name="timezone_offset_minutes" value="0">
+      <script>document.getElementById('timezone_offset_minutes').value = new Date().getTimezoneOffset();</script>
       <label for="title">{{ t('label_title') }}</label>
       <input type="text" id="title" name="title" required autofocus placeholder="{{ t('placeholder_title') }}" value="{{ prefill_title }}">
 
@@ -20,6 +22,18 @@
 
       <label for="attendees">{{ t('label_attendees') }}</label>
       <input type="text" id="attendees" name="attendees" placeholder="{{ t('placeholder_attendees') }}" value="{{ prefill_attendees }}">
+
+      <label for="repeat">{{ t('label_repeat') }}</label>
+      <select id="repeat" name="repeat" onchange="document.getElementById('repeat_count_wrap').style.display = this.value === 'none' ? 'none' : 'block';">
+        <option value="none">{{ t('repeat_none') }}</option>
+        <option value="weekly">{{ t('repeat_weekly') }}</option>
+        <option value="monthly">{{ t('repeat_monthly') }}</option>
+      </select>
+
+      <div id="repeat_count_wrap" style="display: none;">
+        <label for="repeat_count">{{ t('label_repeat_count') }}</label>
+        <input type="number" id="repeat_count" name="repeat_count" value="8" min="1" max="52">
+      </div>
 
       <label for="documents">{{ t('label_upload_documents') }}</label>
       <div class="file-input-wrap">

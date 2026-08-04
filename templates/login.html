@@ -12,6 +12,7 @@
       <input type="password" id="password" name="password" required>
       <button type="submit">{{ t('btn_login') }}</button>
     </form>
+    <p class="form-foot"><a href="{{ url_for('forgot_password') }}">{{ t('forgot_password_link') }}</a></p>
     <p class="form-foot">{{ t('no_account_yet') }} <a href="{{ url_for('register') }}">{{ t('register_link') }}</a></p>
   </div>
 {% endblock %}
