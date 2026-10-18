@@ -1,0 +1,3667 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta id="metaDesc" name="description" content="A playable fan companion to The Resistance: Avalon — deals every role in secret, narrates the night aloud, and runs the votes, quests and assassination.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Knights of Avalon</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="Knights of Avalon">
+<meta property="og:description" content="A playable table for The Resistance: Avalon. It deals every role in secret, reads the night aloud, and runs the votes, quests and the assassination.">
+<meta property="og:image" content="og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Knights of Avalon">
+<meta name="twitter:description" content="Deals the roles. Speaks the night. Runs the game.">
+<meta name="twitter:image" content="og.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230A0D15'/%3E%3Cpath d='M16 4 L19 20 L16 29 L13 20 Z' fill='none' stroke='%23C79A3B' stroke-width='1.6'/%3E%3Cpath d='M9 19 H23' stroke='%23C79A3B' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>html,body{margin:0;padding:0}img{max-width:100%}</style>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@400;500&display=swap">
+
+<style>
+/* ── A single committed visual world: a hall at night, lit by candles.
+      Every colour is painted explicitly so the page holds on any host ground. ── */
+:root{
+  --ink:#0A0D15;
+  --ink-2:#0D1220;
+  --stone:#151B2A;
+  --stone-2:#1C2436;
+  --edge:#2A3348;
+  --vellum:#E9E0C8;
+  --vellum-dim:#B9B29D;
+  --mist:#818BA3;
+  --gilt:#C79A3B;
+  --gilt-hi:#EBC978;
+  --arthur:#4E86C4;
+  --arthur-dim:#2E4E73;
+  --mordred:#B0302F;
+  --mordred-dim:#6C2022;
+  --flame:#FFB454;
+
+  --f-display:"Cinzel Decorative", "Cinzel", Georgia, serif;
+  --f-head:"Cinzel", Georgia, "Times New Roman", serif;
+  --f-body:"Spectral", Georgia, serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --wrap:1140px;
+  --rule:1px solid var(--edge);
+}
+/* Hebrew: the Latin faces above have no Hebrew glyphs, so swap in faces that do. */
+html[lang="he"]{
+  --f-display:"Frank Ruhl Libre", "Cinzel Decorative", Georgia, serif;
+  --f-head:"Frank Ruhl Libre", "Cinzel", Georgia, serif;
+  --f-body:"Frank Ruhl Libre", "Spectral", Georgia, serif;
+  --f-mono:"IBM Plex Mono", "Heebo", ui-monospace, "SF Mono", Menlo, monospace;
+}
+html[lang="he"] body{font-size:18px}
+/* letter-spacing pulls Hebrew letters apart; keep it only for the Latin room code */
+html[lang="he"] :where(*){letter-spacing:normal}
+html[lang="he"] .codebox span, html[lang="he"] #joinCode{letter-spacing:.22em}
+html[lang="he"] .hero h1{line-height:1.08}
+
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+body{
+  margin:0;
+  background:var(--ink);
+  color:var(--vellum);
+  font-family:var(--f-body);
+  font-size:17px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+#motes{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.55}
+.page{position:relative;z-index:1}
+
+h1,h2,h3,h4{font-family:var(--f-head);font-weight:600;text-wrap:balance;margin:0;line-height:1.18}
+p{margin:0}
+a{color:var(--gilt-hi)}
+
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 24px}
+.eyebrow{
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--mist);margin:0;
+}
+.sec{padding:84px 0;position:relative}
+.sec-head{display:flex;flex-direction:column;gap:10px;max-width:62ch;margin-bottom:38px}
+.sec-head h2{font-size:clamp(28px,3.6vw,42px);color:var(--vellum)}
+.sec-head p{color:var(--vellum-dim);font-size:17px}
+
+/* language switch (landing page) */
+.langbar{
+  position:fixed;top:14px;inset-inline-end:14px;z-index:55;display:flex;
+  border:1px solid var(--edge);border-radius:2px;overflow:hidden;background:rgba(10,13,21,.88);
+  backdrop-filter:blur(6px);
+}
+.langbar button{
+  font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;background:transparent;color:var(--vellum-dim);
+  border:0;padding:9px 13px;cursor:pointer;transition:all .2s ease;
+}
+.langbar button + button{border-inline-start:1px solid var(--edge)}
+.langbar button:hover{color:var(--vellum)}
+.langbar button:focus-visible{outline:2px solid var(--gilt-hi);outline-offset:-2px}
+.langbar button[aria-pressed="true"]{background:var(--gilt);color:#141008;font-weight:500}
+
+/* ── register A: the legend. warm, gilt, night ── */
+/* ── register B: the table. cold slate, mono, exact ── */
+.slate{background:linear-gradient(180deg,var(--ink-2),#0F1522 60%,var(--ink-2));border-top:var(--rule);border-bottom:var(--rule)}
+
+/* ═══ HERO ═══ */
+.hero{padding:64px 0 72px;position:relative;overflow:hidden}
+.hero::after{
+  content:"";position:absolute;left:50%;top:-180px;width:900px;height:640px;transform:translateX(-50%);
+  background:radial-gradient(ellipse at center, rgba(199,154,59,.16), rgba(199,154,59,0) 68%);
+  pointer-events:none;
+}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,460px);gap:56px;align-items:center;position:relative}
+.crest{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.crest svg{width:26px;height:26px;display:block}
+.crest span{font-family:var(--f-mono);font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--gilt)}
+.hero h1{
+  font-family:var(--f-display);
+  font-size:clamp(46px,8.2vw,96px);
+  line-height:.94;letter-spacing:.01em;
+  color:var(--vellum);
+  text-shadow:0 0 46px rgba(199,154,59,.28);
+}
+.hero h1 .ln{display:block;overflow:hidden}
+.hero h1 .ln > i{display:block;font-style:normal;animation:rise .9s cubic-bezier(.2,.7,.25,1) both}
+.hero h1 .ln:nth-child(2) > i{animation-delay:.12s}
+.hero h1 em{font-style:normal;color:var(--gilt-hi)}
+@keyframes rise{from{transform:translateY(102%)}to{transform:translateY(0)}}
+.lede{margin-top:22px;font-size:19px;line-height:1.62;color:var(--vellum-dim);max-width:52ch}
+.lede b{color:var(--vellum);font-weight:400}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.chip{
+  font-family:var(--f-mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--vellum-dim);border:1px solid var(--edge);border-radius:2px;padding:6px 11px;background:rgba(21,27,42,.7);
+}
+.chip b{color:var(--gilt);font-weight:500}
+
+/* round table */
+.table-stage{position:relative}
+.table-stage svg{width:100%;height:auto;display:block;overflow:visible}
+.tbl-rim{fill:none;stroke:var(--gilt);stroke-width:1.2;opacity:.55}
+.tbl-top{fill:url(#wood)}
+.tbl-inner{fill:none;stroke:var(--gilt);stroke-width:.6;opacity:.32}
+.seat-body{fill:#222B3E;stroke:#39445C;stroke-width:1}
+.seat text{font-family:var(--f-mono);font-size:9px;fill:var(--mist);text-anchor:middle;letter-spacing:.08em}
+.seat{transition:transform .45s cubic-bezier(.2,.8,.3,1),opacity .45s ease}
+.leader-mark{transition:transform .8s cubic-bezier(.5,.05,.2,1)}
+.flame{transform-origin:center bottom;animation:flicker 2.6s ease-in-out infinite}
+.flame:nth-of-type(2n){animation-duration:3.3s;animation-delay:-.7s}
+.flame:nth-of-type(3n){animation-duration:2.1s;animation-delay:-1.4s}
+@keyframes flicker{0%,100%{transform:scaleY(1) scaleX(1);opacity:.95}
+  30%{transform:scaleY(1.16) scaleX(.92);opacity:1}
+  55%{transform:scaleY(.9) scaleX(1.06);opacity:.82}
+  75%{transform:scaleY(1.08) scaleX(.96);opacity:.97}}
+.table-caption{
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--mist);text-align:center;margin-top:14px;
+}
+.table-caption b{color:var(--gilt)}
+
+/* ═══ COURT / CHARACTERS ═══ */
+.court-split{display:grid;grid-template-columns:1fr;gap:44px}
+.faction{display:flex;flex-direction:column;gap:20px}
+.faction-bar{display:flex;align-items:baseline;gap:14px;padding-bottom:12px;border-bottom:1px solid var(--edge)}
+.faction-bar h3{font-size:22px;letter-spacing:.04em}
+.faction-bar .n{font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mist)}
+.good-bar h3{color:var(--arthur)}
+.evil-bar h3{color:var(--mordred)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:18px}
+
+.card{perspective:1100px;background:none;border:0;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:start}
+.card:focus-visible{outline:2px solid var(--gilt-hi);outline-offset:5px;border-radius:3px}
+.card-in{
+  position:relative;transform-style:preserve-3d;
+  transition:transform .62s cubic-bezier(.3,.8,.3,1);
+  aspect-ratio:3/4.25;
+}
+.card[aria-pressed="true"] .card-in{transform:rotateY(180deg)}
+.face{
+  position:absolute;inset:0;backface-visibility:hidden;
+  border:1px solid var(--edge);border-radius:3px;
+  background:linear-gradient(180deg,var(--stone-2),var(--stone) 62%,#101623);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  box-shadow:0 14px 30px rgba(0,0,0,.45);
+  transition:border-color .3s ease, box-shadow .3s ease, transform .3s ease;
+}
+.card:hover .face, .card:focus-visible .face{transform:translateY(-4px)}
+.card.good:hover .face{border-color:var(--arthur-dim);box-shadow:0 20px 38px rgba(0,0,0,.55),0 0 0 1px rgba(78,134,196,.25)}
+.card.evil:hover .face{border-color:var(--mordred-dim);box-shadow:0 20px 38px rgba(0,0,0,.55),0 0 0 1px rgba(176,48,47,.25)}
+.face-back{transform:rotateY(180deg);padding:18px 16px;justify-content:space-between}
+.portrait{flex:1;position:relative;display:block;width:100%}
+.portrait svg{width:100%;height:100%;display:block}
+.card-foot{padding:12px 14px 14px;border-top:1px solid var(--edge);background:rgba(10,13,21,.55)}
+.card-foot h4{font-size:16.5px;letter-spacing:.03em}
+.card-foot .role{font-family:var(--f-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mist);margin-top:4px}
+.card.good .card-foot .role b{color:var(--arthur);font-weight:500}
+.card.evil .card-foot .role b{color:var(--mordred);font-weight:500}
+.face-back h4{font-size:16px;color:var(--gilt-hi);margin-bottom:8px}
+.face-back p{font-size:14.5px;line-height:1.55;color:var(--vellum-dim)}
+.face-back .note{font-size:12.5px;color:var(--mist);font-style:italic;margin-top:10px;border-top:1px solid var(--edge);padding-top:9px}
+.flip-hint{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mist);margin-top:12px}
+.card[aria-pressed="true"] .flip-hint::before{content:"↩ "}
+
+/* ═══ THE TABLE (data register) ═══ */
+.count-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:30px}
+.count-row .lbl{font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mist);margin-inline-end:6px}
+.pbtn{
+  font-family:var(--f-mono);font-size:15px;width:46px;height:44px;
+  background:var(--stone);color:var(--vellum-dim);border:1px solid var(--edge);border-radius:2px;
+  cursor:pointer;transition:all .2s ease;
+}
+.pbtn:hover{border-color:var(--gilt);color:var(--vellum)}
+.pbtn:focus-visible{outline:2px solid var(--gilt-hi);outline-offset:3px}
+.pbtn[aria-pressed="true"]{background:var(--gilt);border-color:var(--gilt-hi);color:#141008;font-weight:500}
+
+.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px;align-items:stretch}
+.loyalty{border:1px solid var(--edge);border-radius:3px;padding:20px 22px;background:var(--stone);display:flex;flex-direction:column;gap:14px}
+.loyalty .top{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.loyalty h3{font-size:19px}
+.loyalty .num{font-family:var(--f-mono);font-size:38px;line-height:1;font-variant-numeric:tabular-nums}
+.g-side h3,.g-side .num{color:var(--arthur)}
+.e-side h3,.e-side .num{color:var(--mordred)}
+.pips{display:flex;flex-wrap:wrap;gap:7px}
+.pip{width:14px;height:18px;border-radius:2px 2px 5px 5px;transition:transform .3s ease, opacity .3s ease}
+.g-side .pip{background:linear-gradient(180deg,var(--arthur),var(--arthur-dim))}
+.e-side .pip{background:linear-gradient(180deg,var(--mordred),var(--mordred-dim))}
+.loyalty p{font-size:14px;color:var(--mist)}
+
+/* quest track */
+.track-shell{margin-top:30px;border:1px solid var(--edge);border-radius:3px;background:var(--stone);overflow:hidden}
+.track-hd{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--edge);background:rgba(10,13,21,.4)}
+.track-hd .t{font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mist)}
+.track-scroll{overflow-x:auto}
+.track{display:flex;gap:0;min-width:560px;padding:26px 20px 22px}
+.q{flex:1;display:flex;flex-direction:column;align-items:center;gap:12px;position:relative;background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:6px 4px;border-radius:3px}
+.q:focus-visible{outline:2px solid var(--gilt-hi);outline-offset:2px}
+.q + .q::before{content:"";position:absolute;inset-inline-start:-50%;top:38px;width:100%;height:1px;background:var(--edge)}
+.q-node{
+  position:relative;width:74px;height:74px;border-radius:50%;
+  border:1.5px solid var(--edge);background:radial-gradient(circle at 38% 32%, #232C41, #131A28);
+  display:grid;place-items:center;
+  font-family:var(--f-mono);font-size:26px;color:var(--vellum);font-variant-numeric:tabular-nums;
+  transition:border-color .3s ease, box-shadow .3s ease, transform .3s ease;
+  z-index:1;
+}
+.q:hover .q-node{transform:translateY(-3px);border-color:var(--gilt)}
+.q-lab{font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--mist);text-align:center}
+.q-two{color:var(--gilt);display:block;margin-top:3px}
+.q.pass .q-node{border-color:var(--arthur);box-shadow:0 0 0 4px rgba(78,134,196,.13),0 0 26px rgba(78,134,196,.3);color:var(--arthur);animation:stamp .42s cubic-bezier(.2,1.5,.4,1)}
+.q.fail .q-node{border-color:var(--mordred);box-shadow:0 0 0 4px rgba(176,48,47,.14),0 0 26px rgba(176,48,47,.32);color:var(--mordred);animation:stamp .42s cubic-bezier(.2,1.5,.4,1)}
+@keyframes stamp{0%{transform:scale(1.28) rotate(-5deg)}100%{transform:scale(1) rotate(0)}}
+.track-foot{padding:12px 20px 16px;border-top:1px solid var(--edge);font-size:14px;color:var(--mist)}
+.track-foot b{color:var(--vellum-dim);font-weight:400}
+
+/* ═══ ROUND FLOW ═══ */
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:20px}
+.step{border-inline-start:2px solid var(--gilt);padding:4px 0 4px 0;padding-inline-start:20px;display:flex;flex-direction:column;gap:9px}
+.step .no{font-family:var(--f-mono);font-size:11px;letter-spacing:.2em;color:var(--gilt)}
+.step h3{font-size:20px}
+.step p{font-size:15.5px;color:var(--vellum-dim)}
+.step .warn{font-size:13.5px;color:var(--mordred);font-family:var(--f-mono);letter-spacing:.02em}
+
+.vote-demo{margin-top:34px;border:1px solid var(--edge);border-radius:3px;background:var(--stone);padding:22px}
+.vote-hd{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-bottom:20px}
+.vote-hd .t{font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mist)}
+.btn{
+  font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  background:transparent;color:var(--gilt-hi);border:1px solid var(--gilt);border-radius:2px;
+  padding:10px 18px;cursor:pointer;transition:all .22s ease;
+}
+.btn:hover{background:var(--gilt);color:#141008}
+.btn:focus-visible{outline:2px solid var(--gilt-hi);outline-offset:3px}
+.tokens{display:flex;flex-wrap:wrap;gap:14px}
+.tok{perspective:600px;width:66px}
+.tok-in{position:relative;width:66px;height:66px;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.3,.8,.3,1)}
+.tok.rev .tok-in{transform:rotateY(180deg)}
+.tok-f,.tok-b{
+  position:absolute;inset:0;border-radius:50%;backface-visibility:hidden;
+  display:grid;place-items:center;
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  border:1px solid var(--edge);
+}
+.tok-f{background:radial-gradient(circle at 36% 30%,#2A3349,#151B2A);color:var(--mist)}
+.tok-b{transform:rotateY(180deg)}
+.tok.yes .tok-b{background:radial-gradient(circle at 36% 30%,#5E97D3,#2A4A6E);color:#EAF3FC;border-color:var(--arthur)}
+.tok.no .tok-b{background:radial-gradient(circle at 36% 30%,#C24240,#66201F);color:#FDECEB;border-color:var(--mordred)}
+.tok .who{display:block;text-align:center;font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;color:var(--mist);margin-top:8px}
+.tally{margin-top:20px;font-family:var(--f-mono);font-size:14px;letter-spacing:.08em;color:var(--mist);min-height:1.5em}
+.tally b{color:var(--vellum)}
+.tally .ok{color:var(--arthur)}
+.tally .nope{color:var(--mordred)}
+
+/* ═══ NIGHT SCRIPT ═══ */
+.script-grid{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:34px;align-items:start}
+.toggles{display:flex;flex-direction:column;gap:10px;border:1px solid var(--edge);border-radius:3px;padding:18px;background:var(--stone)}
+.toggles > .t{font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mist);margin-bottom:4px}
+.tg{
+  display:flex;align-items:center;gap:12px;width:100%;text-align:start;
+  background:transparent;border:1px solid var(--edge);border-radius:2px;padding:11px 13px;cursor:pointer;
+  color:var(--vellum-dim);font-family:var(--f-body);font-size:15px;transition:all .2s ease;
+}
+.tg:hover{border-color:var(--mist);color:var(--vellum)}
+.tg:focus-visible{outline:2px solid var(--gilt-hi);outline-offset:2px}
+.tg .box{width:14px;height:14px;border:1px solid var(--mist);border-radius:1px;flex:0 0 auto;position:relative;transition:all .2s ease}
+.tg[aria-pressed="true"]{color:var(--vellum);border-color:var(--gilt)}
+.tg[aria-pressed="true"] .box{background:var(--gilt);border-color:var(--gilt)}
+.tg[aria-pressed="true"] .box::after{content:"";position:absolute;left:4px;top:.5px;width:4px;height:8px;border:solid #141008;border-width:0 2px 2px 0;transform:rotate(42deg)}
+.tg small{margin-inline-start:auto;font-family:var(--f-mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase}
+.tg.g small{color:var(--arthur)}
+.tg.e small{color:var(--mordred)}
+
+.script{border:1px solid var(--edge);border-radius:3px;background:linear-gradient(180deg,#12182600,#0D121F);overflow:hidden}
+.script-hd{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--edge)}
+.script-hd .t{font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mist)}
+ol.lines{list-style:none;margin:0;padding:8px 0;counter-reset:l}
+ol.lines li{
+  counter-increment:l;display:flex;gap:16px;padding:11px 22px;
+  font-size:16.5px;line-height:1.5;color:var(--vellum-dim);
+  transition:background .3s ease,color .3s ease;
+}
+ol.lines li::before{
+  content:counter(l,decimal-leading-zero);
+  font-family:var(--f-mono);font-size:11px;color:var(--edge);padding-top:6px;flex:0 0 auto;
+}
+ol.lines li.ins-line{color:var(--vellum)}
+ol.lines li .ins{font-style:normal;color:var(--mordred);}
+ol.lines li .ins.p{color:var(--gilt-hi)}
+ol.lines li.now{background:rgba(199,154,59,.09);color:var(--vellum);box-shadow:inset 3px 0 0 var(--gilt)}
+html[dir="rtl"] ol.lines li.now{box-shadow:inset -3px 0 0 var(--gilt)}
+ol.lines li.done{opacity:.42}
+
+/* ═══ ENDGAME ═══ */
+.ends{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1px;background:var(--edge);border:1px solid var(--edge);border-radius:3px;overflow:hidden}
+.end{background:var(--stone);padding:24px 22px;display:flex;flex-direction:column;gap:10px}
+.end .who{font-family:var(--f-mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase}
+.end.g .who{color:var(--arthur)}
+.end.e .who{color:var(--mordred)}
+.end h3{font-size:19px}
+.end p{font-size:15px;color:var(--vellum-dim)}
+
+.assassin{
+  margin-top:30px;border:1px solid var(--mordred-dim);border-radius:3px;
+  background:linear-gradient(120deg,rgba(176,48,47,.09),rgba(21,27,42,.9) 55%);
+  padding:28px 26px;display:grid;grid-template-columns:64px minmax(0,1fr);gap:22px;align-items:start;
+}
+.assassin svg{width:64px;height:64px;display:block}
+.assassin h3{font-size:22px;color:var(--vellum);margin-bottom:10px}
+.assassin p{color:var(--vellum-dim);font-size:16px;max-width:62ch}
+
+/* ═══ VARIANTS ═══ */
+.vars{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:26px}
+.var{display:flex;flex-direction:column;gap:12px}
+.var h3{font-size:19px;color:var(--gilt-hi)}
+.var p{font-size:15.5px;color:var(--vellum-dim)}
+.var ul{margin:0;padding-inline-start:18px;font-size:15px;color:var(--vellum-dim);display:flex;flex-direction:column;gap:7px}
+.var li::marker{color:var(--gilt)}
+
+footer{border-top:1px solid var(--edge);padding:38px 0 54px;background:var(--ink-2)}
+footer p{font-size:13.5px;color:var(--mist);max-width:70ch}
+footer p + p{margin-top:10px}
+
+/* online play */
+.codebox{
+  border:1px solid var(--gilt);border-radius:4px;padding:20px;text-align:center;
+  background:radial-gradient(ellipse at 50% 0%, rgba(199,154,59,.16), rgba(13,18,32,.85) 68%);
+}
+.codebox span{
+  font-family:var(--f-mono);font-size:clamp(38px,11vw,62px);letter-spacing:.22em;
+  color:var(--gilt-hi);display:block;text-indent:.22em;direction:ltr;
+}
+.lobbylist{display:flex;flex-direction:column;gap:1px;background:var(--edge);border:1px solid var(--edge);border-radius:2px;overflow:hidden}
+.lobbyrow{display:flex;align-items:center;gap:11px;background:var(--ink-2);padding:12px 14px}
+.lobbyrow .ln{font-family:var(--f-head);font-size:16.5px;color:var(--vellum)}
+.lobbyrow.off .ln{color:var(--mist);text-decoration:line-through}
+.lobbyrow .tagl{
+  font-family:var(--f-mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--gilt);border:1px solid var(--edge);border-radius:2px;padding:3px 7px;
+}
+.dotlive{margin-inline-start:auto;width:9px;height:9px;border-radius:50%;background:var(--edge);flex:0 0 auto}
+.dotlive.on{background:var(--arthur);box-shadow:0 0 0 3px rgba(78,134,196,.18)}
+.waitrow{display:flex;flex-wrap:wrap;gap:8px}
+.waitchip{
+  font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;color:var(--vellum-dim);
+  border:1px solid var(--edge);border-radius:2px;padding:7px 11px;background:var(--ink-2);
+}
+
+/* ═══════════════ THE GAME ═══════════════ */
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px;align-items:center}
+.btn-lg{
+  font-family:var(--f-head);font-size:16px;letter-spacing:.06em;
+  background:var(--gilt);color:#141008;border:1px solid var(--gilt-hi);border-radius:2px;
+  padding:15px 30px;cursor:pointer;transition:all .22s ease;font-weight:600;
+}
+.btn-lg:hover{background:var(--gilt-hi);transform:translateY(-2px);box-shadow:0 10px 26px rgba(199,154,59,.24)}
+.btn-lg:focus-visible{outline:2px solid var(--vellum);outline-offset:3px}
+.btn-ghost{
+  font-family:var(--f-head);font-size:15px;letter-spacing:.06em;
+  background:transparent;color:var(--vellum-dim);border:1px solid var(--edge);border-radius:2px;
+  padding:15px 24px;cursor:pointer;transition:all .22s ease;
+}
+.btn-ghost:hover{border-color:var(--mist);color:var(--vellum)}
+.btn-ghost:focus-visible{outline:2px solid var(--gilt-hi);outline-offset:3px}
+
+.play-band{
+  border:1px solid var(--gilt);border-radius:3px;margin-top:34px;
+  background:linear-gradient(115deg,rgba(199,154,59,.10),rgba(21,27,42,.75) 58%);
+  padding:30px 28px;display:flex;flex-wrap:wrap;gap:22px;align-items:center;justify-content:space-between;
+}
+.play-band h3{font-size:22px;margin-bottom:7px}
+.play-band p{color:var(--vellum-dim);font-size:15.5px;max-width:56ch}
+
+/* full-screen game */
+.gv{
+  position:fixed;inset:0;z-index:60;overflow-y:auto;
+  background:radial-gradient(ellipse 900px 620px at 50% -8%, #17203300, #090C14 62%), var(--ink);
+  display:flex;flex-direction:column;
+}
+.g-bar{
+  position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:12px 20px;border-bottom:1px solid var(--edge);background:rgba(9,12,20,.94);
+  backdrop-filter:blur(6px);
+}
+.g-bar .g-t{font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mist)}
+.g-bar .spacer{flex:1}
+.g-icon{
+  background:transparent;border:1px solid var(--edge);color:var(--vellum-dim);border-radius:2px;
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  padding:9px 13px;cursor:pointer;transition:all .2s ease;
+}
+.g-icon:hover{border-color:var(--mist);color:var(--vellum)}
+.g-icon:focus-visible{outline:2px solid var(--gilt-hi);outline-offset:2px}
+.g-icon[aria-pressed="false"]{opacity:.55}
+.mini-track{display:flex;gap:5px}
+.mini{width:22px;height:22px;border-radius:50%;border:1px solid var(--edge);display:grid;place-items:center;
+  font-family:var(--f-mono);font-size:9px;color:var(--mist);font-variant-numeric:tabular-nums}
+.mini.pass{border-color:var(--arthur);color:var(--arthur);background:rgba(78,134,196,.14)}
+.mini.fail{border-color:var(--mordred);color:var(--mordred);background:rgba(176,48,47,.16)}
+.mini.now{border-color:var(--gilt);color:var(--gilt)}
+.rej{display:flex;gap:4px;align-items:center}
+.rej i{width:9px;height:9px;border-radius:50%;background:var(--edge);display:block}
+.rej i.on{background:var(--mordred)}
+
+.g-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:34px 20px 64px}
+.g-inner{width:100%;max-width:660px;display:flex;flex-direction:column;gap:22px}
+.g-inner.wide{max-width:880px}
+.g-eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gilt);text-align:center}
+.g-h{font-family:var(--f-head);font-size:clamp(26px,4.6vw,38px);text-align:center;color:var(--vellum);text-wrap:balance;line-height:1.16}
+.g-sub{text-align:center;color:var(--vellum-dim);font-size:16.5px;max-width:54ch;margin:0 auto;line-height:1.6}
+.g-note{text-align:center;color:var(--mist);font-size:14px;font-style:italic}
+
+.panel{border:1px solid var(--edge);border-radius:3px;background:var(--stone);padding:22px}
+.panel > .ph{font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mist);display:block;margin-bottom:14px}
+
+.namegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.namein{display:flex;align-items:center;gap:10px;border:1px solid var(--edge);border-radius:2px;background:var(--ink-2);padding:0 12px}
+.namein span{font-family:var(--f-mono);font-size:11px;color:var(--mist);flex:0 0 auto}
+.namein input{
+  flex:1;min-width:0;background:transparent;border:0;color:var(--vellum);
+  font-family:var(--f-body);font-size:16px;padding:12px 0;
+}
+.namein input:focus{outline:none}
+.namein:focus-within{border-color:var(--gilt)}
+
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.warnbox{
+  border:1px solid var(--mordred-dim);background:rgba(176,48,47,.10);border-radius:2px;
+  padding:13px 16px;color:#E9A9A7;font-size:14.5px;
+}
+.okbox{border:1px solid var(--edge);background:rgba(78,134,196,.07);border-radius:2px;padding:13px 16px;color:var(--vellum-dim);font-size:14.5px}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.mode{
+  text-align:start;border:1px solid var(--edge);border-radius:3px;background:var(--ink-2);
+  padding:18px;cursor:pointer;color:var(--vellum-dim);font:inherit;transition:all .2s ease;
+  display:flex;flex-direction:column;gap:7px;
+}
+.mode:hover{border-color:var(--mist)}
+.mode:focus-visible{outline:2px solid var(--gilt-hi);outline-offset:2px}
+.mode[aria-pressed="true"]{border-color:var(--gilt);background:rgba(199,154,59,.08);color:var(--vellum)}
+.mode b{font-family:var(--f-head);font-size:17px;color:var(--vellum);font-weight:600}
+.mode span{font-size:14.5px;line-height:1.5}
+.langopts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.langopts .mode{align-items:center;text-align:center;padding:14px}
+
+/* pass-the-device cover */
+.cover{
+  border:1px solid var(--gilt);border-radius:4px;
+  background:radial-gradient(ellipse at 50% 0%, rgba(199,154,59,.14), rgba(13,18,32,.9) 62%);
+  padding:52px 26px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:18px;
+  animation:coverIn .4s ease both;
+}
+@keyframes coverIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.cover .to{font-family:var(--f-display);font-size:clamp(30px,6vw,46px);color:var(--gilt-hi);line-height:1.1;word-break:break-word}
+.cover .sub{color:var(--vellum-dim);font-size:16px;max-width:44ch}
+
+/* private role card */
+.rolecard{
+  border:1px solid var(--edge);border-radius:4px;overflow:hidden;
+  background:linear-gradient(180deg,var(--stone-2),#0F1523);
+  animation:coverIn .4s ease both;
+}
+.rc-top{display:grid;grid-template-columns:132px minmax(0,1fr);gap:20px;padding:22px;align-items:center}
+.rc-top .art{border-radius:3px;overflow:hidden;border:1px solid var(--edge)}
+.rc-top .art svg{display:block;width:100%;height:auto}
+.rc-name{font-family:var(--f-head);font-size:27px;line-height:1.15}
+.rc-side{font-family:var(--f-mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;margin-top:6px}
+.rc-side.g{color:var(--arthur)}
+.rc-side.e{color:var(--mordred)}
+.rc-blurb{color:var(--vellum-dim);font-size:15px;margin-top:11px;line-height:1.55}
+.rc-know{border-top:1px solid var(--edge);padding:20px 22px;background:rgba(10,13,21,.5)}
+.rc-know .kt{font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mist);margin-bottom:12px}
+.knows{display:flex;flex-wrap:wrap;gap:9px}
+.know{
+  font-family:var(--f-head);font-size:17px;padding:9px 15px;border-radius:2px;
+  border:1px solid var(--mordred-dim);background:rgba(176,48,47,.13);color:#F0BEBC;
+}
+.know.g{border-color:var(--arthur-dim);background:rgba(78,134,196,.13);color:#C6DDF5}
+.know.q{border-color:var(--gilt);background:rgba(199,154,59,.12);color:var(--gilt-hi)}
+.rc-know p{color:var(--mist);font-size:14px;margin-top:12px;font-style:italic}
+
+/* seat picker */
+.seatgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.seatbtn{
+  display:flex;align-items:center;gap:11px;text-align:start;font:inherit;color:var(--vellum-dim);
+  border:1px solid var(--edge);border-radius:2px;background:var(--ink-2);padding:14px 15px;cursor:pointer;
+  transition:all .2s ease;
+}
+.seatbtn:hover{border-color:var(--mist);color:var(--vellum)}
+.seatbtn:focus-visible{outline:2px solid var(--gilt-hi);outline-offset:2px}
+.seatbtn .dot{width:11px;height:11px;border-radius:50%;border:1px solid var(--mist);flex:0 0 auto;transition:all .2s ease}
+.seatbtn[aria-pressed="true"]{border-color:var(--gilt);background:rgba(199,154,59,.11);color:var(--vellum)}
+.seatbtn[aria-pressed="true"] .dot{background:var(--gilt);border-color:var(--gilt)}
+.seatbtn .tagl{margin-inline-start:auto;font-family:var(--f-mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gilt)}
+.seatbtn:disabled{opacity:.4;cursor:not-allowed}
+
+/* real cards you lay face down */
+.hand{display:flex;flex-wrap:wrap;gap:20px;justify-content:center}
+.playcard{
+  width:158px;background:none;border:0;padding:0;font:inherit;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:11px;
+  transition:transform .22s cubic-bezier(.2,.8,.3,1);
+}
+.playcard:hover{transform:translateY(-7px)}
+.playcard:focus-visible{outline:none}
+.playcard:focus-visible .pc{outline:2px solid var(--gilt-hi);outline-offset:4px}
+.pc{
+  width:158px;aspect-ratio:5/7;border-radius:5px;position:relative;overflow:hidden;
+  border:1px solid var(--edge);display:grid;place-items:center;
+  box-shadow:0 16px 34px rgba(0,0,0,.5);
+  transition:border-color .22s ease, box-shadow .22s ease;
+}
+.pc::after{content:"";position:absolute;inset:7px;border:1px solid rgba(255,255,255,.12);border-radius:3px;pointer-events:none}
+.pc svg{width:60%;height:auto;display:block}
+.pc-s{background:linear-gradient(168deg,#2B4E75,#152A40 62%,#0E1B29);border-color:var(--arthur-dim)}
+.playcard:hover .pc-s{border-color:var(--arthur);box-shadow:0 22px 42px rgba(0,0,0,.55),0 0 0 1px rgba(78,134,196,.3)}
+.pc-f{background:linear-gradient(168deg,#6B2422,#3A1213 62%,#240B0C);border-color:var(--mordred-dim)}
+.playcard:hover .pc-f{border-color:var(--mordred);box-shadow:0 22px 42px rgba(0,0,0,.55),0 0 0 1px rgba(176,48,47,.32)}
+.pc-back{background:radial-gradient(circle at 42% 34%,#1E2637,#0B1018);border-color:var(--gilt)}
+.pc-back svg{opacity:.7}
+.pc-label{font-family:var(--f-head);font-size:17px;letter-spacing:.06em}
+.playcard.s .pc-label{color:#A9CBEC}
+.playcard.f .pc-label{color:#EDAEAC}
+.playcard.down .pc-label{color:var(--mist)}
+@keyframes refuse{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+.playcard.refuse{animation:refuse .42s ease}
+.refuse-note{text-align:center;color:#E9A9A7;font-size:15px;min-height:1.4em}
+
+/* vote tokens */
+.tokens-choice{display:flex;flex-wrap:wrap;gap:22px;justify-content:center}
+.vtok{
+  background:none;border:0;padding:0;font:inherit;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:12px;transition:transform .22s cubic-bezier(.2,.8,.3,1);
+}
+.vtok:hover{transform:translateY(-6px)}
+.vtok:focus-visible{outline:none}
+.vtok:focus-visible .vt{outline:2px solid var(--gilt-hi);outline-offset:4px}
+.vt{
+  width:136px;height:136px;border-radius:50%;position:relative;display:grid;place-items:center;
+  border:1px solid var(--edge);box-shadow:0 14px 32px rgba(0,0,0,.48);transition:border-color .22s ease, box-shadow .22s ease;
+}
+.vt::after{content:"";position:absolute;inset:10px;border:1px solid rgba(255,255,255,.13);border-radius:50%;pointer-events:none}
+.vt svg{width:50%;height:auto;display:block}
+.vt-y{background:radial-gradient(circle at 36% 30%,#3E6FA8,#16273A);border-color:var(--arthur-dim)}
+.vtok:hover .vt-y{border-color:var(--arthur);box-shadow:0 20px 38px rgba(0,0,0,.55),0 0 0 1px rgba(78,134,196,.3)}
+.vt-n{background:radial-gradient(circle at 36% 30%,#9E3331,#31100F);border-color:var(--mordred-dim)}
+.vtok:hover .vt-n{border-color:var(--mordred);box-shadow:0 20px 38px rgba(0,0,0,.55),0 0 0 1px rgba(176,48,47,.32)}
+.vt-label{font-family:var(--f-head);font-size:17px;letter-spacing:.06em}
+.vtok.y .vt-label{color:#A9CBEC}
+.vtok.n .vt-label{color:#EDAEAC}
+
+/* reveals */
+.reveal-row{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
+.rv{perspective:600px}
+.rv-in{position:relative;width:88px;height:118px;transform-style:preserve-3d;transition:transform .62s cubic-bezier(.3,.8,.3,1)}
+.rv.on .rv-in{transform:rotateY(180deg)}
+.rv-f,.rv-b{position:absolute;inset:0;border-radius:3px;backface-visibility:hidden;display:grid;place-items:center;
+  border:1px solid var(--edge);font-family:var(--f-head);font-size:14px;text-align:center;padding:8px}
+.rv-f{background:radial-gradient(circle at 38% 28%,#232C41,#131A28);color:var(--mist)}
+.rv-b{transform:rotateY(180deg)}
+.rv.s .rv-b{background:linear-gradient(180deg,#2C4E72,#16283C);border-color:var(--arthur);color:#D6E8FA}
+.rv.f .rv-b{background:linear-gradient(180deg,#6E2322,#3A1211);border-color:var(--mordred);color:#F6D3D1}
+.rv.yes .rv-b{background:linear-gradient(180deg,#2C4E72,#16283C);border-color:var(--arthur);color:#D6E8FA}
+.rv.no .rv-b{background:linear-gradient(180deg,#6E2322,#3A1211);border-color:var(--mordred);color:#F6D3D1}
+.rv .cap{display:block;text-align:center;font-family:var(--f-mono);font-size:10px;color:var(--mist);margin-top:8px;max-width:88px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.verdict{text-align:center;font-family:var(--f-head);font-size:clamp(24px,4.4vw,34px);line-height:1.2}
+.verdict.good{color:var(--arthur)}
+.verdict.evil{color:var(--mordred)}
+
+/* night narration */
+.night{
+  border:1px solid var(--edge);border-radius:4px;background:#080B12;padding:38px 26px;min-height:230px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;text-align:center;
+}
+.night .ln{font-family:var(--f-head);font-size:clamp(21px,3.6vw,30px);line-height:1.35;color:var(--vellum);max-width:24ch;text-wrap:balance}
+.night .ln .ins{font-style:normal;color:var(--mordred)}
+.night .ln .ins.p{color:var(--gilt-hi)}
+.night .prog{font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;color:var(--mist)}
+
+/* final reveal */
+.final{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.fin{border:1px solid var(--edge);border-radius:3px;overflow:hidden;background:var(--stone)}
+.fin .art svg{display:block;width:100%;height:auto}
+.fin .lab{padding:10px 12px;border-top:1px solid var(--edge)}
+.fin .lab b{display:block;font-family:var(--f-head);font-size:15px}
+.fin .lab span{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mist)}
+.fin.g{border-color:var(--arthur-dim)}
+.fin.e{border-color:var(--mordred-dim)}
+.fin.g .lab span{color:var(--arthur)}
+.fin.e .lab span{color:var(--mordred)}
+
+.g-actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.hint{text-align:center;color:var(--mist);font-size:13.5px;font-family:var(--f-mono);letter-spacing:.05em}
+
+@media (max-width:560px){
+  .rc-top{grid-template-columns:1fr;text-align:center;justify-items:center}
+  .rc-top .art{max-width:150px}
+  .g-body{padding:26px 14px 56px}
+}
+
+@media (max-width:900px){
+  .hero-grid{grid-template-columns:1fr;gap:40px}
+  .script-grid{grid-template-columns:1fr}
+  .sec{padding:64px 0}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+  .js-rv{opacity:1;transform:none}
+}
+/* quest suspense + flash */
+.qsus{min-height:62vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:22px;cursor:pointer;user-select:none}
+.qsus .orb{width:120px;height:120px;border-radius:50%;
+  background:radial-gradient(circle at 50% 45%,var(--gilt-hi) 0,rgba(199,154,59,.55) 28%,rgba(199,154,59,0) 68%);
+  animation:qorb 2.4s ease-in forwards}
+.qsus .qt{font-family:var(--f-display,inherit);letter-spacing:.18em;text-transform:uppercase;color:var(--vellum);font-size:15px;opacity:.85;animation:qpulse 1.1s ease-in-out infinite}
+.qsus .qs{color:var(--mist,#8d93a6);font-size:13px;opacity:.7}
+@keyframes qorb{0%{transform:scale(.35);opacity:.2;filter:blur(6px)}70%{transform:scale(1.15);opacity:1;filter:blur(0)}100%{transform:scale(2.4);opacity:1;filter:blur(1px)}}
+@keyframes qpulse{0%,100%{opacity:.35}50%{opacity:1}}
+.qflash{position:fixed;inset:0;z-index:9999;pointer-events:none;background:#fff6dc;opacity:0;animation:qflash .75s ease-out forwards}
+@keyframes qflash{0%{opacity:0}12%{opacity:.95}100%{opacity:0}}
+.gv.qshake{animation:qshake .45s ease-out}
+@keyframes qshake{0%,100%{transform:none}20%{transform:translate(-6px,3px)}40%{transform:translate(5px,-4px)}60%{transform:translate(-3px,2px)}80%{transform:translate(2px,-1px)}}
+@media (prefers-reduced-motion:reduce){.qsus .orb,.qsus .qt,.qflash,.gv.qshake{animation:none}.qflash{display:none}}
+</style>
+
+<canvas id="motes" aria-hidden="true"></canvas>
+
+<div class="langbar" id="langbar" role="group" aria-label="Language / שפה">
+  <button type="button" data-lang="en" aria-pressed="true">EN</button>
+  <button type="button" data-lang="he" aria-pressed="false">עב</button>
+</div>
+
+<div class="page">
+
+<!-- ═══════════ HERO ═══════════ -->
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="crest">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.6 3.5 4.4v7.1c0 5 3.6 8.9 8.5 10.9 4.9-2 8.5-5.9 8.5-10.9V4.4Z" fill="none" stroke="#C79A3B" stroke-width="1.2"/><path d="M12 6.2v10M8.6 9.6h6.8" stroke="#C79A3B" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <span data-i="s.crest">An unofficial companion to The Resistance: Avalon</span>
+      </div>
+      <h1>
+        <span class="ln"><i data-i="h.l1">Knights of</i></span>
+        <span class="ln"><i><em data-i="h.l2">Avalon</em></i></span>
+      </h1>
+      <p class="lede" data-i="s.lede">Arthur's court is infiltrated. <b>Merlin sees every traitor but must never be seen.</b> Five quests decide Britain — and the whole game is played with your eyes open, lying to your friends' faces.</p>
+      <div class="hero-meta">
+        <span class="chip" data-i="chip.players"><b>5–10</b> players</span>
+        <span class="chip" data-i="chip.minutes"><b>30–60</b> minutes</span>
+        <span class="chip" data-i="chip.quests"><b>3</b> quests to win</span>
+        <span class="chip" data-i="chip.blade"><b>1</b> blade held back</span>
+      </div>
+      <div class="cta-row">
+        <button class="btn-lg" id="startBtn" data-i="btn.start">Start a game</button>
+        <button class="btn-ghost" id="netBtn" data-i="btn.net">A phone each</button>
+        <button class="btn-ghost" id="resumeBtn" data-i="btn.resume" hidden>Resume game</button>
+      </div>
+      <p class="hint" style="text-align:start;margin-top:14px" data-i="s.hint">One phone passed round, or a phone each · deals the roles · reads the night aloud</p>
+    </div>
+
+    <div class="table-stage">
+      <svg viewBox="0 0 440 440" role="img" data-ia="aria-label:table.aria" aria-label="A round table with seats for the current player count, one marked as Leader.">
+        <defs>
+          <radialGradient id="wood" cx="42%" cy="34%">
+            <stop offset="0%" stop-color="#23293A"/>
+            <stop offset="60%" stop-color="#161C2B"/>
+            <stop offset="100%" stop-color="#0C1120"/>
+          </radialGradient>
+          <radialGradient id="glow" cx="50%" cy="50%">
+            <stop offset="0%" stop-color="#FFB454" stop-opacity=".38"/>
+            <stop offset="100%" stop-color="#FFB454" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <circle cx="220" cy="220" r="200" fill="url(#glow)"/>
+        <circle class="tbl-top" cx="220" cy="220" r="118"/>
+        <circle class="tbl-rim" cx="220" cy="220" r="118"/>
+        <circle class="tbl-inner" cx="220" cy="220" r="100"/>
+        <circle class="tbl-inner" cx="220" cy="220" r="58"/>
+        <g id="candles"></g>
+        <g id="seats"></g>
+        <g id="leader" class="leader-mark">
+          <path d="M-11 5 L-11 -4 L-6 1 L0 -7 L6 1 L11 -4 L11 5 Z" fill="#C79A3B"/>
+          <rect x="-11" y="6.5" width="22" height="3" fill="#EBC978"/>
+        </g>
+      </svg>
+      <p class="table-caption"><span data-i="table.cap">Leader passes clockwise</span> · <b id="seatCount">7 seats</b></p>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════ THE COURT ═══════════ -->
+<section class="sec" id="court">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow" data-i="court.eye">The Court</p>
+      <h2 data-i="court.h">Fourteen cards. Two loyalties. One of them is lying to you right now.</h2>
+      <p data-i="court.p">Merlin and the Assassin are in every game. The other four powers are optional — add one at a time until the table knows how they play. Turn any card to read its power.</p>
+    </div>
+    <div class="court-split">
+      <div class="faction">
+        <div class="faction-bar good-bar"><h3 data-i="court.good.h">Loyal Servants of Arthur</h3><span class="n" data-i="court.good.n">Arthur's sigil · blue field</span></div>
+        <div class="cards" id="goodCards"></div>
+      </div>
+      <div class="faction">
+        <div class="faction-bar evil-bar"><h3 data-i="court.evil.h">Minions of Mordred</h3><span class="n" data-i="court.evil.n">Mordred's sigil · red field</span></div>
+        <div class="cards" id="evilCards"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ THE TABLE / DATA ═══════════ -->
+<section class="sec slate" id="setup">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow" data-i="setup.eye">Setup · the referee's sheet</p>
+      <h2 data-i="setup.h">Set the table</h2>
+      <p data-i="setup.p">Pick your player count. The loyalty split, the seating circle above, and every quest team size below all follow from it.</p>
+    </div>
+
+    <div class="count-row" role="group" data-ia="aria-label:setup.count.aria" aria-label="Player count">
+      <span class="lbl" data-i="setup.players">Players</span>
+      <button class="pbtn" data-n="5">5</button>
+      <button class="pbtn" data-n="6">6</button>
+      <button class="pbtn" data-n="7">7</button>
+      <button class="pbtn" data-n="8">8</button>
+      <button class="pbtn" data-n="9">9</button>
+      <button class="pbtn" data-n="10">10</button>
+    </div>
+
+    <div class="split">
+      <div class="loyalty g-side">
+        <div class="top"><h3 data-i="loy.good">Good</h3><span class="num" id="goodNum">4</span></div>
+        <div class="pips" id="goodPips"></div>
+        <p data-i="loy.good.p">One of them is Merlin. Good must always play a Success card on a quest.</p>
+      </div>
+      <div class="loyalty e-side">
+        <div class="top"><h3 data-i="loy.evil">Evil</h3><span class="num" id="evilNum">3</span></div>
+        <div class="pips" id="evilPips"></div>
+        <p data-i="loy.evil.p">One of them carries the blade. Evil may play Success or Fail — and often should play Success.</p>
+      </div>
+    </div>
+
+    <div class="track-shell">
+      <div class="track-hd">
+        <span class="t" data-i="track.t1">Quest track · team size</span>
+        <span class="t" data-i="track.t2">Click a quest to mark it</span>
+      </div>
+      <div class="track-scroll">
+        <div class="track" id="track"></div>
+      </div>
+      <p class="track-foot" id="trackFoot" data-i="track.foot"><b>Three successes and Good wins. Three failures and Evil wins.</b></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ THE ROUND ═══════════ -->
+<section class="sec" id="round">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow" data-i="round.eye">One round, three phases</p>
+      <h2 data-i="round.h">How a round actually plays</h2>
+      <p data-i="round.p">Every round repeats the same shape. The order matters, so these are numbered — you cannot vote before a team is proposed, and you cannot quest before a vote passes.</p>
+    </div>
+    <div class="flow">
+      <div class="step">
+        <span class="no" data-i="step1.no">PHASE 01</span>
+        <h3 data-i="step1.h">The Leader proposes</h3>
+        <p data-i="step1.p">The Leader hands out Team tokens — the number is set by the quest track. The Leader may put themselves on the team, but doesn't have to. One token per player.</p>
+      </div>
+      <div class="step">
+        <span class="no" data-i="step2.no">PHASE 02</span>
+        <h3 data-i="step2.h">Everyone votes</h3>
+        <p data-i="step2.p">All players, Leader included, choose Approve or Reject in secret, then reveal together. A majority approves; a tie is a rejection. Reject and leadership passes clockwise.</p>
+        <p class="warn" data-i="step2.warn">5 rejections in one round → Evil wins outright</p>
+      </div>
+      <div class="step">
+        <span class="no" data-i="step3.no">PHASE 03</span>
+        <h3 data-i="step3.h">The team quests</h3>
+        <p data-i="step3.p">Each team member secretly plays one Quest card. The Leader shuffles them before revealing. A single Fail sinks the quest — except the 4th quest with 7+ players, which needs two.</p>
+      </div>
+    </div>
+
+    <div class="play-band">
+      <div>
+        <h3 data-i="band.h">Let this page run it</h3>
+        <p data-i="band.p">One phone passed around the table. It deals every role in secret, narrates the night out loud, collects the votes and the quest cards, and holds the blade until the end.</p>
+      </div>
+      <button class="btn-lg" id="startBtn2" data-i="btn.start">Start a game</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ NIGHT SCRIPT ═══════════ -->
+<section class="sec slate" id="script">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow" data-i="script.eye">The reveal</p>
+      <h2 data-i="script.h">Read this aloud, slowly, in the dark</h2>
+      <p data-i="script.p">The opening script changes with every optional character you add. Switch them on and the wording rewrites itself — read exactly what appears, including the pauses.</p>
+    </div>
+    <div class="script-grid">
+      <div class="toggles">
+        <span class="t" data-i="tog.t">Optional characters</span>
+        <button class="tg g" data-c="percival"><span class="box"></span><span data-i="c.percival.name">Percival</span><small data-i="side.good">Good</small></button>
+        <button class="tg e" data-c="mordred"><span class="box"></span><span data-i="c.mordred.name">Mordred</span><small data-i="side.evil">Evil</small></button>
+        <button class="tg e" data-c="morgana"><span class="box"></span><span data-i="c.morgana.name">Morgana</span><small data-i="side.evil">Evil</small></button>
+        <button class="tg e" data-c="oberon"><span class="box"></span><span data-i="c.oberon.name">Oberon</span><small data-i="side.evil">Evil</small></button>
+        <p style="font-size:13.5px;color:var(--mist);margin-top:6px;line-height:1.5" id="scriptNote">Merlin and the Assassin are always in play.</p>
+      </div>
+      <div class="script">
+        <div class="script-hd">
+          <span class="t" data-i="narr.t">Narration</span>
+          <button class="btn" id="narrateBtn" data-i="narr.btn">Walk the script</button>
+        </div>
+        <ol class="lines" id="lines"></ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ ENDGAME ═══════════ -->
+<section class="sec" id="endgame">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow" data-i="end.eye">Game end</p>
+      <h2 data-i="end.h">Four ways it ends</h2>
+      <p data-i="end.p">The game stops the instant a third quest resolves either way — and then, if Good got there, one more thing happens.</p>
+    </div>
+    <div class="ends">
+      <div class="end g"><span class="who" data-i="end.goodwins">Good wins</span><h3 data-i="e1.h">Three quests succeed</h3><p data-i="e1.p">…and the Assassin then fails to name Merlin.</p></div>
+      <div class="end e"><span class="who" data-i="end.evilwins">Evil wins</span><h3 data-i="e2.h">Three quests fail</h3><p data-i="e2.p">The game ends immediately. No assassination needed.</p></div>
+      <div class="end e"><span class="who" data-i="end.evilwins">Evil wins</span><h3 data-i="e3.h">Five teams rejected</h3><p data-i="e3.p">Five consecutive failed votes in a single round hands the game to Mordred.</p></div>
+      <div class="end e"><span class="who" data-i="end.evilwins">Evil wins</span><h3 data-i="e4.h">Merlin is named</h3><p data-i="e4.p">Three successes on the board, and the blade still finds him.</p></div>
+    </div>
+
+    <div class="assassin">
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <path d="M24 3 L28 20 L24 44 L20 20 Z" fill="none" stroke="#B0302F" stroke-width="1.4"/>
+        <path d="M14 20 H34" stroke="#B0302F" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="24" cy="20" r="2.6" fill="#B0302F"/>
+      </svg>
+      <div>
+        <h3 data-i="assn.h">Evil's last chance</h3>
+        <p data-i="assn.p">If Good completes three quests, play does not stop. Without revealing a single Character card, the Evil players confer openly and the holder of the Assassin card names one Good player as Merlin. Name him and Evil takes the game after all. This is why Merlin spends five rounds steering the table while pretending to guess.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ VARIANTS ═══════════ -->
+<section class="sec slate" id="variants">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow" data-i="var.eye">Optional rules</p>
+      <h2 data-i="var.h">Once the table knows the game</h2>
+    </div>
+    <div class="vars">
+      <div class="var">
+        <h3 data-i="v1.h">Lady of the Lake</h3>
+        <p data-i="v1.p">Open information about someone's loyalty — used three times, and it moves.</p>
+        <ul>
+          <li data-i="v1.l1">At setup, the token goes to the player on the Leader's right.</li>
+          <li data-i="v1.l2">Immediately after the 2nd, 3rd and 4th quests resolve, its holder examines one player.</li>
+          <li data-i="v1.l3">The examined player passes the Loyalty card matching their true side — passing the wrong one loses the game.</li>
+          <li data-i="v1.l4">The token then moves to the player just examined. Nobody can be examined twice, and a former holder can't be targeted.</li>
+          <li data-i="v1.l5">The holder may talk about what they saw, but must not reveal the card. Best at 7+; it favours Good.</li>
+        </ul>
+      </div>
+      <div class="var">
+        <h3 data-i="v2.h">Targeting</h3>
+        <p data-i="v2.p">Quests attempted in any order the Leader likes — planning replaces routine.</p>
+        <ul>
+          <li data-i="v2.l1">In the Team phase the Leader picks both the team and which quest they're attempting.</li>
+          <li data-i="v2.l2">The team size must match the quest chosen; mark it with the Round marker before the vote.</li>
+          <li data-i="v2.l3">A quest attempted once cannot be attempted again.</li>
+          <li data-i="v2.l4">The 5th quest is locked until two other quests have succeeded.</li>
+          <li data-i="v2.l5">At 7+ players the 4th quest still needs two Fails.</li>
+        </ul>
+      </div>
+      <div class="var">
+        <h3 data-i="v3.h">Plot &amp; Loyalty cards</h3>
+        <p data-i="v3.p">For tables mixing in Plot cards from The Resistance.</p>
+        <ul>
+          <li data-i="v3.l1">Whenever a Plot card would reveal your Character card, hand over the matching Loyalty card instead.</li>
+          <li data-i="v3.l2">Merlin's identity stays secret even when his loyalty is exposed.</li>
+          <li data-i="v3.l3">Passing a Loyalty card that doesn't match your Character card loses the game.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p data-i="foot.p1">A fan-made rules companion for <b style="color:var(--vellum-dim);font-weight:400">The Resistance: Avalon</b>, designed by Don Eskridge and published by Indie Boards &amp; Cards. Not affiliated with or endorsed by the publisher.</p>
+    <p data-i="foot.p2">All artwork on this page was drawn for this companion and is not from the published game. Rules text is paraphrased from the rulebook — the printed rulebook is the authority at your table.</p>
+  </div>
+</footer>
+
+</div>
+
+<!-- ═══════════ PLAYABLE GAME ═══════════ -->
+<div class="gv" id="gv" hidden>
+  <div class="g-bar">
+    <span class="g-t" id="barRound">Setup</span>
+    <div class="mini-track" id="barTrack"></div>
+    <span class="g-t" id="barLeader"></span>
+    <span class="spacer"></span>
+    <div class="rej" id="barRej" hidden><span class="g-t" id="barRejLbl">Rejections</span><i></i><i></i><i></i><i></i><i></i></div>
+    <button class="g-icon" id="voiceBtn" aria-pressed="true">Voice on</button>
+    <button class="g-icon" id="quitBtn">Quit</button>
+  </div>
+  <div class="g-body"><div class="g-inner" id="gBody"></div></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  /* ═══════════════════════════════════════════════════
+     LANGUAGE — English / Hebrew for the whole game.
+     Static page text carries data-i keys (English is read from the page itself);
+     every string built by script goes through t(key, vars).
+     ═══════════════════════════════════════════════════ */
+  var I18N = {en:{}, he:{}};
+  var LANG = "en";
+  try{
+    var savedLang = localStorage.getItem("avalon_lang");
+    if(savedLang === "he" || savedLang === "en") LANG = savedLang;
+    else if(/^he/i.test(navigator.language || "")) LANG = "he";
+  }catch(e){}
+  function t(k, v){
+    var s = (I18N[LANG] && I18N[LANG][k] != null) ? I18N[LANG][k] : (I18N.en[k] != null ? I18N.en[k] : k);
+    if(v) s = s.replace(/\{(\w+)\}/g, function(m, n){ return v[n] != null ? v[n] : m; });
+    return s;
+  }
+  // like t(), but escapes the inserted values — for strings that go into innerHTML
+  function th(k, v){
+    var e = {};
+    if(v) for(var n in v) e[n] = esc(v[n]);
+    return t(k, e);
+  }
+
+  I18N.en = {
+    "meta.title":"Knights of Avalon",
+    "meta.desc":"A playable fan companion to The Resistance: Avalon — deals every role in secret, narrates the night aloud, and runs the votes, quests and assassination.",
+    "side.good":"Good","side.evil":"Evil",
+    "seats":"{n} seats",
+    "table.aria":"A round table with seats for the current player count, one marked as Leader.",
+    "player":"Player {n}","host":"Host","you":"You",
+
+    "c.merlin.name":"Merlin","c.merlin.role":"Always in play",
+    "c.merlin.power":"Knows every agent of Evil from the first moment — and must spend the whole game steering the table without ever sounding certain.",
+    "c.merlin.note":"If Evil names him at the end, Evil wins.",
+    "c.percival.name":"Percival","c.percival.role":"Optional",
+    "c.percival.power":"Sees Merlin during the reveal. Used well, he draws the blade onto himself and keeps the real Merlin alive.",
+    "c.percival.note":"With 5 players, add Mordred or Morgana alongside him.",
+    "c.servant.name":"Loyal Servant","c.servant.role":"5 in the box",
+    "c.servant.power":"No power, no knowledge, no excuses. Everything he has, he argues for out loud.",
+    "c.servant.note":"Always plays a Success card on a quest.",
+    "c.assassin.name":"The Assassin","c.assassin.role":"Always in play",
+    "c.assassin.power":"Holds the blade. If Good completes three quests, he names the player he believes is Merlin.",
+    "c.assassin.note":"Name him correctly and Evil takes the game.",
+    "c.mordred.name":"Mordred","c.mordred.role":"Optional",
+    "c.mordred.power":"Hidden from Merlin entirely. Merlin's information has a hole in it and he doesn't know where.",
+    "c.mordred.note":"Makes Evil stronger.",
+    "c.morgana.name":"Morgana","c.morgana.role":"Optional",
+    "c.morgana.power":"Appears to Percival as Merlin. Percival wakes knowing two faces and not which one to protect.",
+    "c.morgana.note":"Makes Evil stronger. Pair her with Percival.",
+    "c.oberon.name":"Oberon","c.oberon.role":"Optional",
+    "c.oberon.power":"Evil, but alone — he never learns his allies and they never learn him. He keeps his eyes shut during the reveal.",
+    "c.oberon.note":"Not a Minion of Mordred. Makes Good stronger.",
+    "c.minion.name":"Minion of Mordred","c.minion.role":"3 in the box",
+    "c.minion.power":"Knows the other agents of Evil and nothing more. His whole job is to sound like a servant of Arthur.",
+    "c.minion.note":"May play Success or Fail on a quest.",
+    "card.back":"Turn back",
+
+    "ord1":"First","ord2":"Second","ord3":"Third","ord4":"Fourth","ord5":"Fifth",
+    "q.lab":"{ord} quest",
+    "q.aria":"{ord} quest, team of {n}. Click to mark success or failure.",
+    "q.two":"two fails needed",
+    "sc.pass":"<b style='color:var(--arthur)'>Three quests succeeded.</b> Good holds the board — now the Assassin gets one guess at Merlin.",
+    "sc.fail":"<b style='color:var(--mordred)'>Three quests failed.</b> Mordred's minions take Britain. The game ends at once.",
+    "sc.prog":"{p} success{ps}, {f} failure{fs} so far.",
+
+    /* night script */
+    "n.close":"Everyone close your eyes and extend your hand into a fist in front of you.",
+    "n.minions":"Minions of Mordred",
+    "n.comma":",",
+    "n.notOberon":", not Oberon,",
+    "n.openLook":" open your eyes and look around so that you know all agents of Evil.",
+    "n.minionsClose":"Minions of Mordred, close your eyes.",
+    "n.allClosed":"All players should have their eyes closed and hands in a fist in front of them.",
+    "n.notMordred":", not Mordred himself,",
+    "n.thumb":" extend your thumb so that Merlin will know of you.",
+    "n.merlinOpen":"Merlin, open your eyes and see the agents of Evil.",
+    "n.thumbsDown":"Minions of Mordred, put your thumbs down and re-form your hand into a fist.",
+    "n.merlinClose":"Merlin, close your eyes.",
+    "n.merlin":"Merlin",
+    "n.merlinMorgana":"Merlin and Morgana",
+    "n.percival":"Percival",
+    "n.pThumb":", extend your thumb so that Percival may know of you.",
+    "n.pOpen":", open your eyes so that you may know {pair}.",
+    "n.pDown":", put your thumbs down and form your hand into a fist.",
+    "n.pClose":", close your eyes.",
+    "n.allOpen":"Everyone, open your eyes.",
+    "sn.base":"Merlin and the Assassin are always in play.",
+    "sn.five":"With 5 players and Percival, add <b style='color:var(--gilt-hi);font-weight:400'>Mordred or Morgana</b> too.",
+    "sn.more":"Add one special character at a time until everyone knows how it plays.",
+    "narr.btn":"Walk the script","narr.stop":"Stop",
+
+    /* game chrome */
+    "bar.setup":"Setup","bar.new":"New game","bar.over":"Game over",
+    "bar.quest":"Quest {n} of 5","bar.leader":"Leader · {name}","bar.rej":"Rejections",
+    "voice.on":"Voice on","voice.off":"Voice off","voice.said":"Voice on.",
+    "quit":"Quit","quit.sure":"Quit — sure?",
+    "tag.leader":"Leader","tag.you":"You","tag.host":"Host",
+
+    /* setup */
+    "g.eye":"Assemble the court","g.h":"Who is at the table?",
+    "g.players":"Players",
+    "g.split.good":"{n} Good","g.split.evil":"{n} Evil",
+    "g.names":"Names — tap to edit","g.nameOf":"Name of player {n}",
+    "g.opt":"Optional characters",
+    "o.percival":"Good — sees Merlin","o.mordred":"Evil — hidden from Merlin","o.morgana":"Evil — looks like Merlin","o.oberon":"Evil — alone, unknown",
+    "g.how":"How the roles get told",
+    "m.app.h":"This page tells you",
+    "m.app.p":"Pass the phone around. Each player sees their own card and exactly what they are allowed to know. Fast, and nobody can peek.",
+    "m.rit.h":"The spoken night",
+    "m.rit.p":"Each player sees only their own card, then the page reads the eyes-closed ritual aloud. The traditional way — no host needed.",
+    "g.house":"House rules",
+    "h.novote":"Skip the voting round","h.novote.s":"agree out loud",
+    "h.novote.p":"The Leader still names the team here. The table just agrees on it out loud instead of passing the phone round for secret votes — faster, though you lose the tell of watching who approved.",
+    "g.deal":"Deal the cards","g.back":"Back to the guide",
+    "g.nospeech":"This browser has no speech voice, so the page will show the words instead of speaking them.",
+    "g.nohe":"This browser has no Hebrew voice, so the page will show the words instead of speaking them.",
+    "g.lang":"Language",
+    "lang.en":"English","lang.he":"עברית",
+    "sp.tooMany":"Too many Evil characters for {n} players — Evil has {ev} seats and the Assassin takes one.",
+    "sp.five":"With 5 players and Percival, the rulebook says to add Mordred or Morgana as well.",
+    "sp.morgana":"Morgana only bites when Percival is in the game — she is the one he mistakes for Merlin.",
+    "sp.pure":"Merlin and the Assassin alone is the pure game. Add one special character at a time.",
+    "sp.dealt":"The cards are dealt. Pass the device to {name}.",
+
+    /* covers + deal */
+    "cv.pass":"Pass the device to",
+    "cv.lookAway":"Everyone else, look away.",
+    "cv.iam":"I am {name}",
+    "cv.of":"{i} of {n}",
+    "rc.evil":"Minion of Mordred — Evil","rc.good":"Loyal to Arthur — Good",
+    "rc.nobody":"Nobody",
+    "rc.memorise":"Memorise your card. The night ritual comes next — keep your eyes closed unless you are called.",
+    "rc.hide":"Hide and pass on",
+    "rc.never":"{i} of {n} · never say this card out loud",
+    "k.merlin.t":"The agents of Evil",
+    "k.merlin.mord":"Mordred is also Evil, and he is hidden from you. One traitor is missing from this list.",
+    "k.merlin.all":"That is all of them.",
+    "k.perc.two":"One of these two is Merlin","k.perc.one":"Merlin",
+    "k.perc.noteTwo":"The other is Morgana, and she is Evil. Guess wrong and you protect a traitor.",
+    "k.perc.noteOne":"Keep him alive.",
+    "k.ob.t":"You work alone",
+    "k.ob.n":"You do not know the other agents of Evil, and they do not know you. Fail quietly.",
+    "k.ev.t1":"Your fellow agents of Evil","k.ev.t0":"No one you can see",
+    "k.ev.ob":"Oberon is Evil too, but he is hidden from you as you are from him.",
+    "k.ev.names":"Never say these names out loud.","k.ev.alone":"You are on your own.",
+    "k.gd.t":"You know nothing",
+    "k.gd.n":"No power, no information. Everything you have, you argue for out loud.",
+
+    /* night */
+    "nt.eye":"The reveal · everyone but the named keeps their eyes shut",
+    "nt.next":"Next line","nt.skip":"Skip the ritual",
+    "nt.hintVoice":"Read aloud automatically — tap Next to hurry it along",
+    "nt.hintText":"Read this line out loud, then tap Next",
+
+    /* propose */
+    "p.eye":"Quest {n} · team building",
+    "p.h":"{name} picks {n} for the quest",
+    "p.subNo":"Talk it through and agree out loud. Anyone may go, including the Leader.",
+    "p.sub":"Talk it through first. Anyone may go, including the Leader — and rejecting a team is not a sign of Evil.",
+    "p.dict":"<b style=\"color:var(--gilt-hi);font-weight:400\">The Dictator</b> — fifth proposal. No vote: whoever the Leader picks goes on the quest.",
+    "p.two":"This quest needs <b style=\"color:var(--gilt-hi);font-weight:400\">two Fail cards</b> to fail.",
+    "p.chosen":"Chosen {c} of {n}",
+    "p.btnDict":"Dictator — send them","p.btnSend":"Send them on the quest","p.btnVote":"Call the vote",
+    "p.hintDict":"Proposal {n} · no vote this time, the team goes",
+    "p.hint":"Proposal {n} · on proposal 5 the Leader becomes Dictator and there is no vote",
+    "p.say":"{name} is the Leader. Choose {n} for quest {q}.",
+
+    /* vote */
+    "v.sub":"The proposed team is <b style=\"color:var(--vellum);font-weight:400\">{team}</b>.",
+    "v.take":"Take my vote tokens","v.of":"Vote {i} of {n}",
+    "v.in":"Your vote is face down","v.cast":"Cast",
+    "v.allAt":"Every vote is turned over at the same moment, once the last player has chosen.",
+    "v.turn":"Turn them all over","v.pass":"Pass on",
+    "v.watch":"{name} — nobody is watching",
+    "v.send":"Send {team}?",
+    "v.approve":"Approve","v.reject":"Reject",
+    "vr.eye":"The vote","vr.front":"Vote",
+    "vr.count":"{y} approve · {n} reject",
+    "vr.ok":"The team rides.","vr.no":"Rejected.","vr.tie":"Rejected — a tie is a rejection.",
+    "vr.sayOk":"The team is approved.","vr.sayFive":"The team is rejected. That is five.",
+    "vr.sayLeft":"The team is rejected. {n} rejections left before Evil wins.",
+    "continue":"Continue",
+
+    /* quest */
+    "q.you":"You are on this quest. Everyone else, look away.",
+    "q.take":"Take my quest cards","q.card":"Card {i} of {n} on the quest",
+    "q.down":"Your card is face down","q.played":"Played",
+    "q.pile":"It goes into the pile with the rest and gets shuffled before anyone sees it. Nobody will know which card was yours.",
+    "q.shuffle":"Shuffle and reveal",
+    "q.playOne":"Play one card","q.success":"Success","q.fail":"Fail",
+    "q.refuse":"A loyal servant of Arthur cannot fail a quest.",
+    "qr.eye":"Quest {n} · shuffled, so no card can be traced back",
+    "qr.front":"Quest",
+    "qr.f0":"No Fail cards.","qr.f1":"1 Fail card.","qr.fN":"{n} Fail cards.",
+    "qr.f1need":"1 Fail card — and this quest needed two.",
+    "qr.ok":"The quest succeeds.","qr.no":"The quest fails.",
+    "qs.shuffled":"The cards are shuffled…","qs.skip":"tap to skip",
+
+    /* assassin + end */
+    "a.eye":"Three quests succeeded · Evil’s last chance",
+    "a.h":"{name} holds the blade",
+    "a.sub":"The Evil players may talk openly now — but no Character card is revealed. Name the player you believe is Merlin.",
+    "a.panel":"Loyal servants of Arthur",
+    "a.strike":"Strike","a.strikeN":"Strike {name}",
+    "a.say":"Three quests have succeeded. {name}, name Merlin.",
+    "e.goodEye":"Arthur holds Britain","e.evilEye":"Mordred takes Britain",
+    "e.good":"Good wins","e.evil":"Evil wins",
+    "e.revealed":"Everyone, revealed",
+    "e.again":"Play again",
+    "e.sayGood":"Good wins. {why}","e.sayEvil":"Evil wins. {why}",
+    "why.five":"Five teams rejected in a single round.",
+    "why.three":"Three quests failed.",
+    "why.hit":"The Assassin named {name} — and he was Merlin.",
+    "why.miss":"The Assassin named {name}, who was not Merlin.",
+
+    /* online */
+    "net.eye":"A phone each","net.h":"Everyone gets their own screen",
+    "net.sub":"One person hosts and reads out a four-letter code. Nobody passes a phone, and nobody can glance at anyone else's card.",
+    "net.yourName":"Your name","net.namePh":"Your name",
+    "net.hostH":"Host a table",
+    "net.hostP":"Your phone runs the game and deals the cards. Keep this page open — if you close it the table closes.",
+    "net.open":"Open a room",
+    "net.joinH":"Join a table","net.code":"Code","net.join":"Join",
+    "net.needName":"Put your name in first.","net.needCode":"A room code is four characters.",
+    "net.frame":"Heads up: previews inside another page usually block the peer-to-peer connection. Open the site at its own address for a phone each — passing one phone works anywhere.",
+    "net.back":"Back","net.cancel":"Cancel","net.leave":"Leave",
+    "net.opening":"Opening the room","net.finding":"Finding the room",
+    "net.moment":"One moment","net.knock":"Knocking at {code}",
+    "net.connecting":"Connecting players to each other directly.",
+    "net.lost":"Disconnected","net.noluck":"No luck",
+    "net.lostH":"Lost the table","net.failH":"Couldn't connect",
+    "net.lostP":"Rejoin with the same code and the same name and you get your seat and your card back.",
+    "net.rejoin":"Rejoin {code}",
+    "net.waiting":"Waiting","net.waitHost":"Waiting for the host",
+    "net.roomCode":"Room code",
+    "net.lobbySub":"Everyone opens this same page, taps <b style=\"color:var(--vellum);font-weight:400\">A phone each</b> and types that code.",
+    "net.at":"At the table · {n}","net.need":" — need 5 to 10",
+    "net.tooMany":"Too many Evil characters for {n} players.",
+    "net.close":"Close the room",
+    "net.waitDeal":"Waiting for {name} to deal.",
+    "net.mine":"Yours alone · nobody else can see this screen",
+    "net.know":"I know who I am","net.reading":"Still reading",
+    "net.done":"Everyone is done.",
+    "net.leader":"Quest {n} · you are the Leader",
+    "net.pick":"Pick {n} for the quest",
+    "net.choosing":"{name} is choosing {n}",
+    "net.talk":"Talk it through out loud. Say who you trust and why — that is the whole game.",
+    "net.myCard":"My card","net.yours":"Yours alone","net.hideIt":"Hide it",
+    "net.voteIn":"Your vote is in","net.face":"Face down","net.stillVoting":"Still voting",
+    "net.noSee":"Nobody can see your screen",
+    "net.waitFor":"Waiting for {name}.",
+    "net.qn":"Quest {n}",
+    "net.onQuest":"{names} are on the quest",
+    "net.notYou":"You are not on this one. Watch faces.",
+    "net.stillPlay":"Still playing a card",
+    "net.cardIn":"Your card is in",
+    "net.shuffled":"The cards get shuffled before anyone sees them.",
+    "net.aHold":"Three quests succeeded · you hold the blade",
+    "net.aName":"Name Merlin",
+    "net.aTalk":"Talk it over with the other agents of Evil out loud. Then choose.",
+    "net.aThree":"Three quests succeeded","net.aChoosing":"The Assassin is choosing",
+    "net.aOther":"{name} holds the blade. If they name Merlin, Evil takes the game after all.",
+    "net.again":"Play again — same table",
+    "net.waitAgain":"Waiting for {name} to deal again.",
+    "kick.full":"That table is full.",
+    "kick.started":"That game has already started — ask the host to deal you in next round.",
+    "ne.peer":"No room with that code. Check the letters and that the host still has the page open.",
+    "ne.network":"Lost contact with the room service. Check the connection and try again.",
+    "ne.incompat":"This browser can't do peer-to-peer play.",
+    "ne.taken":"That room code is taken.",
+    "ne.generic":"Connection problem{t}.",
+    "ne.lib":"Couldn't load the peer-to-peer library. Online play needs a normal internet connection.",
+    "ne.libShort":"Couldn't load the peer-to-peer library.",
+    "ne.noroom":"Couldn't open a room. Try again in a moment.",
+    "ne.nostart":"Couldn't start peer-to-peer here."
+  };
+
+  I18N.he = {
+    "meta.title":"אבירי אבלון",
+    "meta.desc":"מלווה מעריצים שאפשר לשחק בו ל-The Resistance: Avalon — מחלק כל תפקיד בסתר, מקריא את הלילה בקול ומנהל את ההצבעות, המשימות והחיסול.",
+    "side.good":"טובים","side.evil":"רעים",
+    "seats":"{n} מושבים",
+    "table.aria":"שולחן עגול עם מושבים לפי מספר השחקנים הנוכחי, אחד מהם מסומן כמוביל.",
+    "player":"שחקן {n}","host":"מארח","you":"אתם",
+
+    "c.merlin.name":"מרלין","c.merlin.role":"תמיד במשחק",
+    "c.merlin.power":"מכיר כל סוכן של הרשע מהרגע הראשון — וחייב לבלות את כל המשחק בהכוונת השולחן בלי להישמע בטוח אף פעם.",
+    "c.merlin.note":"אם הרעים מזהים אותו בסוף, הרעים מנצחים.",
+    "c.percival.name":"פרסיבל","c.percival.role":"אופציונלי",
+    "c.percival.power":"רואה את מרלין בזמן החשיפה. אם משתמשים בו נכון, הוא מושך את הלהב אל עצמו ושומר על מרלין האמיתי בחיים.",
+    "c.percival.note":"עם 5 שחקנים, הוסיפו לצידו את מורדרד או את מורגנה.",
+    "c.servant.name":"משרת נאמן","c.servant.role":"5 בקופסה",
+    "c.servant.power":"בלי כוח, בלי ידע, בלי תירוצים. כל מה שיש לו, הוא מנמק בקול.",
+    "c.servant.note":"תמיד משחק קלף הצלחה במשימה.",
+    "c.assassin.name":"המתנקש","c.assassin.role":"תמיד במשחק",
+    "c.assassin.power":"מחזיק את הלהב. אם הטובים משלימים שלוש משימות, הוא מצביע על השחקן שלדעתו הוא מרלין.",
+    "c.assassin.note":"אם יזהה נכון, הרעים לוקחים את המשחק.",
+    "c.mordred.name":"מורדרד","c.mordred.role":"אופציונלי",
+    "c.mordred.power":"מוסתר ממרלין לחלוטין. במידע של מרלין יש חור והוא לא יודע איפה.",
+    "c.mordred.note":"מחזק את הרעים.",
+    "c.morgana.name":"מורגנה","c.morgana.role":"אופציונלי",
+    "c.morgana.power":"נראית לפרסיבל כמרלין. פרסיבל מתעורר כשהוא מכיר שני פנים ולא יודע על איזה מהם להגן.",
+    "c.morgana.note":"מחזקת את הרעים. כדאי לשלב אותה עם פרסיבל.",
+    "c.oberon.name":"אוברון","c.oberon.role":"אופציונלי",
+    "c.oberon.power":"רע, אבל לבד — הוא אף פעם לא לומד מי בעלי בריתו והם אף פעם לא לומדים אותו. הוא שומר על עיניים עצומות בזמן החשיפה.",
+    "c.oberon.note":"אינו נאמן מורדרד. מחזק את הטובים.",
+    "c.minion.name":"נאמן מורדרד","c.minion.role":"3 בקופסה",
+    "c.minion.power":"מכיר את שאר סוכני הרשע ותו לא. כל תפקידו הוא להישמע כמו משרת של ארתור.",
+    "c.minion.note":"יכול לשחק הצלחה או כישלון במשימה.",
+    "card.back":"הפוך חזרה",
+
+    "ord1":"ראשונה","ord2":"שנייה","ord3":"שלישית","ord4":"רביעית","ord5":"חמישית",
+    "q.lab":"משימה {ord}",
+    "q.aria":"משימה {ord}, צוות של {n}. לחצו כדי לסמן הצלחה או כישלון.",
+    "q.two":"נדרשים שני כישלונות",
+    "sc.pass":"<b style='color:var(--arthur)'>שלוש משימות הצליחו.</b> הטובים מחזיקים בלוח — עכשיו למתנקש יש ניחוש אחד על מרלין.",
+    "sc.fail":"<b style='color:var(--mordred)'>שלוש משימות נכשלו.</b> נאמני מורדרד לוקחים את בריטניה. המשחק נגמר מיד.",
+    "sc.prog":"עד כה: הצלחות {p} · כישלונות {f}.",
+
+    "n.close":"כולם עוצמים עיניים ומושיטים אגרוף קדימה.",
+    "n.minions":"נאמני מורדרד",
+    "n.comma":",",
+    "n.notOberon":", לא אוברון,",
+    "n.openLook":" פתחו את העיניים והסתכלו סביב כדי שתכירו את כל סוכני הרשע.",
+    "n.minionsClose":"נאמני מורדרד, עצמו עיניים.",
+    "n.allClosed":"כל השחקנים צריכים להיות בעיניים עצומות ועם אגרוף מושט קדימה.",
+    "n.notMordred":", לא מורדרד עצמו,",
+    "n.thumb":" הושיטו את האגודל כדי שמרלין יכיר אתכם.",
+    "n.merlinOpen":"מרלין, פתח את העיניים וראה את סוכני הרשע.",
+    "n.thumbsDown":"נאמני מורדרד, הורידו את האגודלים וחזרו לאגרוף.",
+    "n.merlinClose":"מרלין, עצום עיניים.",
+    "n.merlin":"מרלין",
+    "n.merlinMorgana":"מרלין ומורגנה",
+    "n.percival":"פרסיבל",
+    "n.pThumb":", הושיטו את האגודל כדי שפרסיבל יכיר אתכם.",
+    "n.pOpen":", פתח את העיניים כדי שתכיר את {pair}.",
+    "n.pDown":", הורידו את האגודלים וחזרו לאגרוף.",
+    "n.pClose":", עצום עיניים.",
+    "n.allOpen":"כולם, פתחו עיניים.",
+    "sn.base":"מרלין והמתנקש תמיד במשחק.",
+    "sn.five":"עם 5 שחקנים ופרסיבל, הוסיפו גם <b style='color:var(--gilt-hi);font-weight:400'>את מורדרד או את מורגנה</b>.",
+    "sn.more":"הוסיפו דמות מיוחדת אחת בכל פעם, עד שכולם מכירים איך היא משחקת.",
+    "narr.btn":"עבור על התסריט","narr.stop":"עצור",
+
+    "bar.setup":"הכנה","bar.new":"משחק חדש","bar.over":"המשחק נגמר",
+    "bar.quest":"משימה {n} מתוך 5","bar.leader":"מוביל · {name}","bar.rej":"דחיות",
+    "voice.on":"קול פעיל","voice.off":"קול כבוי","voice.said":"הקול פועל.",
+    "quit":"יציאה","quit.sure":"יציאה — בטוחים?",
+    "tag.leader":"מוביל","tag.you":"אתם","tag.host":"מארח",
+
+    "g.eye":"מרכיבים את החצר","g.h":"מי יושב סביב השולחן?",
+    "g.players":"שחקנים",
+    "g.split.good":"{n} טובים","g.split.evil":"{n} רעים",
+    "g.names":"שמות — הקישו כדי לערוך","g.nameOf":"שם שחקן {n}",
+    "g.opt":"דמויות אופציונליות",
+    "o.percival":"טוב — רואה את מרלין","o.mordred":"רע — מוסתר ממרלין","o.morgana":"רע — נראית כמרלין","o.oberon":"רע — לבד, לא מוכר",
+    "g.how":"איך מספרים את התפקידים",
+    "m.app.h":"הדף מספר לכם",
+    "m.app.p":"מעבירים את הטלפון בין השחקנים. כל שחקן רואה את הקלף שלו ובדיוק מה שמותר לו לדעת. מהיר, ואף אחד לא יכול להציץ.",
+    "m.rit.h":"הלילה המוקרא",
+    "m.rit.p":"כל שחקן רואה רק את הקלף שלו, ואז הדף מקריא בקול את טקס העיניים העצומות. הדרך המסורתית — בלי צורך במנחה.",
+    "g.house":"חוקי בית",
+    "h.novote":"מדלגים על סבב ההצבעה","h.novote.s":"מסכימים בקול",
+    "h.novote.p":"המוביל עדיין קובע את הצוות. השולחן פשוט מסכים על כך בקול במקום להעביר את הטלפון להצבעות סודיות — מהיר יותר, אבל מאבדים את הרמז של לראות מי אישר.",
+    "g.deal":"מחלקים קלפים","g.back":"חזרה למדריך",
+    "g.nospeech":"לדפדפן הזה אין קול דיבור, לכן הדף יציג את המילים במקום להקריא אותן.",
+    "g.nohe":"לדפדפן הזה אין קול בעברית, לכן הדף יציג את המילים במקום להקריא אותן.",
+    "g.lang":"שפה",
+    "lang.en":"English","lang.he":"עברית",
+    "sp.tooMany":"יותר מדי דמויות רעות ל-{n} שחקנים — לרעים יש {ev} מושבים והמתנקש תופס אחד.",
+    "sp.five":"עם 5 שחקנים ופרסיבל, חוברת החוקים אומרת להוסיף גם את מורדרד או את מורגנה.",
+    "sp.morgana":"מורגנה משפיעה רק כשפרסיבל במשחק — היא זו שהוא מבלבל עם מרלין.",
+    "sp.pure":"מרלין והמתנקש לבדם הם המשחק הטהור. הוסיפו דמות מיוחדת אחת בכל פעם.",
+    "sp.dealt":"הקלפים חולקו. העבירו את המכשיר אל {name}.",
+
+    "cv.pass":"העבירו את המכשיר אל",
+    "cv.lookAway":"כל השאר, הסתכלו הצידה.",
+    "cv.iam":"אני {name}",
+    "cv.of":"{i} מתוך {n}",
+    "rc.evil":"נאמן מורדרד — רע","rc.good":"נאמן לארתור — טוב",
+    "rc.nobody":"אף אחד",
+    "rc.memorise":"שננו את הקלף שלכם. אחריו מגיע טקס הלילה — השאירו עיניים עצומות אלא אם קוראים לכם.",
+    "rc.hide":"הסתירו והעבירו הלאה",
+    "rc.never":"{i} מתוך {n} · לעולם אל תגידו את הקלף הזה בקול",
+    "k.merlin.t":"סוכני הרשע",
+    "k.merlin.mord":"מורדרד גם הוא רע, והוא מוסתר ממך. חסר בוגד אחד ברשימה הזאת.",
+    "k.merlin.all":"אלה כולם.",
+    "k.perc.two":"אחד משני אלה הוא מרלין","k.perc.one":"מרלין",
+    "k.perc.noteTwo":"השני הוא מורגנה, והיא רעה. אם תטעו, תגנו על בוגדת.",
+    "k.perc.noteOne":"שמרו עליו בחיים.",
+    "k.ob.t":"אתם עובדים לבד",
+    "k.ob.n":"אתם לא מכירים את שאר סוכני הרשע, והם לא מכירים אתכם. כשלו בשקט.",
+    "k.ev.t1":"שותפיכם לרשע","k.ev.t0":"אף אחד שאתם יכולים לראות",
+    "k.ev.ob":"אוברון גם הוא רע, אבל הוא מוסתר ממכם כשם שאתם מוסתרים ממנו.",
+    "k.ev.names":"לעולם אל תגידו את השמות האלה בקול.","k.ev.alone":"אתם לבד.",
+    "k.gd.t":"אתם לא יודעים כלום",
+    "k.gd.n":"בלי כוח, בלי מידע. כל מה שיש לכם, אתם מנמקים בקול.",
+
+    "nt.eye":"החשיפה · כולם חוץ מהנקראים שומרים על עיניים עצומות",
+    "nt.next":"השורה הבאה","nt.skip":"דלגו על הטקס",
+    "nt.hintVoice":"מוקרא אוטומטית — לחצו הבא כדי להאיץ",
+    "nt.hintText":"הקריאו את השורה בקול ואז לחצו הבא",
+
+    "p.eye":"משימה {n} · בניית צוות",
+    "p.h":"{name} בוחר {n} למשימה",
+    "p.subNo":"דברו על זה והסכימו בקול. כל אחד יכול לצאת, כולל המוביל.",
+    "p.sub":"דברו על זה קודם. כל אחד יכול לצאת, כולל המוביל — ודחיית צוות אינה סימן לרשע.",
+    "p.dict":"<b style=\"color:var(--gilt-hi);font-weight:400\">הדיקטטור</b> — הצעה חמישית. בלי הצבעה: מי שהמוביל בוחר יוצא למשימה.",
+    "p.two":"המשימה הזאת צריכה <b style=\"color:var(--gilt-hi);font-weight:400\">שני קלפי כישלון</b> כדי להיכשל.",
+    "p.chosen":"נבחרו {c} מתוך {n}",
+    "p.btnDict":"דיקטטור — שלחו אותם","p.btnSend":"שלחו אותם למשימה","p.btnVote":"קוראים להצבעה",
+    "p.hintDict":"הצעה {n} · בלי הצבעה הפעם, הצוות יוצא",
+    "p.hint":"הצעה {n} · בהצעה 5 המוביל הופך לדיקטטור ואין הצבעה",
+    "p.say":"{name} הוא המוביל. בחרו {n} למשימה {q}.",
+
+    "v.sub":"הצוות המוצע הוא <b style=\"color:var(--vellum);font-weight:400\">{team}</b>.",
+    "v.take":"אקח את אסימוני ההצבעה","v.of":"הצבעה {i} מתוך {n}",
+    "v.in":"ההצבעה שלכם הפוכה","v.cast":"הוצבעה",
+    "v.allAt":"כל ההצבעות מתהפכות באותו רגע, אחרי שהשחקן האחרון בחר.",
+    "v.turn":"הפכו את כולן","v.pass":"העבירו הלאה",
+    "v.watch":"{name} — אף אחד לא מסתכל",
+    "v.send":"לשלוח את {team}?",
+    "v.approve":"אישור","v.reject":"דחייה",
+    "vr.eye":"ההצבעה","vr.front":"הצבעה",
+    "vr.count":"{y} מאשרים · {n} דוחים",
+    "vr.ok":"הצוות יוצא לדרך.","vr.no":"נדחה.","vr.tie":"נדחה — שוויון הוא דחייה.",
+    "vr.sayOk":"הצוות אושר.","vr.sayFive":"הצוות נדחה. זו הדחייה החמישית.",
+    "vr.sayLeft":"הצוות נדחה. נותרו {n} דחיות לפני שהרעים מנצחים.",
+    "continue":"המשך",
+
+    "q.you":"אתם במשימה הזאת. כל השאר, הסתכלו הצידה.",
+    "q.take":"אקח את קלפי המשימה שלי","q.card":"קלף {i} מתוך {n} במשימה",
+    "q.down":"הקלף שלכם הפוך","q.played":"שוחק",
+    "q.pile":"הוא נכנס לערימה עם השאר ומעורבב לפני שמישהו רואה אותו. אף אחד לא ידע איזה קלף היה שלכם.",
+    "q.shuffle":"ערבבו וחשפו",
+    "q.playOne":"שחקו קלף אחד","q.success":"הצלחה","q.fail":"כישלון",
+    "q.refuse":"משרת נאמן של ארתור לא יכול להכשיל משימה.",
+    "qr.eye":"משימה {n} · מעורבבים, כך שאי אפשר לאתר אף קלף",
+    "qr.front":"משימה",
+    "qr.f0":"אין קלפי כישלון.","qr.f1":"קלף כישלון אחד.","qr.fN":"{n} קלפי כישלון.",
+    "qr.f1need":"קלף כישלון אחד — והמשימה הזאת הצריכה שניים.",
+    "qr.ok":"המשימה הצליחה.","qr.no":"המשימה נכשלה.",
+    "qs.shuffled":"הקלפים מעורבבים…","qs.skip":"הקישו כדי לדלג",
+
+    "a.eye":"שלוש משימות הצליחו · ההזדמנות האחרונה של הרעים",
+    "a.h":"{name} מחזיק את הלהב",
+    "a.sub":"השחקנים הרעים רשאים לדבר בגלוי עכשיו — אבל אף קלף דמות לא נחשף. בחרו את השחקן שלדעתכם הוא מרלין.",
+    "a.panel":"משרתיו הנאמנים של ארתור",
+    "a.strike":"הכו","a.strikeN":"הכו את {name}",
+    "a.say":"שלוש משימות הצליחו. {name}, קבעו מי מרלין.",
+    "e.goodEye":"ארתור שולט בבריטניה","e.evilEye":"מורדרד לוקח את בריטניה",
+    "e.good":"הטובים מנצחים","e.evil":"הרעים מנצחים",
+    "e.revealed":"כולם, בגלוי",
+    "e.again":"משחקים שוב",
+    "e.sayGood":"הטובים מנצחים. {why}","e.sayEvil":"הרעים מנצחים. {why}",
+    "why.five":"חמישה צוותים נדחו בסבב אחד.",
+    "why.three":"שלוש משימות נכשלו.",
+    "why.hit":"המתנקש זיהה את {name} — והוא היה מרלין.",
+    "why.miss":"המתנקש זיהה את {name}, שלא היה מרלין.",
+
+    "net.eye":"טלפון לכל אחד","net.h":"לכל אחד המסך שלו",
+    "net.sub":"אדם אחד מארח ומקריא קוד בן ארבעה תווים. אף אחד לא מעביר טלפון, ואף אחד לא יכול להציץ בקלף של מישהו אחר.",
+    "net.yourName":"השם שלכם","net.namePh":"השם שלכם",
+    "net.hostH":"אירוח שולחן",
+    "net.hostP":"הטלפון שלכם מריץ את המשחק ומחלק את הקלפים. השאירו את הדף פתוח — אם תסגרו אותו השולחן ייסגר.",
+    "net.open":"פתחו חדר",
+    "net.joinH":"הצטרפות לשולחן","net.code":"קוד","net.join":"הצטרפות",
+    "net.needName":"הכניסו קודם את השם שלכם.","net.needCode":"קוד חדר הוא ארבעה תווים.",
+    "net.frame":"שימו לב: תצוגות מקדימות בתוך דף אחר בדרך כלל חוסמות את החיבור הישיר. פתחו את האתר בכתובת שלו כדי לשחק עם טלפון לכל אחד — העברת טלפון אחד עובדת בכל מקום.",
+    "net.back":"חזרה","net.cancel":"ביטול","net.leave":"יציאה",
+    "net.opening":"פותחים את החדר","net.finding":"מחפשים את החדר",
+    "net.moment":"רגע","net.knock":"מנסים להתחבר אל {code}",
+    "net.connecting":"מחברים את השחקנים ישירות זה לזה.",
+    "net.lost":"התנתקתם","net.noluck":"לא הצלחנו",
+    "net.lostH":"איבדנו את השולחן","net.failH":"לא הצלחנו להתחבר",
+    "net.lostP":"הצטרפו שוב עם אותו קוד ואותו שם ותקבלו בחזרה את המושב והקלף.",
+    "net.rejoin":"הצטרפו שוב ל-{code}",
+    "net.waiting":"ממתינים","net.waitHost":"ממתינים למארח",
+    "net.roomCode":"קוד חדר",
+    "net.lobbySub":"כולם פותחים את אותו דף, לוחצים <b style=\"color:var(--vellum);font-weight:400\">טלפון לכל אחד</b> ומקלידים את הקוד.",
+    "net.at":"ליד השולחן · {n}","net.need":" — צריך 5 עד 10",
+    "net.tooMany":"יותר מדי דמויות רעות ל-{n} שחקנים.",
+    "net.close":"סגירת החדר",
+    "net.waitDeal":"ממתינים ש-{name} יחלק.",
+    "net.mine":"רק שלכם · אף אחד אחר לא יכול לראות את המסך הזה",
+    "net.know":"אני יודע מי אני","net.reading":"עדיין קוראים",
+    "net.done":"כולם סיימו.",
+    "net.leader":"משימה {n} · אתם המוביל",
+    "net.pick":"בחרו {n} למשימה",
+    "net.choosing":"{name} בוחר {n}",
+    "net.talk":"דברו על זה בקול. אמרו במי אתם בוטחים ולמה — זה כל המשחק.",
+    "net.myCard":"הקלף שלי","net.yours":"רק שלכם","net.hideIt":"הסתירו",
+    "net.voteIn":"ההצבעה שלכם נקלטה","net.face":"הפוכה","net.stillVoting":"עדיין מצביעים",
+    "net.noSee":"אף אחד לא רואה את המסך שלכם",
+    "net.waitFor":"ממתינים ל-{name}.",
+    "net.qn":"משימה {n}",
+    "net.onQuest":"{names} במשימה",
+    "net.notYou":"אתם לא במשימה הזאת. הסתכלו על הפנים.",
+    "net.stillPlay":"עדיין משחקים קלף",
+    "net.cardIn":"הקלף שלכם בפנים",
+    "net.shuffled":"הקלפים מעורבבים לפני שמישהו רואה אותם.",
+    "net.aHold":"שלוש משימות הצליחו · אתם מחזיקים את הלהב",
+    "net.aName":"זהו את מרלין",
+    "net.aTalk":"שוחחו על זה בקול עם שאר סוכני הרשע. ואז בחרו.",
+    "net.aThree":"שלוש משימות הצליחו","net.aChoosing":"המתנקש בוחר",
+    "net.aOther":"{name} מחזיק את הלהב. אם יזהה את מרלין, הרעים לוקחים את המשחק בכל זאת.",
+    "net.again":"משחקים שוב — אותו שולחן",
+    "net.waitAgain":"ממתינים ש-{name} יחלק שוב.",
+    "kick.full":"השולחן הזה מלא.",
+    "kick.started":"המשחק הזה כבר התחיל — בקשו מהמארח לצרף אתכם בסבב הבא.",
+    "ne.peer":"אין חדר עם הקוד הזה. בדקו את האותיות ושהמארח עדיין מחזיק את הדף פתוח.",
+    "ne.network":"איבדנו קשר עם שירות החדרים. בדקו את החיבור ונסו שוב.",
+    "ne.incompat":"הדפדפן הזה לא יכול לשחק ישירות בין מכשירים.",
+    "ne.taken":"קוד החדר הזה תפוס.",
+    "ne.generic":"בעיית חיבור{t}.",
+    "ne.lib":"לא הצלחנו לטעון את ספריית החיבור הישיר. משחק מקוון צריך חיבור אינטרנט רגיל.",
+    "ne.libShort":"לא הצלחנו לטעון את ספריית החיבור הישיר.",
+    "ne.noroom":"לא הצלחנו לפתוח חדר. נסו שוב עוד רגע.",
+    "ne.nostart":"לא הצלחנו להפעיל חיבור ישיר כאן."
+  };
+
+  /* static page text (keys on the HTML itself) */
+  I18N.he["s.crest"] = "מלווה לא רשמי ל-The Resistance: Avalon";
+  I18N.he["h.l1"] = "אבירי";
+  I18N.he["h.l2"] = "אבלון";
+  I18N.he["s.lede"] = "חצרו של ארתור נחדרה על ידי אויבים. <b>מרלין רואה כל בוגד, אך אסור שיראו אותו.</b> חמש משימות מכריעות את גורל בריטניה, והמשחק כולו מתנהל בעיניים פקוחות, תוך שקר בפנים של החברים.";
+  I18N.he["chip.players"] = "<b>5–10</b> שחקנים";
+  I18N.he["chip.minutes"] = "<b>30–60</b> דקות";
+  I18N.he["chip.quests"] = "<b>3</b> משימות לניצחון";
+  I18N.he["chip.blade"] = "<b>1</b> להב שמור לסוף";
+  I18N.he["btn.start"] = "התחל משחק";
+  I18N.he["btn.net"] = "טלפון לכל אחד";
+  I18N.he["btn.resume"] = "המשך משחק";
+  I18N.he["s.hint"] = "טלפון אחד שעובר מיד ליד, או טלפון לכל אחד · מחלק תפקידים · מקריא את הלילה בקול";
+  I18N.he["table.cap"] = "המוביל עובר עם כיוון השעון";
+  I18N.he["court.eye"] = "החצר";
+  I18N.he["court.h"] = "ארבעה־עשר קלפים. שתי נאמנויות. אחד מהם משקר לך ברגע זה.";
+  I18N.he["court.p"] = "מרלין והמתנקש נמצאים בכל משחק. ארבעת הכוחות האחרים הם אופציונליים — הוסיפו אחד בכל פעם עד שהשולחן מכיר את אופן המשחק שלהם. הפכו כל קלף כדי לקרוא על הכוח שלו.";
+  I18N.he["court.good.h"] = "משרתיו הנאמנים של ארתור";
+  I18N.he["court.good.n"] = "סמל ארתור · שדה כחול";
+  I18N.he["court.evil.h"] = "נאמני מורדרד";
+  I18N.he["court.evil.n"] = "סמל מורדרד · שדה אדום";
+  I18N.he["setup.eye"] = "הכנה · דף השופט";
+  I18N.he["setup.h"] = "מסדרים את השולחן";
+  I18N.he["setup.p"] = "בחרו את מספר השחקנים. חלוקת הנאמנויות, מעגל הישיבה למעלה וגודל הצוות בכל משימה למטה נגזרים ממנו.";
+  I18N.he["setup.count.aria"] = "מספר שחקנים";
+  I18N.he["setup.players"] = "שחקנים";
+  I18N.he["loy.good"] = "טובים";
+  I18N.he["loy.good.p"] = "אחד מהם הוא מרלין. הטובים חייבים תמיד לשחק קלף הצלחה במשימה.";
+  I18N.he["loy.evil"] = "רעים";
+  I18N.he["loy.evil.p"] = "אחד מהם נושא את הלהב. הרעים יכולים לשחק הצלחה או כישלון — ולעיתים קרובות כדאי להם לשחק הצלחה.";
+  I18N.he["track.t1"] = "מסלול המשימות · גודל צוות";
+  I18N.he["track.t2"] = "לחצו על משימה כדי לסמן אותה";
+  I18N.he["track.foot"] = "<b>שלוש הצלחות והטובים מנצחים. שלושה כישלונות והרעים מנצחים.</b>";
+  I18N.he["round.eye"] = "סבב אחד, שלושה שלבים";
+  I18N.he["round.h"] = "איך סבב מתנהל בפועל";
+  I18N.he["round.p"] = "כל סבב חוזר על אותה צורה. הסדר חשוב, לכן השלבים ממוספרים — אי אפשר להצביע לפני שהוצע צוות, ואי אפשר לצאת למשימה לפני שהצבעה אושרה.";
+  I18N.he["step1.no"] = "שלב 01";
+  I18N.he["step1.h"] = "המוביל מציע";
+  I18N.he["step1.p"] = "המוביל מחלק אסימוני צוות — המספר נקבע לפי מסלול המשימות. המוביל יכול לצרף את עצמו לצוות, אך אינו חייב. אסימון אחד לכל שחקן.";
+  I18N.he["step2.no"] = "שלב 02";
+  I18N.he["step2.h"] = "כולם מצביעים";
+  I18N.he["step2.p"] = "כל השחקנים, כולל המוביל, בוחרים בסתר אישור או דחייה, ואז חושפים יחד. רוב מאשר; שוויון הוא דחייה. אם נדחה, ההובלה עוברת עם כיוון השעון.";
+  I18N.he["step2.warn"] = "5 דחיות בסבב אחד ← הרעים מנצחים מיד";
+  I18N.he["step3.no"] = "שלב 03";
+  I18N.he["step3.h"] = "הצוות יוצא למשימה";
+  I18N.he["step3.p"] = "כל חבר צוות משחק בסתר קלף משימה אחד. המוביל מערבב אותם לפני החשיפה. כישלון אחד מפיל את המשימה — חוץ מהמשימה הרביעית עם 7 שחקנים ומעלה, שדורשת שניים.";
+  I18N.he["band.h"] = "תנו לדף הזה לנהל את זה";
+  I18N.he["band.p"] = "טלפון אחד שעובר סביב השולחן. הוא מחלק כל תפקיד בסתר, מקריא את הלילה בקול, אוסף את ההצבעות ואת קלפי המשימה, ושומר את הלהב עד הסוף.";
+  I18N.he["script.eye"] = "החשיפה";
+  I18N.he["script.h"] = "הקריאו את זה בקול, לאט, בחושך";
+  I18N.he["script.p"] = "תסריט הפתיחה משתנה עם כל דמות אופציונלית שמוסיפים. הדליקו אותן והנוסח משתנה מעצמו — קראו בדיוק את מה שמופיע, כולל ההפסקות.";
+  I18N.he["tog.t"] = "דמויות אופציונליות";
+  I18N.he["narr.t"] = "הקראה";
+  I18N.he["end.eye"] = "סוף המשחק";
+  I18N.he["end.h"] = "ארבע דרכים להסתיים";
+  I18N.he["end.p"] = "המשחק נעצר ברגע שמשימה שלישית מוכרעת לכל כיוון — ואז, אם הטובים הגיעו לשם, קורה עוד דבר אחד.";
+  I18N.he["end.goodwins"] = "הטובים מנצחים";
+  I18N.he["end.evilwins"] = "הרעים מנצחים";
+  I18N.he["e1.h"] = "שלוש משימות מצליחות";
+  I18N.he["e1.p"] = "…והמתנקש לא מצליח לזהות את מרלין.";
+  I18N.he["e2.h"] = "שלוש משימות נכשלות";
+  I18N.he["e2.p"] = "המשחק נגמר מיד. אין צורך בחיסול.";
+  I18N.he["e3.h"] = "חמישה צוותים נדחו";
+  I18N.he["e3.p"] = "חמש הצבעות כושלות ברצף בסבב אחד נותנות את המשחק למורדרד.";
+  I18N.he["e4.h"] = "מרלין מזוהה";
+  I18N.he["e4.p"] = "שלוש הצלחות על הלוח, והלהב עדיין מוצא אותו.";
+  I18N.he["assn.h"] = "ההזדמנות האחרונה של הרעים";
+  I18N.he["assn.p"] = "אם הטובים משלימים שלוש משימות, המשחק לא נעצר. בלי לחשוף אף קלף דמות, השחקנים הרעים מתייעצים בגלוי, ומי שמחזיק בקלף המתנקש מצביע על שחקן טוב אחד כמרלין. אם יזהה אותו, הרעים לוקחים את המשחק בכל זאת. לכן מרלין מבלה חמישה סבבים בהכוונת השולחן תוך שהוא מעמיד פנים שהוא מנחש.";
+  I18N.he["var.eye"] = "חוקים אופציונליים";
+  I18N.he["var.h"] = "כשהשולחן מכיר את המשחק";
+  I18N.he["v1.h"] = "גבירת האגם";
+  I18N.he["v1.p"] = "מידע גלוי על נאמנותו של מישהו — משמש שלוש פעמים, ועובר מיד ליד.";
+  I18N.he["v1.l1"] = "בתחילת המשחק האסימון עובר לשחקן שמימין למוביל.";
+  I18N.he["v1.l2"] = "מיד אחרי שהמשימה השנייה, השלישית והרביעית מוכרעות, מחזיק האסימון בודק שחקן אחד.";
+  I18N.he["v1.l3"] = "השחקן הנבדק מעביר את קלף הנאמנות שמתאים לצד האמיתי שלו — מי שמעביר קלף שגוי מפסיד במשחק.";
+  I18N.he["v1.l4"] = "האסימון עובר אז לשחקן שזה עתה נבדק. אי אפשר לבדוק אף אחד פעמיים, ומחזיק קודם לא יכול להיות מטרה.";
+  I18N.he["v1.l5"] = "המחזיק רשאי לדבר על מה שראה, אך אסור לו לחשוף את הקלף. הכי מתאים ל-7 ומעלה; זה מקל על הטובים.";
+  I18N.he["v2.h"] = "מיקוד";
+  I18N.he["v2.p"] = "משימות שמנסים בכל סדר שהמוביל רוצה — תכנון מחליף שגרה.";
+  I18N.he["v2.l1"] = "בשלב הצוות המוביל בוחר גם את הצוות וגם איזו משימה מנסים.";
+  I18N.he["v2.l2"] = "גודל הצוות חייב להתאים למשימה שנבחרה; סמנו אותה בסמן הסבב לפני ההצבעה.";
+  I18N.he["v2.l3"] = "משימה שכבר נוסתה אי אפשר לנסות שוב.";
+  I18N.he["v2.l4"] = "המשימה החמישית נעולה עד ששתי משימות אחרות הצליחו.";
+  I18N.he["v2.l5"] = "עם 7 שחקנים ומעלה המשימה הרביעית עדיין דורשת שני כישלונות.";
+  I18N.he["v3.h"] = "קלפי עלילה ונאמנות";
+  I18N.he["v3.p"] = "לשולחנות שמערבבים קלפי עלילה מ-The Resistance.";
+  I18N.he["v3.l1"] = "בכל פעם שקלף עלילה היה חושף את קלף הדמות שלך, מוסרים במקומו את קלף הנאמנות המתאים.";
+  I18N.he["v3.l2"] = "זהותו של מרלין נשארת סודית גם כשנאמנותו נחשפת.";
+  I18N.he["v3.l3"] = "מי שמעביר קלף נאמנות שלא תואם את קלף הדמות שלו מפסיד במשחק.";
+  I18N.he["foot.p1"] = "מלווה חוקים של מעריצים ל-<b style=\"color:var(--vellum-dim);font-weight:400\">The Resistance: Avalon</b>, שעוצב על ידי דון אסקרידג׳ ופורסם על ידי Indie Boards &amp; Cards. אין קשר למו״ל ואין לו אישור.";
+  I18N.he["foot.p2"] = "כל האיורים בדף הזה צוירו עבור המלווה הזה ואינם מהמשחק שפורסם. נוסח החוקים מנוסח מחדש מתוך חוברת החוקים — חוברת החוקים המודפסת היא הסמכות בשולחן שלכם.";
+
+  /* English for the static keys is read straight off the page, once */
+  function captureEnglish(){
+    var els = document.querySelectorAll("[data-i]");
+    for(var i=0;i<els.length;i++){
+      var k = els[i].getAttribute("data-i");
+      if(I18N.en[k] == null) I18N.en[k] = els[i].innerHTML;
+    }
+    var as = document.querySelectorAll("[data-ia]");
+    for(var j=0;j<as.length;j++){
+      var p = as[j].getAttribute("data-ia").split(":");
+      if(I18N.en[p[1]] == null) I18N.en[p[1]] = as[j].getAttribute(p[0]) || "";
+    }
+  }
+  captureEnglish();
+
+  var DEFAULT_NAMES = {
+    en:["Justin","Walter","Laura","Evie","Thomas","Margaret","Don","Narae","Jess","Kai"],
+    he:["נועה","דור","מיכל","איתי","שירה","עומר","ליאור","תמר","יובל","אורי"]
+  };
+  function dname(i){ return t("player", {n:i+1}); }
+
+  /* ───────────── data ───────────── */
+  var SPLIT = {5:[3,2],6:[4,2],7:[4,3],8:[5,3],9:[6,3],10:[6,4]};
+  var TEAMS = {
+    5:[2,3,2,3,3], 6:[2,3,4,3,4], 7:[2,3,3,4,4],
+    8:[3,4,4,5,5], 9:[3,4,4,5,5], 10:[3,4,4,5,5]
+  };
+
+  var CHARS = [
+    {k:"merlin",   side:"good", accent:"#4E86C4"},
+    {k:"percival", side:"good", accent:"#6FA8DC"},
+    {k:"servant",  side:"good", accent:"#3F6D9E"},
+    {k:"assassin", side:"evil", accent:"#C24240"},
+    {k:"mordred",  side:"evil", accent:"#B0302F"},
+    {k:"morgana",  side:"evil", accent:"#8E3F7E"},
+    {k:"oberon",   side:"evil", accent:"#7A5FA8"},
+    {k:"minion",   side:"evil", accent:"#8E2B2A"}
+  ];
+  function cn(c, f){ return t("c." + c.k + "." + f); }
+
+  /* ───────────── original portrait art ─────────────
+     Built from simple geometry so every figure shares one hand. */
+  function emblem(k){
+    switch(k){
+      case "merlin":   return '<path d="M0,-11 L2.9,-2.9 L11,0 L2.9,2.9 L0,11 L-2.9,2.9 L-11,0 L-2.9,-2.9 Z"/>'+
+                              '<circle cx="0" cy="0" r="1.6" fill="#0A0D15"/>';
+      case "percival": return '<path d="M-12,0 Q0,-8.5 12,0 Q0,8.5 -12,0 Z" fill="none" stroke-width="1.6"/>'+
+                              '<circle cx="0" cy="0" r="3.4"/>';
+      case "servant":  return '<path d="M0,-11 L10,-7 V1 Q10,8 0,12 Q-10,8 -10,1 V-7 Z" fill="none" stroke-width="1.7"/>'+
+                              '<path d="M0,-6 V7 M-5,-1 H5" stroke-width="1.7" fill="none"/>';
+      case "assassin": return '<path d="M0,-13 L3,-2 L0,12 L-3,-2 Z" fill="none" stroke-width="1.6"/>'+
+                              '<path d="M-7,-2 H7" stroke-width="1.8"/>';
+      case "mordred":  return '<path d="M-11,7 L-11,-6 L-5.5,0 L0,-9 L5.5,0 L11,-6 L11,7 Z" fill="none" stroke-width="1.6"/>'+
+                              '<path d="M-11,10 H11" stroke-width="2"/>';
+      case "morgana":  return '<path d="M4,-11 A11,11 0 1 0 4,11 A8.6,8.6 0 1 1 4,-11 Z"/>';
+      case "oberon":   return '<path d="M-10,-9 H10 V4 Q10,11 0,12.5 Q-10,11 -10,4 Z" fill="none" stroke-width="1.6"/>'+
+                              '<path d="M-6,-2.5 H-2 M2,-2.5 H6" stroke-width="2.2"/>';
+      default:         return '<path d="M0,12 L-10,-4 L-6,-10 H6 L10,-4 Z" fill="none" stroke-width="1.6"/>'+
+                              '<path d="M0,-4 V5" stroke-width="1.8"/>';
+    }
+  }
+  function portrait(c){
+    var id = "g_"+c.k, hood = c.side==="good" ? "#1D2E45" : "#341A1E";
+    var hood2 = c.side==="good" ? "#121E2E" : "#201013";
+    return ''+
+    '<svg viewBox="0 0 200 250" aria-hidden="true">'+
+      '<defs>'+
+        '<radialGradient id="'+id+'" cx="50%" cy="34%" r="62%">'+
+          '<stop offset="0%" stop-color="'+c.accent+'" stop-opacity=".34"/>'+
+          '<stop offset="100%" stop-color="'+c.accent+'" stop-opacity="0"/>'+
+        '</radialGradient>'+
+        '<linearGradient id="'+id+'_h" x1="0" y1="0" x2="0" y2="1">'+
+          '<stop offset="0%" stop-color="'+hood+'"/><stop offset="100%" stop-color="'+hood2+'"/>'+
+        '</linearGradient>'+
+      '</defs>'+
+      '<rect width="200" height="250" fill="#111726"/>'+
+      '<circle cx="100" cy="92" r="88" fill="url(#'+id+')"/>'+
+      /* shoulders */
+      '<path d="M22,250 Q26,180 66,158 L134,158 Q174,180 178,250 Z" fill="url(#'+id+'_h)" stroke="'+c.accent+'" stroke-opacity=".32" stroke-width="1"/>'+
+      /* hood */
+      '<path d="M100,32 Q152,32 152,104 Q152,150 134,164 Q118,150 100,150 Q82,150 66,164 Q48,150 48,104 Q48,32 100,32 Z" fill="url(#'+id+'_h)" stroke="'+c.accent+'" stroke-opacity=".45" stroke-width="1.2"/>'+
+      /* face void */
+      '<path d="M100,56 Q133,56 133,102 Q133,136 100,142 Q67,136 67,102 Q67,56 100,56 Z" fill="#07090F"/>'+
+      /* eyes */
+      '<ellipse cx="87" cy="98" rx="6.2" ry="3.1" fill="'+c.accent+'" opacity=".92"/>'+
+      '<ellipse cx="113" cy="98" rx="6.2" ry="3.1" fill="'+c.accent+'" opacity=".92"/>'+
+      /* clasp + emblem */
+      '<circle cx="100" cy="196" r="26" fill="#0A0D15" stroke="'+c.accent+'" stroke-opacity=".5" stroke-width="1"/>'+
+      '<g transform="translate(100,196)" fill="'+c.accent+'" stroke="'+c.accent+'" stroke-linejoin="round" stroke-linecap="round">'+emblem(c.k)+'</g>'+
+    '</svg>';
+  }
+
+  function buildCards(){
+    var g = document.getElementById("goodCards"), e = document.getElementById("evilCards");
+    g.innerHTML = ""; e.innerHTML = "";
+    CHARS.forEach(function(c){
+      var btn = document.createElement("button");
+      btn.className = "card " + c.side;
+      btn.type = "button";
+      btn.setAttribute("aria-pressed","false");
+      btn.innerHTML =
+        '<div class="card-in">'+
+          '<div class="face face-front">'+
+            '<div class="portrait">'+portrait(c)+'</div>'+
+            '<div class="card-foot"><h4>'+esc(cn(c,"name"))+'</h4>'+
+              '<div class="role"><b>'+esc(t(c.side==="good"?"side.good":"side.evil"))+'</b> · '+esc(cn(c,"role"))+'</div></div>'+
+          '</div>'+
+          '<div class="face face-back">'+
+            '<div><h4>'+esc(cn(c,"name"))+'</h4><p>'+esc(cn(c,"power"))+'</p>'+
+            '<p class="note">'+esc(cn(c,"note"))+'</p></div>'+
+            '<div class="flip-hint">'+esc(t("card.back"))+'</div>'+
+          '</div>'+
+        '</div>';
+      btn.addEventListener("click", function(){
+        var on = btn.getAttribute("aria-pressed") === "true";
+        btn.setAttribute("aria-pressed", on ? "false" : "true");
+      });
+      (c.side==="good" ? g : e).appendChild(btn);
+    });
+  }
+
+  /* ───────────── round table ───────────── */
+  var players = 7;
+  var leaderIdx = 0;
+  var CX=220, CY=220, SEAT_R=170;
+
+  function seatGlyph(i){
+    return '<g class="seat" data-i="'+i+'">'+
+      '<path class="seat-body" d="M0,-15 Q13,-15 13,3 Q13,15 0,15 Q-13,15 -13,3 Q-13,-15 0,-15 Z"/>'+
+      '<circle cx="0" cy="-4" r="5.5" fill="#0A0D15"/>'+
+      '<text y="30">'+(i+1)+'</text>'+
+    '</g>';
+  }
+  function drawSeats(){
+    var s = document.getElementById("seats"), out = "";
+    for(var i=0;i<players;i++){
+      var a = (-90 + i*360/players) * Math.PI/180;
+      var x = CX + SEAT_R*Math.cos(a), y = CY + SEAT_R*Math.sin(a);
+      out += '<g transform="translate('+x.toFixed(1)+','+y.toFixed(1)+')">'+seatGlyph(i)+'</g>';
+    }
+    s.innerHTML = out;
+    if(leaderIdx >= players) leaderIdx = 0;
+    moveLeader();
+    document.getElementById("seatCount").textContent = t("seats", {n:players});
+  }
+  function drawCandles(){
+    var g = document.getElementById("candles"), out = "";
+    for(var i=0;i<6;i++){
+      var a = (-60 + i*60) * Math.PI/180;
+      var x = CX + 92*Math.cos(a), y = CY + 92*Math.sin(a);
+      out += '<g transform="translate('+x.toFixed(1)+','+y.toFixed(1)+')">'+
+        '<rect x="-2.5" y="-2" width="5" height="12" rx="1.5" fill="#2A3349"/>'+
+        '<circle cx="0" cy="-2" r="9" fill="#FFB454" opacity=".13"/>'+
+        '<path class="flame" d="M0,-14 Q3.4,-8 0,-3 Q-3.4,-8 0,-14 Z" fill="#FFB454"/>'+
+      '</g>';
+    }
+    g.innerHTML = out;
+  }
+  function moveLeader(){
+    var a = (-90 + leaderIdx*360/players) * Math.PI/180;
+    var x = CX + (SEAT_R-33)*Math.cos(a), y = CY + (SEAT_R-33)*Math.sin(a);
+    document.getElementById("leader").setAttribute("transform","translate("+x.toFixed(1)+","+y.toFixed(1)+")");
+  }
+
+  /* ───────────── setup panel ───────────── */
+  function pips(el, n){
+    el.innerHTML = "";
+    for(var i=0;i<n;i++){
+      var d = document.createElement("span");
+      d.className = "pip";
+      el.appendChild(d);
+    }
+  }
+  function ordName(i){ return t("ord" + (i+1)); }
+  function buildTrack(){
+    var tr = document.getElementById("track"), sizes = TEAMS[players];
+    tr.innerHTML = "";
+    sizes.forEach(function(sz, i){
+      var b = document.createElement("button");
+      b.className = "q"; b.type = "button";
+      b.setAttribute("aria-label", t("q.aria", {ord:ordName(i), n:sz}));
+      var two = (i===3 && players>=7) ? '<span class="q-two">'+esc(t("q.two"))+'</span>' : '';
+      b.innerHTML = '<span class="q-node">'+sz+'</span><span class="q-lab">'+esc(t("q.lab", {ord:ordName(i)}))+two+'</span>';
+      b.addEventListener("click", function(){
+        if(b.classList.contains("pass")){ b.classList.remove("pass"); b.classList.add("fail"); }
+        else if(b.classList.contains("fail")){ b.classList.remove("fail"); }
+        else { b.classList.add("pass"); }
+        scoreTrack();
+      });
+      tr.appendChild(b);
+    });
+    scoreTrack();
+  }
+  function scoreTrack(){
+    var p = document.querySelectorAll("#track .q.pass").length;
+    var f = document.querySelectorAll("#track .q.fail").length;
+    var el = document.getElementById("trackFoot");
+    var base = t("track.foot");
+    if(p>=3) el.innerHTML = t("sc.pass");
+    else if(f>=3) el.innerHTML = t("sc.fail");
+    else if(p||f) el.innerHTML = base + " &nbsp;·&nbsp; " + t("sc.prog", {p:p, f:f, ps:(p===1?"":"es"), fs:(f===1?"":"s")});
+    else el.innerHTML = base;
+  }
+  function setPlayers(n){
+    players = n;
+    document.querySelectorAll(".pbtn").forEach(function(b){
+      b.setAttribute("aria-pressed", Number(b.dataset.n)===n ? "true" : "false");
+    });
+    document.getElementById("goodNum").textContent = SPLIT[n][0];
+    document.getElementById("evilNum").textContent = SPLIT[n][1];
+    pips(document.getElementById("goodPips"), SPLIT[n][0]);
+    pips(document.getElementById("evilPips"), SPLIT[n][1]);
+    drawSeats();
+    buildTrack();
+  }
+
+  /* ───────────── night script ─────────────
+     A line is a list of segments; a segment with `e` is highlighted. */
+  var opt = {percival:false, mordred:false, morgana:false, oberon:false};
+  function sg(x, e){ return {x:x, e:e || ""}; }
+  function scriptLines(o){
+    var L = [];
+    var pair = o.morgana ? t("n.merlinMorgana") : t("n.merlin");
+    L.push([sg(t("n.close"))]);
+    L.push([sg(t("n.minions")), o.oberon ? sg(t("n.notOberon"), "ins") : sg(t("n.comma")), sg(t("n.openLook"))]);
+    L.push([sg(t("n.minionsClose"))]);
+    L.push([sg(t("n.allClosed"))]);
+    L.push([sg(t("n.minions")), o.mordred ? sg(t("n.notMordred"), "ins") : sg(t("n.comma")), sg(t("n.thumb"))]);
+    L.push([sg(t("n.merlinOpen"))]);
+    L.push([sg(t("n.thumbsDown"))]);
+    L.push([sg(t("n.merlinClose"))]);
+    L.push([sg(t("n.allClosed"))]);
+    if(o.percival){
+      L.push([sg(pair, "ins p"), sg(t("n.pThumb"))]);
+      L.push([sg(t("n.percival"), "ins p"), sg(t("n.pOpen", {pair:pair}))]);
+      L.push([sg(pair, "ins p"), sg(t("n.pDown"))]);
+      L.push([sg(t("n.percival"), "ins p"), sg(t("n.pClose"))]);
+      L.push([sg(t("n.allClosed"))]);
+    }
+    L.push([sg(t("n.allOpen"))]);
+    return L;
+  }
+  function segHtml(parts){
+    return parts.map(function(s){
+      return s.e ? '<em class="ins'+(s.e === "ins p" ? " p" : "")+'">'+esc(s.x)+'</em>' : esc(s.x);
+    }).join("");
+  }
+  function segPlain(parts){ return parts.map(function(s){ return s.x; }).join(""); }
+
+  function renderScript(){
+    var ol = document.getElementById("lines");
+    ol.innerHTML = "";
+    scriptLines(opt).forEach(function(parts){
+      var li = document.createElement("li");
+      li.innerHTML = '<span>' + segHtml(parts) + '</span>';
+      if(parts.some(function(s){ return !!s.e; })) li.className = "ins-line";
+      ol.appendChild(li);
+    });
+    var chosen = Object.keys(opt).filter(function(k){ return opt[k]; });
+    var note = document.getElementById("scriptNote");
+    if(!chosen.length){ note.textContent = t("sn.base"); }
+    else if(opt.percival && !opt.mordred && !opt.morgana && players===5){
+      note.innerHTML = t("sn.five");
+    } else {
+      note.textContent = t("sn.more");
+    }
+  }
+  var narrating = null;
+  function narrate(){
+    var btn = document.getElementById("narrateBtn");
+    var items = Array.prototype.slice.call(document.querySelectorAll("#lines li"));
+    if(narrating){
+      clearInterval(narrating); narrating = null;
+      items.forEach(function(li){ li.classList.remove("now","done"); });
+      btn.textContent = t("narr.btn");
+      return;
+    }
+    var i = 0;
+    btn.textContent = t("narr.stop");
+    items.forEach(function(li){ li.classList.remove("now","done"); });
+    function step(){
+      items.forEach(function(li,j){
+        li.classList.toggle("now", j===i);
+        li.classList.toggle("done", j<i);
+      });
+      if(items[i]){ shush(); speak(items[i].textContent); }
+      i++;
+      if(i > items.length){
+        clearInterval(narrating); narrating = null;
+        items.forEach(function(li){ li.classList.remove("now","done"); });
+        btn.textContent = t("narr.btn");
+      }
+    }
+    step();
+    narrating = setInterval(step, 3200);
+  }
+
+  /* ───────────── ambient motes ───────────── */
+  function motes(){
+    var c = document.getElementById("motes");
+    if(!c || reduce) return;
+    var ctx = c.getContext("2d"), w, h, parts = [];
+    function size(){
+      w = c.width = Math.floor(window.innerWidth * (window.devicePixelRatio||1));
+      h = c.height = Math.floor(window.innerHeight * (window.devicePixelRatio||1));
+    }
+    size();
+    window.addEventListener("resize", size);
+    for(var i=0;i<70;i++){
+      parts.push({x:Math.random()*1, y:Math.random()*1, r:Math.random()*1.6+.5,
+                  s:Math.random()*.00022+.00006, d:Math.random()*Math.PI*2, o:Math.random()*.5+.15});
+    }
+    function frame(){
+      ctx.clearRect(0,0,w,h);
+      for(var i=0;i<parts.length;i++){
+        var p = parts[i];
+        p.y -= p.s; p.d += .012;
+        p.x += Math.sin(p.d)*.00035;
+        if(p.y < -.02){ p.y = 1.02; p.x = Math.random(); }
+        ctx.beginPath();
+        ctx.arc(p.x*w, p.y*h, p.r*(window.devicePixelRatio||1), 0, 6.284);
+        ctx.fillStyle = "rgba(215,175,95," + p.o + ")";
+        ctx.fill();
+      }
+      requestAnimationFrame(frame);
+    }
+    frame();
+  }
+
+  /* ═══════════════════════════════════════════════════
+     THE PLAYABLE GAME — one device, passed around
+     ═══════════════════════════════════════════════════ */
+  var ROLE = {}; CHARS.forEach(function(c){ ROLE[c.k] = c; });
+  var EVIL_KEYS = ["assassin","mordred","morgana","oberon","minion"];
+  function isEvil(k){ return EVIL_KEYS.indexOf(k) >= 0; }
+  function shuffle(a){
+    for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var tmp=a[i]; a[i]=a[j]; a[j]=tmp; }
+    return a;
+  }
+
+  /* ── the voice ── */
+  var muted = false;
+  try{ muted = localStorage.getItem("avalon_mute") === "1"; }catch(e){}
+  var voice = null, canSpeak = ("speechSynthesis" in window) && (typeof SpeechSynthesisUtterance !== "undefined");
+  function pickVoice(){
+    voice = null;
+    if(!canSpeak) return;
+    var vs = [];
+    try{ vs = speechSynthesis.getVoices() || []; }catch(e){ return; }
+    if(!vs.length) return;
+    if(LANG === "he"){
+      // a Hebrew voice or nothing: an English voice reading Hebrew letters is just noise
+      var h = vs.filter(function(v){ return /^he/i.test(v.lang) || /^iw/i.test(v.lang); });
+      voice = h[0] || null;
+      return;
+    }
+    var p = vs.filter(function(v){ return /en[-_]GB/i.test(v.lang); });
+    if(!p.length) p = vs.filter(function(v){ return /^en/i.test(v.lang); });
+    voice = p[0] || vs[0];
+  }
+  if(canSpeak){
+    pickVoice();
+    try{ speechSynthesis.onvoiceschanged = pickVoice; }catch(e){}
+  }
+  // can the page speak right now, in the chosen language?
+  function speechAvail(){ return canSpeak && (LANG !== "he" || !!voice); }
+  function speechOK(){ return speechAvail() && !muted; }
+  function shush(){ if(canSpeak){ try{ speechSynthesis.cancel(); }catch(e){} } }
+  function speak(text, onEnd){
+    if(!speechOK() || !text){ if(onEnd) setTimeout(onEnd, 60); return; }
+    try{
+      var u = new SpeechSynthesisUtterance(String(text));
+      if(voice) u.voice = voice;
+      u.lang = LANG === "he" ? "he-IL" : (voice && voice.lang) || "en-GB";
+      u.rate = .92; u.pitch = .95;
+      var done = false;
+      u.onend = u.onerror = function(){ if(!done){ done = true; if(onEnd) onEnd(); } };
+      speechSynthesis.speak(u);
+      // fallback if the engine never fires onend
+      setTimeout(function(){ if(!done){ done = true; if(onEnd) onEnd(); } }, 1400 + String(text).length * 78);
+    }catch(e){ if(onEnd) setTimeout(onEnd, 60); }
+  }
+
+  /* ── state ── */
+  var G = null, SAVE = "avalon_game_v2", nightTimer = null, quitArmed = false;
+  function save(){ try{ localStorage.setItem(SAVE, JSON.stringify(G)); }catch(e){} }
+  function loadSaved(){ try{ var s = localStorage.getItem(SAVE); return s ? JSON.parse(s) : null; }catch(e){ return null; } }
+  function clearSave(){ try{ localStorage.removeItem(SAVE); }catch(e){} }
+
+  var cfg = { n:7, names:DEFAULT_NAMES[LANG].slice(0), opts:{percival:false,mordred:false,morgana:false,oberon:false}, mode:"app", novote:false };
+
+  function evilSpecials(o){ return (o.mordred?1:0)+(o.morgana?1:0)+(o.oberon?1:0); }
+  function setupProblem(){
+    var ev = SPLIT[cfg.n][1];
+    if(1 + evilSpecials(cfg.opts) > ev)
+      return t("sp.tooMany", {n:cfg.n, ev:ev});
+    return null;
+  }
+  function setupAdvice(){
+    if(cfg.opts.percival && cfg.n === 5 && !cfg.opts.mordred && !cfg.opts.morgana)
+      return t("sp.five");
+    if(cfg.opts.morgana && !cfg.opts.percival)
+      return t("sp.morgana");
+    if(!evilSpecials(cfg.opts) && !cfg.opts.percival)
+      return t("sp.pure");
+    return null;
+  }
+  function assignRoles(n, o){
+    var ev = SPLIT[n][1], gd = SPLIT[n][0];
+    var evil = ["assassin"];
+    if(o.mordred) evil.push("mordred");
+    if(o.morgana) evil.push("morgana");
+    if(o.oberon)  evil.push("oberon");
+    while(evil.length < ev) evil.push("minion");
+    var good = ["merlin"];
+    if(o.percival) good.push("percival");
+    while(good.length < gd) good.push("servant");
+    return shuffle(good.concat(evil));
+  }
+  function seatsWith(pred, st){
+    st = st || G;
+    var out = [];
+    for(var i=0;i<st.n;i++) if(pred(st.roles[i], i)) out.push(i);
+    return out;
+  }
+  function failsNeeded(qi, n){ return (qi === 3 && (n || G.n) >= 7) ? 2 : 1; }
+  function passes(){ return G.results.filter(function(r){ return r === "pass"; }).length; }
+  function fails(){ return G.results.filter(function(r){ return r === "fail"; }).length; }
+
+  /* what a given seat is allowed to know — returned as text *keys*, so every
+     device shows it in its own language (the online host never sends prose) */
+  function knowledge(i, st){
+    st = st || G;
+    var r = st.roles[i];
+    if(r === "merlin"){
+      var seen = seatsWith(function(k){ return isEvil(k) && k !== "mordred"; }, st);
+      return { tk:"k.merlin.t", list:seen, cls:"", nk: st.opts.mordred ? "k.merlin.mord" : "k.merlin.all" };
+    }
+    if(r === "percival"){
+      var pair = seatsWith(function(k){ return k === "merlin" || (st.opts.morgana && k === "morgana"); }, st);
+      shuffle(pair);
+      return { tk: st.opts.morgana ? "k.perc.two" : "k.perc.one", list:pair, cls:"q",
+        nk: st.opts.morgana ? "k.perc.noteTwo" : "k.perc.noteOne" };
+    }
+    if(r === "oberon"){
+      return { tk:"k.ob.t", list:[], cls:"", nk:"k.ob.n" };
+    }
+    if(isEvil(r)){
+      var allies = seatsWith(function(k, s2){ return isEvil(k) && k !== "oberon" && s2 !== i; }, st);
+      return { tk: allies.length ? "k.ev.t1" : "k.ev.t0", list:allies, cls:"",
+        nk: st.opts.oberon ? "k.ev.ob" : (allies.length ? "k.ev.names" : "k.ev.alone") };
+    }
+    return { tk:"k.gd.t", list:[], cls:"g", nk:"k.gd.n" };
+  }
+  // the `why` of a finished game is stored as {k, name} — older saves may hold a plain string
+  function whyText(w){
+    if(!w) return "";
+    if(typeof w === "string") return w;
+    return t(w.k, {name: w.name || ""});
+  }
+
+  /* ── shell ── */
+  var gv = document.getElementById("gv"), gBody = document.getElementById("gBody");
+  function openGame(state){
+    G = state || null;
+    gv.hidden = false;
+    document.body.style.overflow = "hidden";
+    render();
+  }
+  function closeGame(){
+    shush(); clearTimeout(nightTimer); nightTimer = null;
+    if(mode === "net"){ netLeave(); mode = "solo"; }
+    gv.hidden = true;
+    document.body.style.overflow = "";
+    refreshResume();
+  }
+  function refreshResume(){
+    var b = document.getElementById("resumeBtn"), s = loadSaved();
+    if(!b) return;
+    b.hidden = !(s && s.screen && s.screen !== "end");
+  }
+  function bar(){
+    var r = document.getElementById("barRound"), tr = document.getElementById("barTrack"),
+        l = document.getElementById("barLeader"), rj = document.getElementById("barRej");
+    document.getElementById("barRejLbl").textContent = t("bar.rej");
+    if(!G){ r.textContent = t("bar.new"); tr.innerHTML = ""; l.textContent = ""; rj.hidden = true; return; }
+    r.textContent = G.screen === "end" ? t("bar.over") : t("bar.quest", {n:Math.min(G.qi + 1, 5)});
+    var h = "";
+    for(var i=0;i<5;i++){
+      var c = "mini";
+      if(G.results[i] === "pass") c += " pass";
+      else if(G.results[i] === "fail") c += " fail";
+      else if(i === G.qi && G.screen !== "end") c += " now";
+      h += '<span class="' + c + '">' + TEAMS[G.n][i] + '</span>';
+    }
+    tr.innerHTML = h;
+    l.textContent = G.screen === "end" ? "" : t("bar.leader", {name:G.names[G.leader]});
+    rj.hidden = (G.screen === "end") || !!G.novote;
+    var d = rj.querySelectorAll("i");
+    for(var k=0;k<5;k++) d[k].className = (k < G.rejects) ? "on" : "";
+  }
+  function put(html, wide){
+    gBody.className = "g-inner" + (wide ? " wide" : "");
+    gBody.innerHTML = html;
+    gv.scrollTop = 0;
+    bar();
+  }
+  function on(sel, fn, ev){
+    var els = gBody.querySelectorAll(sel);
+    Array.prototype.forEach.call(els, function(e){ e.addEventListener(ev || "click", fn); });
+  }
+  function nm(i){ return esc(G.names[i] || dname(i)); }
+
+  // propose/assassin re-render on every tap; without this the voice repeats itself
+  var lastSpoke = "";
+  function speakOnce(key, text){
+    if(lastSpoke === key) return;
+    lastSpoke = key;
+    shush(); speak(text);
+  }
+
+  /* ── setup ── */
+  function renderSetup(){
+    var prob = setupProblem(), adv = setupAdvice(), sp = SPLIT[cfg.n];
+    var counts = "";
+    [5,6,7,8,9,10].forEach(function(n){
+      counts += '<button class="pbtn" data-n="'+n+'" aria-pressed="'+(cfg.n===n)+'">'+n+'</button>';
+    });
+    var names = "";
+    for(var i=0;i<cfg.n;i++){
+      names += '<label class="namein"><span>'+(i+1)+'</span><input type="text" data-i="'+i+'" maxlength="14" value="'+esc(cfg.names[i]||dname(i))+'" aria-label="'+esc(t("g.nameOf",{n:i+1}))+'"></label>';
+    }
+    var optRows = ["percival","mordred","morgana","oberon"].map(function(k){
+      var good = (k === "percival");
+      return '<button class="tg '+(good?"g":"e")+'" data-c="'+k+'" aria-pressed="'+(cfg.opts[k]?"true":"false")+'">'+
+             '<span class="box"></span>'+esc(t("c."+k+".name"))+'<small>'+esc(t("o."+k))+'</small></button>';
+    }).join("");
+    var noSpeech = !speechAvail()
+      ? '<p class="hint">'+esc(canSpeak && LANG === "he" ? t("g.nohe") : t("g.nospeech"))+'</p>' : '';
+
+    put(
+      '<p class="g-eyebrow">'+esc(t("g.eye"))+'</p>'+
+      '<h2 class="g-h">'+esc(t("g.h"))+'</h2>'+
+      '<div class="panel"><span class="ph">Language · שפה</span>'+
+        '<div class="langopts">'+
+          '<button class="mode" data-lang="en" aria-pressed="'+(LANG==="en")+'"><b>English</b></button>'+
+          '<button class="mode" data-lang="he" aria-pressed="'+(LANG==="he")+'"><b>עברית</b></button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="panel"><span class="ph">'+esc(t("g.players"))+'</span>'+
+        '<div class="count-row" style="margin:0">'+counts+'</div>'+
+        '<p style="margin-top:14px;color:var(--mist);font-size:14.5px">'+
+          '<b style="color:var(--arthur);font-weight:400">'+esc(t("g.split.good",{n:sp[0]}))+'</b> · '+
+          '<b style="color:var(--mordred);font-weight:400">'+esc(t("g.split.evil",{n:sp[1]}))+'</b>'+
+        '</p>'+
+      '</div>'+
+      '<div class="panel"><span class="ph">'+esc(t("g.names"))+'</span><div class="namegrid">'+names+'</div></div>'+
+      '<div class="panel"><span class="ph">'+esc(t("g.opt"))+'</span><div class="opts">'+optRows+'</div>'+
+        (prob ? '<div class="warnbox" style="margin-top:14px">'+esc(prob)+'</div>'
+              : (adv ? '<div class="okbox" style="margin-top:14px">'+esc(adv)+'</div>' : ''))+
+      '</div>'+
+      '<div class="panel"><span class="ph">'+esc(t("g.how"))+'</span><div class="modes">'+
+        '<button class="mode" data-m="app" aria-pressed="'+(cfg.mode==="app")+'"><b>'+esc(t("m.app.h"))+'</b>'+
+          '<span>'+esc(t("m.app.p"))+'</span></button>'+
+        '<button class="mode" data-m="ritual" aria-pressed="'+(cfg.mode==="ritual")+'"><b>'+esc(t("m.rit.h"))+'</b>'+
+          '<span>'+esc(t("m.rit.p"))+'</span></button>'+
+      '</div></div>'+
+      '<div class="panel"><span class="ph">'+esc(t("g.house"))+'</span>'+
+        '<button class="tg" data-h="novote" aria-pressed="'+(cfg.novote?"true":"false")+'">'+
+          '<span class="box"></span>'+esc(t("h.novote"))+'<small>'+esc(t("h.novote.s"))+'</small></button>'+
+        '<p style="font-size:13.5px;color:var(--mist);margin-top:11px;line-height:1.5">'+
+          esc(t("h.novote.p"))+
+        '</p>'+
+      '</div>'+
+      '<div class="g-actions">'+
+        '<button class="btn-lg" id="goBtn"'+(prob?' disabled style="opacity:.4;cursor:not-allowed"':'')+'>'+esc(t("g.deal"))+'</button>'+
+        '<button class="btn-ghost" id="backBtn">'+esc(t("g.back"))+'</button>'+
+      '</div>'+
+      noSpeech
+    );
+
+    on(".pbtn", function(){
+      cfg.n = Number(this.dataset.n);
+      // a smaller table can't hold every Evil special — drop the last ones added
+      ["oberon","morgana","mordred"].forEach(function(k){
+        if(setupProblem() && cfg.opts[k]) cfg.opts[k] = false;
+      });
+      renderSetup();
+    });
+    on(".mode[data-lang]", function(){ setLang(this.dataset.lang); });
+    on(".tg[data-c]", function(){ cfg.opts[this.dataset.c] = !cfg.opts[this.dataset.c]; renderSetup(); });
+    on(".tg[data-h]", function(){ cfg.novote = !cfg.novote; renderSetup(); });
+    on(".mode[data-m]", function(){ cfg.mode = this.dataset.m; renderSetup(); });
+    on(".namein input", function(){ cfg.names[Number(this.dataset.i)] = this.value; }, "input");
+    on("#backBtn", closeGame);
+    on("#goBtn", function(){
+      if(setupProblem()) return;
+      for(var i=0;i<cfg.n;i++) if(!String(cfg.names[i]||"").trim()) cfg.names[i] = dname(i);
+      G = { n:cfg.n, names:cfg.names.slice(0,cfg.n), opts:JSON.parse(JSON.stringify(cfg.opts)), mode:cfg.mode, novote:cfg.novote,
+            roles:assignRoles(cfg.n, cfg.opts), leader:Math.floor(Math.random()*cfg.n),
+            qi:0, results:[], rejects:0, team:[], votes:[], cards:[], turn:0,
+            revealed:false, done:false, nightIdx:0, winner:null, why:null };
+      G.screen = "deal";
+      save(); render();
+      speak(t("sp.dealt", {name:G.names[0]}));
+    });
+  }
+
+  /* ── card and token faces ── */
+  function sigilSuccess(){
+    return '<svg viewBox="0 0 64 64" aria-hidden="true">'+
+      '<path d="M22 16 H42 V21 A10 10 0 0 1 22 21 Z" fill="#E7C87A" opacity=".3"/>'+
+      '<g fill="none" stroke="#E7C87A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">'+
+      '<path d="M16 12 H48 V22 A16 16 0 0 1 32 38 A16 16 0 0 1 16 22 Z"/>'+
+      '<path d="M32 38 V52"/><path d="M25 52 H39"/><path d="M21 57 H43"/>'+
+      '</g></svg>';
+  }
+  function sigilFail(){
+    return '<svg viewBox="0 0 64 64" aria-hidden="true">'+
+      '<g fill="none" stroke="#F0B6B4" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">'+
+      '<path d="M32 5 L37 24 L34 32 L32 27 L30 32 L27 24 Z"/>'+
+      '<path d="M20 24 H44"/>'+
+      '<path d="M28 41 L30 59 H34 L36 41"/>'+
+      '</g></svg>';
+  }
+  function sigilApprove(){
+    return '<svg viewBox="0 0 64 64" aria-hidden="true">'+
+      '<g fill="none" stroke="#DCEBFB" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">'+
+      '<path d="M32 8 L52 15 V32 Q52 48 32 57 Q12 48 12 32 V15 Z"/>'+
+      '<path d="M32 20 V44"/><path d="M23 29 H41"/></g></svg>';
+  }
+  function sigilReject(){
+    return '<svg viewBox="0 0 64 64" aria-hidden="true">'+
+      '<g fill="none" stroke="#F6CFCE" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">'+
+      '<path d="M32 56 L10 21 L18 9 H46 L54 21 Z"/>'+
+      '<path d="M32 23 V42"/></g></svg>';
+  }
+  function cardBack(){
+    return '<svg viewBox="0 0 64 64" aria-hidden="true">'+
+      '<g fill="none" stroke="#C79A3B" stroke-width="1.4">'+
+      '<circle cx="32" cy="32" r="21"/><circle cx="32" cy="32" r="13.5"/>'+
+      '<path d="M32 11 V53"/><path d="M11 32 H53"/></g></svg>';
+  }
+  function faceDown(label){
+    return '<div class="hand"><div class="playcard down" aria-hidden="true">'+
+      '<div class="pc pc-back">'+cardBack()+'</div>'+
+      '<span class="pc-label">'+esc(label)+'</span></div></div>';
+  }
+
+
+  /* ── quest suspense: flash + a little synthesized music (no audio files) ── */
+  var actx = null;
+  function audioCtx(){
+    if(actx) return actx;
+    try{ var AC = window.AudioContext || window.webkitAudioContext; if(AC) actx = new AC(); }catch(e){ actx = null; }
+    return actx;
+  }
+  ["pointerdown","keydown","touchstart"].forEach(function(ev){
+    document.addEventListener(ev, function(){
+      var c = audioCtx();
+      if(c && c.state === "suspended"){ try{ c.resume(); }catch(e){} }
+    }, {passive:true});
+  });
+  function tone(c, t0, f0, f1, dur, type, vol, dest){
+    var o = c.createOscillator(), g = c.createGain();
+    o.type = type; o.frequency.setValueAtTime(f0, t0);
+    if(f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol, t0 + Math.min(0.03, dur/4));
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(dest); o.start(t0); o.stop(t0 + dur + 0.05);
+  }
+  function noiseBuf(c, secs){
+    var n = Math.floor(c.sampleRate * secs), b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0);
+    for(var i=0;i<n;i++) d[i] = Math.random()*2 - 1;
+    return b;
+  }
+  function playBuildup(){
+    if(muted) return;
+    var c = audioCtx(); if(!c) return;
+    try{
+      if(c.state === "suspended") c.resume();
+      var t0 = c.currentTime + 0.02, out = c.createGain(); out.gain.value = 0.9; out.connect(c.destination);
+      // low drone swelling up through a opening filter
+      var lp = c.createBiquadFilter(); lp.type = "lowpass";
+      lp.frequency.setValueAtTime(180, t0); lp.frequency.exponentialRampToValueAtTime(2200, t0 + 2.0);
+      var dg = c.createGain(); dg.gain.setValueAtTime(0.0001, t0);
+      dg.gain.exponentialRampToValueAtTime(0.22, t0 + 1.9); dg.gain.exponentialRampToValueAtTime(0.0001, t0 + 2.35);
+      lp.connect(dg); dg.connect(out);
+      [55, 82.4, 110.5].forEach(function(f){
+        var o = c.createOscillator(); o.type = "sawtooth"; o.frequency.value = f;
+        o.connect(lp); o.start(t0); o.stop(t0 + 2.4);
+      });
+      // heartbeat that speeds up
+      [0.1, 0.62, 1.1, 1.5, 1.82].forEach(function(dt){
+        tone(c, t0 + dt, 95, 38, 0.2, "sine", 0.55, out);
+        tone(c, t0 + dt + 0.17, 80, 36, 0.18, "sine", 0.35, out);
+      });
+      // rising airy noise
+      var ns = c.createBufferSource(); ns.buffer = noiseBuf(c, 2.4);
+      var bp = c.createBiquadFilter(); bp.type = "bandpass"; bp.Q.value = 1.2;
+      bp.frequency.setValueAtTime(300, t0); bp.frequency.exponentialRampToValueAtTime(5200, t0 + 2.0);
+      var ng = c.createGain(); ng.gain.setValueAtTime(0.0001, t0);
+      ng.gain.exponentialRampToValueAtTime(0.18, t0 + 1.95); ng.gain.exponentialRampToValueAtTime(0.0001, t0 + 2.3);
+      ns.connect(bp); bp.connect(ng); ng.connect(out); ns.start(t0); ns.stop(t0 + 2.4);
+    }catch(e){}
+  }
+  function playImpact(){
+    if(muted) return;
+    var c = audioCtx(); if(!c) return;
+    try{
+      var t0 = c.currentTime + 0.01, out = c.createGain(); out.gain.value = 0.95; out.connect(c.destination);
+      tone(c, t0, 140, 28, 0.9, "sine", 0.9, out);
+      var ns = c.createBufferSource(); ns.buffer = noiseBuf(c, 0.6);
+      var hp = c.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 900;
+      var ng = c.createGain(); ng.gain.setValueAtTime(0.5, t0); ng.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.55);
+      ns.connect(hp); hp.connect(ng); ng.connect(out); ns.start(t0); ns.stop(t0 + 0.6);
+    }catch(e){}
+  }
+  function playVerdict(ok){
+    if(muted) return;
+    var c = audioCtx(); if(!c) return;
+    try{
+      var t0 = c.currentTime + 0.02, out = c.createGain(); out.gain.value = 0.6; out.connect(c.destination);
+      if(ok){
+        [523.25, 659.25, 783.99, 1046.5].forEach(function(f, i){ tone(c, t0 + i*0.11, f, f, 1.1, "triangle", 0.32, out); });
+        tone(c, t0, 261.63, 261.63, 1.6, "sine", 0.3, out);
+      } else {
+        tone(c, t0, 196, 98, 1.4, "sawtooth", 0.22, out);
+        tone(c, t0, 277.2, 138.6, 1.4, "sawtooth", 0.2, out);   // a tritone down
+        tone(c, t0 + 0.05, 65.4, 49, 1.6, "sine", 0.45, out);
+      }
+    }catch(e){}
+  }
+  function flashScreen(){
+    if(reduce) return;
+    var f = document.createElement("div"); f.className = "qflash";
+    document.body.appendChild(f);
+    setTimeout(function(){ if(f.parentNode) f.parentNode.removeChild(f); }, 900);
+    gv.classList.remove("qshake"); void gv.offsetWidth; gv.classList.add("qshake");
+    setTimeout(function(){ gv.classList.remove("qshake"); }, 520);
+  }
+  var qIntroTimer = null, qIntroDone = null;
+  /* shows the suspense screen, then flash + impact, then calls done() */
+  function questSuspense(done){
+    var finished = false;
+    clearTimeout(qIntroTimer);
+    put(
+      '<div class="qsus" id="qsus"><div class="orb"></div>'+
+      '<p class="qt">'+esc(t("qs.shuffled"))+'</p>'+
+      '<p class="qs">'+esc(t("qs.skip"))+'</p></div>'
+    );
+    function finish(withFx){
+      if(finished) return; finished = true;
+      clearTimeout(qIntroTimer);
+      if(withFx){ flashScreen(); playImpact(); }
+      done();
+    }
+    on("#qsus", function(){ finish(false); });
+    playBuildup();
+    qIntroTimer = setTimeout(function(){ finish(true); }, reduce ? 500 : 2400);
+  }
+
+  /* ── pass-the-device cover ── */
+  function coverScreen(name, sub, label, cb, extra){
+    put(
+      '<div class="cover">'+
+        '<p class="g-eyebrow">'+esc(t("cv.pass"))+'</p>'+
+        '<p class="to">'+esc(name)+'</p>'+
+        '<p class="sub">'+sub+'</p>'+
+        '<button class="btn-lg" id="revBtn">'+label+'</button>'+
+        (extra || '')+
+      '</div>'
+    );
+    on("#revBtn", cb);
+  }
+
+  /* ── deal ── */
+  function renderDeal(){
+    var i = G.turn;
+    if(!G.revealed){
+      coverScreen(G.names[i], esc(t("cv.lookAway")), esc(t("cv.iam", {name:G.names[i]})), function(){
+        G.revealed = true; save(); render();
+      }, '<p class="hint">'+esc(t("cv.of", {i:i+1, n:G.n}))+'</p>');
+      return;
+    }
+    var r = G.roles[i], c = ROLE[r], ev = isEvil(r), k = knowledge(i);
+    var chips = k.list.map(function(s){
+      return '<span class="know '+(k.cls || (isEvil(G.roles[s]) && G.roles[i] !== "percival" ? "" : "g"))+'">'+nm(s)+'</span>';
+    }).join("");
+    var showKnow = (G.mode === "app");
+    put(
+      '<div class="rolecard">'+
+        '<div class="rc-top">'+
+          '<div class="art">'+portrait(c)+'</div>'+
+          '<div>'+
+            '<div class="rc-name">'+esc(cn(c,"name"))+'</div>'+
+            '<div class="rc-side '+(ev?"e":"g")+'">'+esc(ev ? t("rc.evil") : t("rc.good"))+'</div>'+
+            '<p class="rc-blurb">'+esc(cn(c,"power"))+'</p>'+
+          '</div>'+
+        '</div>'+
+        (showKnow
+          ? '<div class="rc-know"><div class="kt">'+esc(t(k.tk))+'</div>'+
+            (chips ? '<div class="knows">'+chips+'</div>' : '<div class="knows"><span class="know g">'+esc(t("rc.nobody"))+'</span></div>')+
+            '<p>'+esc(t(k.nk))+'</p></div>'
+          : '<div class="rc-know"><p style="font-style:normal;color:var(--vellum-dim);font-size:15px">'+esc(t("rc.memorise"))+'</p></div>')+
+      '</div>'+
+      '<div class="g-actions"><button class="btn-lg" id="hideBtn">'+esc(t("rc.hide"))+'</button></div>'+
+      '<p class="hint">'+esc(t("rc.never", {i:i+1, n:G.n}))+'</p>'
+    );
+    on("#hideBtn", function(){
+      G.revealed = false;
+      G.turn++;
+      if(G.turn >= G.n){
+        G.turn = 0;
+        if(G.mode === "ritual"){ G.screen = "night"; G.nightIdx = 0; }
+        else { G.screen = "propose"; G.team = []; }
+      }
+      save(); render();
+    });
+  }
+
+  /* ── the spoken night ── */
+  function renderNight(){
+    var L = scriptLines(G.opts), i = G.nightIdx;
+    if(i >= L.length){
+      clearTimeout(nightTimer); nightTimer = null;
+      G.screen = "propose"; G.team = []; save(); render(); return;
+    }
+    put(
+      '<p class="g-eyebrow">'+esc(t("nt.eye"))+'</p>'+
+      '<div class="night">'+
+        '<p class="ln">'+segHtml(L[i])+'</p>'+
+        '<p class="prog">'+(i+1)+' / '+L.length+'</p>'+
+      '</div>'+
+      '<div class="g-actions">'+
+        '<button class="btn-lg" id="nextLn">'+esc(t("nt.next"))+'</button>'+
+        '<button class="btn-ghost" id="skipNight">'+esc(t("nt.skip"))+'</button>'+
+      '</div>'+
+      '<p class="hint">'+esc(speechOK() ? t("nt.hintVoice") : t("nt.hintText"))+'</p>'
+    );
+    var advanced = false;
+    function step(){
+      if(advanced) return;
+      advanced = true;
+      clearTimeout(nightTimer);
+      G.nightIdx++; save(); render();
+    }
+    on("#nextLn", step);
+    on("#skipNight", function(){
+      advanced = true; clearTimeout(nightTimer); shush();
+      G.screen = "propose"; G.team = []; save(); render();
+    });
+    shush();
+    if(!speechOK()){
+      nightTimer = setTimeout(step, 4600);       // reading time, nothing is spoken
+    } else {
+      speak(segPlain(L[i]), function(){
+        nightTimer = setTimeout(step, 1600);     // a beat after the voice finishes
+      });
+    }
+  }
+
+  /* ── propose a team ── */
+  function renderPropose(){
+    var need = TEAMS[G.n][G.qi];
+    var rows = "";
+    for(var i=0;i<G.n;i++){
+      rows += '<button class="seatbtn" data-i="'+i+'" aria-pressed="'+(G.team.indexOf(i)>=0)+'">'+
+        '<span class="dot"></span>'+nm(i)+
+        (i === G.leader ? '<span class="tagl">'+esc(t("tag.leader"))+'</span>' : '')+
+      '</button>';
+    }
+    var two = failsNeeded(G.qi) === 2;
+    var off = (G.team.length !== need) ? ' disabled style="opacity:.4;cursor:not-allowed"' : '';
+    var propNo = (G.props || 0) + 1, dictator = (propNo >= 5);
+    put(
+      '<p class="g-eyebrow">'+esc(t("p.eye", {n:G.qi+1}))+'</p>'+
+      '<h2 class="g-h">'+th("p.h", {name:G.names[G.leader], n:need})+'</h2>'+
+      '<p class="g-sub">'+esc(G.novote ? t("p.subNo") : t("p.sub"))+'</p>'+
+      (dictator && !G.novote ? '<div class="okbox" style="text-align:center">'+t("p.dict")+'</div>' : '')+
+      (two ? '<div class="okbox" style="text-align:center">'+t("p.two")+'</div>' : '')+
+      '<div class="panel"><span class="ph">'+esc(t("p.chosen", {c:G.team.length, n:need}))+'</span>'+
+        '<div class="seatgrid">'+rows+'</div></div>'+
+      '<div class="g-actions">'+
+        (G.novote || dictator
+          ? '<button class="btn-lg" id="skipVote"'+off+'>'+esc(dictator && !G.novote ? t("p.btnDict") : t("p.btnSend"))+'</button>'
+          : '<button class="btn-lg" id="voteGo"'+off+'>'+esc(t("p.btnVote"))+'</button>')+
+      '</div>'+
+      (G.novote ? '' : '<p class="hint">'+esc(dictator ? t("p.hintDict", {n:propNo}) : t("p.hint", {n:propNo}))+'</p>')
+    );
+    on(".seatbtn", function(){
+      var i = Number(this.dataset.i), at = G.team.indexOf(i);
+      if(at >= 0) G.team.splice(at, 1);
+      else { if(G.team.length >= need) return; G.team.push(i); }
+      save(); renderPropose();
+    });
+    on("#voteGo", function(){
+      if(G.team.length !== need) return;
+      G.props = propNo;
+      G.votes = []; G.turn = 0; G.revealed = false; G.done = false; G.screen = "vote"; save(); render();
+    });
+    on("#skipVote", function(){
+      if(G.team.length !== need) return;
+      if(!G.novote && !dictator) return;
+      startQuest();
+    });
+    speakOnce("propose:"+G.qi+":"+G.leader+":"+G.rejects,
+      t("p.say", {name:G.names[G.leader], n:need, q:G.qi+1}));
+  }
+
+  /* ── secret vote ── */
+  function renderVote(){
+    var i = G.turn;
+    var teamNames = G.team.map(function(s){ return G.names[s]; }).join(", ");
+    if(!G.revealed){
+      coverScreen(G.names[i], th("v.sub", {team:teamNames}), esc(t("v.take")), function(){
+        G.revealed = true; G.done = false; save(); render();
+      }, '<p class="hint">'+esc(t("v.of", {i:i+1, n:G.n}))+'</p>');
+      return;
+    }
+    if(G.done){
+      put(
+        '<p class="g-eyebrow">'+nm(i)+'</p>'+
+        '<h2 class="g-h">'+esc(t("v.in"))+'</h2>'+
+        faceDown(t("v.cast"))+
+        '<p class="g-sub">'+esc(t("v.allAt"))+'</p>'+
+        '<div class="g-actions"><button class="btn-lg" id="passOn">'+
+          esc(i + 1 >= G.n ? t("v.turn") : t("v.pass"))+'</button></div>'
+      );
+      on("#passOn", function(){
+        G.revealed = false; G.done = false;
+        G.turn++;
+        if(G.turn >= G.n){ G.turn = 0; G.screen = "voteres"; }
+        save(); render();
+      });
+      return;
+    }
+    put(
+      '<p class="g-eyebrow">'+th("v.watch", {name:G.names[i]})+'</p>'+
+      '<h2 class="g-h">'+th("v.send", {team:teamNames})+'</h2>'+
+      '<div class="tokens-choice">'+
+        '<button class="vtok y" data-v="1"><div class="vt vt-y">'+sigilApprove()+'</div><span class="vt-label">'+esc(t("v.approve"))+'</span></button>'+
+        '<button class="vtok n" data-v="0"><div class="vt vt-n">'+sigilReject()+'</div><span class="vt-label">'+esc(t("v.reject"))+'</span></button>'+
+      '</div>'+
+      '<p class="hint">'+esc(t("v.of", {i:i+1, n:G.n}))+'</p>'
+    );
+    on(".vtok", function(){
+      G.votes[i] = this.dataset.v === "1";
+      G.done = true;
+      save(); render();
+    });
+  }
+
+  function renderVoteRes(){
+    var yes = G.votes.filter(Boolean).length, no = G.n - yes, ok = yes > no;
+    var cards = "";
+    for(var i=0;i<G.n;i++){
+      cards += '<div class="rv '+(G.votes[i]?"yes":"no")+'" data-i="'+i+'">'+
+        '<div class="rv-in"><div class="rv-f">'+esc(t("vr.front"))+'</div><div class="rv-b">'+esc(G.votes[i]?t("v.approve"):t("v.reject"))+'</div></div>'+
+        '<span class="cap">'+nm(i)+'</span></div>';
+    }
+    put(
+      '<p class="g-eyebrow">'+esc(t("vr.eye"))+'</p>'+
+      '<div class="reveal-row">'+cards+'</div>'+
+      '<p class="verdict '+(ok?"good":"evil")+'" id="vd">&nbsp;</p>'+
+      '<div class="g-actions"><button class="btn-lg" id="cont" hidden>'+esc(t("continue"))+'</button></div>'
+    );
+    var rvs = gBody.querySelectorAll(".rv");
+    Array.prototype.forEach.call(rvs, function(el, k){
+      setTimeout(function(){ el.classList.add("on"); }, reduce ? 0 : k * 110);
+    });
+    setTimeout(function(){
+      var v = document.getElementById("vd"), c = document.getElementById("cont");
+      if(!v) return;
+      v.innerHTML = esc(t("vr.count", {y:yes, n:no})) + "<br>" +
+        esc(ok ? t("vr.ok") : (yes === no ? t("vr.tie") : t("vr.no")));
+      if(c) c.hidden = false;
+      speak(ok ? t("vr.sayOk") :
+        (G.rejects + 1 >= 5 ? t("vr.sayFive") : t("vr.sayLeft", {n:4 - G.rejects})));
+    }, reduce ? 40 : G.n * 110 + 700);
+    on("#cont", function(){
+      if(ok){
+        startQuest(); return;
+      } else {
+        G.rejects++;
+        if(G.rejects >= 5){ finish("evil", {k:"why.five"}); return; }
+        G.leader = (G.leader + 1) % G.n;
+        G.team = []; G.screen = "propose";
+      }
+      save(); render();
+    });
+  }
+
+  /* ── the quest ── */
+  function startQuest(){
+    G.rejects = 0; G.cards = []; G.turn = 0; G.props = 0;   // a team is going: the proposal count starts over
+    G.revealed = false; G.done = false;
+    G.screen = "quest";
+    save(); render();
+  }
+
+  function renderQuest(){
+    var seat = G.team[G.turn], evil = isEvil(G.roles[seat]);
+    if(!G.revealed){
+      coverScreen(G.names[seat], esc(t("q.you")), esc(t("q.take")), function(){
+        G.revealed = true; G.done = false; save(); render();
+      }, '<p class="hint">'+esc(t("q.card", {i:G.turn+1, n:G.team.length}))+'</p>');
+      return;
+    }
+    if(G.done){
+      put(
+        '<p class="g-eyebrow">'+nm(seat)+'</p>'+
+        '<h2 class="g-h">'+esc(t("q.down"))+'</h2>'+
+        faceDown(t("q.played"))+
+        '<p class="g-sub">'+esc(t("q.pile"))+'</p>'+
+        '<div class="g-actions"><button class="btn-lg" id="passOn">'+
+          esc(G.turn + 1 >= G.team.length ? t("q.shuffle") : t("v.pass"))+'</button></div>'
+      );
+      on("#passOn", function(){
+        G.revealed = false; G.done = false;
+        G.turn++;
+        if(G.turn >= G.team.length){ G.turn = 0; G.screen = "questres"; }
+        save(); render();
+      });
+      return;
+    }
+    // both cards always look the same, for everyone — a greyed-out Fail would
+    // tell anyone glancing at the screen that this player is Good.
+    put(
+      '<p class="g-eyebrow">'+th("v.watch", {name:G.names[seat]})+'</p>'+
+      '<h2 class="g-h">'+esc(t("q.playOne"))+'</h2>'+
+      '<div class="hand">'+
+        '<button class="playcard s" data-s="1"><div class="pc pc-s">'+sigilSuccess()+'</div><span class="pc-label">'+esc(t("q.success"))+'</span></button>'+
+        '<button class="playcard f" data-s="0"><div class="pc pc-f">'+sigilFail()+'</div><span class="pc-label">'+esc(t("q.fail"))+'</span></button>'+
+      '</div>'+
+      '<p class="refuse-note" id="refuse"></p>'+
+      '<p class="hint">'+esc(t("q.card", {i:G.turn+1, n:G.team.length}))+'</p>'
+    );
+    on(".playcard", function(){
+      var wantsFail = this.dataset.s === "0";
+      if(wantsFail && !evil){
+        var el = this;
+        el.classList.remove("refuse");
+        void el.offsetWidth;
+        el.classList.add("refuse");
+        document.getElementById("refuse").textContent = t("q.refuse");
+        return;
+      }
+      G.cards[G.turn] = !wantsFail;
+      G.done = true;
+      save(); render();
+    });
+  }
+
+  function failCountText(f, need){
+    if(f === 0) return t("qr.f0");
+    if(f === 1) return need === 2 ? t("qr.f1need") : t("qr.f1");
+    return t("qr.fN", {n:f});
+  }
+
+  function renderQuestRes(){
+    var played = G.cards.slice(0, G.team.length);
+    if(played.length < G.team.length || played.some(function(c){ return typeof c !== "boolean"; })){
+      // a card went missing (interrupted mid-quest) — collect them again rather than guess
+      G.cards = []; G.turn = 0; G.revealed = false; G.done = false; G.screen = "quest";
+      save(); render(); return;
+    }
+    var introKey = "s:" + G.qi + ":" + G.rejects + ":" + played.join(",") + ":" + G.team.join(",");
+    if(qIntroDone !== introKey){
+      qIntroDone = introKey;
+      questSuspense(function(){ renderQuestRes(); });
+      return;
+    }
+    var deck = shuffle(played.slice(0));
+    var need = failsNeeded(G.qi);
+    var f = deck.filter(function(c){ return !c; }).length;
+    var ok = f < need;
+    var cards = deck.map(function(c){
+      return '<div class="rv '+(c?"s":"f")+'"><div class="rv-in"><div class="rv-f">'+esc(t("qr.front"))+'</div>'+
+             '<div class="rv-b">'+esc(c?t("q.success"):t("q.fail"))+'</div></div></div>';
+    }).join("");
+    put(
+      '<p class="g-eyebrow">'+esc(t("qr.eye", {n:G.qi+1}))+'</p>'+
+      '<div class="reveal-row">'+cards+'</div>'+
+      '<p class="verdict '+(ok?"good":"evil")+'" id="vd">&nbsp;</p>'+
+      '<div class="g-actions"><button class="btn-lg" id="cont" hidden>'+esc(t("continue"))+'</button></div>'
+    );
+    var rvs = gBody.querySelectorAll(".rv");
+    Array.prototype.forEach.call(rvs, function(el, k){
+      setTimeout(function(){ el.classList.add("on"); }, reduce ? 0 : k * 220);
+    });
+    setTimeout(function(){
+      var v = document.getElementById("vd"), c = document.getElementById("cont");
+      if(!v) return;
+      v.innerHTML = esc(failCountText(f, need)) + "<br>" + esc(ok ? t("qr.ok") : t("qr.no"));
+      if(c) c.hidden = false;
+      playVerdict(ok);
+      speak(ok ? t("qr.ok") : t("qr.no"));
+    }, reduce ? 40 : deck.length * 220 + 700);
+    on("#cont", function(){
+      G.results[G.qi] = ok ? "pass" : "fail";
+      if(fails() >= 3){ finish("evil", {k:"why.three"}); return; }
+      if(passes() >= 3){ G.screen = "assassin"; G.pick = null; save(); render(); return; }
+      G.qi++;
+      G.leader = (G.leader + 1) % G.n;
+      G.rejects = 0; G.team = []; G.cards = []; G.screen = "propose";
+      save(); render();
+    });
+  }
+
+  /* ── assassination ── */
+  function renderAssassin(){
+    var goodSeats = seatsWith(function(k){ return !isEvil(k); });
+    var assassinSeat = seatsWith(function(k){ return k === "assassin"; })[0];
+    var rows = goodSeats.map(function(i){
+      return '<button class="seatbtn" data-i="'+i+'" aria-pressed="'+(G.pick===i)+'"><span class="dot"></span>'+nm(i)+'</button>';
+    }).join("");
+    put(
+      '<p class="g-eyebrow">'+esc(t("a.eye"))+'</p>'+
+      '<h2 class="g-h">'+th("a.h", {name:G.names[assassinSeat]})+'</h2>'+
+      '<p class="g-sub">'+esc(t("a.sub"))+'</p>'+
+      '<div class="panel"><span class="ph">'+esc(t("a.panel"))+'</span><div class="seatgrid">'+rows+'</div></div>'+
+      '<div class="g-actions"><button class="btn-lg" id="strike"'+(G.pick==null?' disabled style="opacity:.4;cursor:not-allowed"':'')+'>'+
+        (G.pick!=null ? th("a.strikeN", {name:G.names[G.pick]}) : esc(t("a.strike")))+'</button></div>'
+    );
+    on(".seatbtn", function(){ G.pick = Number(this.dataset.i); save(); renderAssassin(); });
+    on("#strike", function(){
+      if(G.pick == null) return;
+      if(G.roles[G.pick] === "merlin") finish("evil", {k:"why.hit", name:G.names[G.pick]});
+      else finish("good", {k:"why.miss", name:G.names[G.pick]});
+    });
+    speakOnce("assassin", t("a.say", {name:G.names[assassinSeat]}));
+  }
+
+  /* ── the end ── */
+  function finish(winner, why){
+    G.winner = winner; G.why = why; G.screen = "end"; save(); render();
+  }
+  function renderEnd(){
+    var good = G.winner === "good";
+    var grid = "";
+    for(var i=0;i<G.n;i++){
+      var c = ROLE[G.roles[i]], ev = isEvil(G.roles[i]);
+      grid += '<div class="fin '+(ev?"e":"g")+'"><div class="art">'+portrait(c)+'</div>'+
+        '<div class="lab"><b>'+nm(i)+'</b><span>'+esc(cn(c,"name"))+'</span></div></div>';
+    }
+    var why = whyText(G.why);
+    put(
+      '<p class="g-eyebrow">'+esc(good ? t("e.goodEye") : t("e.evilEye"))+'</p>'+
+      '<h2 class="g-h" style="color:'+(good?"var(--arthur)":"var(--mordred)")+'">'+esc(good?t("e.good"):t("e.evil"))+'</h2>'+
+      '<p class="g-sub">'+esc(why)+'</p>'+
+      '<div class="panel"><span class="ph">'+esc(t("e.revealed"))+'</span><div class="final">'+grid+'</div></div>'+
+      '<div class="g-actions">'+
+        '<button class="btn-lg" id="again">'+esc(t("e.again"))+'</button>'+
+        '<button class="btn-ghost" id="doneBtn">'+esc(t("g.back"))+'</button>'+
+      '</div>', true
+    );
+    on("#again", function(){ clearSave(); G = null; render(); });
+    on("#doneBtn", function(){ clearSave(); G = null; closeGame(); });
+    speak(t(good ? "e.sayGood" : "e.sayEvil", {why:why}));
+  }
+
+  var mode = "solo";
+
+  function render(){
+    if(mode === "net"){ shush(); renderNet(); return; }
+    shush(); clearTimeout(nightTimer); nightTimer = null;
+    lastSpoke = "";
+    quitArmed = false;
+    var q = document.getElementById("quitBtn"); if(q) q.textContent = t("quit");
+    if(!G){ bar(); renderSetup(); return; }
+    switch(G.screen){
+      case "deal":     renderDeal(); break;
+      case "night":    renderNight(); break;
+      case "propose":  renderPropose(); break;
+      case "vote":     renderVote(); break;
+      case "voteres":  renderVoteRes(); break;
+      case "quest":    renderQuest(); break;
+      case "questres": renderQuestRes(); break;
+      case "assassin": renderAssassin(); break;
+      case "end":      renderEnd(); break;
+      default:         G = null; renderSetup();
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     ONLINE PLAY — a phone each, peer to peer.
+     The host's phone holds the whole game and sends every
+     other phone only what that player is allowed to see.
+     ═══════════════════════════════════════════════════════ */
+  var PEERJS_SRC = "https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.5/peerjs.min.js";
+  var CODE_ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  var NET;
+
+  function netReset(){
+    NET = { mode:null, code:"", joinCode:"", name:"", peer:null, conn:null,
+            H:null, view:null, seat:null, status:"", err:"",
+            opts:{percival:false,mordred:false,morgana:false,oberon:false}, novote:false };
+  }
+  netReset();
+  try{ NET.name = localStorage.getItem("avalon_name") || ""; }catch(e){}
+
+  function inFrame(){ try{ return window.self !== window.top; }catch(e){ return true; } }
+  function makeCode(){
+    var s = "";
+    for(var i=0;i<4;i++) s += CODE_ALPHA[Math.floor(Math.random()*CODE_ALPHA.length)];
+    return s;
+  }
+  function peerIdFor(code){ return "knights-of-avalon-v1-" + code; }
+
+  function loadPeer(cb){
+    if(window.Peer) return cb(null);
+    var sc = document.createElement("script");
+    sc.src = PEERJS_SRC;
+    sc.onload = function(){ cb(window.Peer ? null : "load"); };
+    sc.onerror = function(){ cb("load"); };
+    document.head.appendChild(sc);
+    setTimeout(function(){ if(!window.Peer) cb("load"); }, 12000);
+  }
+  // errors are kept as {k, v} so they are worded at render time, in the player's own language
+  function netErrFor(e){
+    var ty = e && e.type;
+    if(ty === "peer-unavailable") return {k:"ne.peer"};
+    if(ty === "network" || ty === "server-error" || ty === "socket-error" || ty === "socket-closed") return {k:"ne.network"};
+    if(ty === "browser-incompatible") return {k:"ne.incompat"};
+    if(ty === "unavailable-id") return {k:"ne.taken"};
+    return {k:"ne.generic", v:{t: ty ? " (" + ty + ")" : ""}};
+  }
+  function netErrText(){
+    if(!NET.err) return "";
+    if(typeof NET.err === "string") return NET.err;
+    return t(NET.err.k, NET.err.v);
+  }
+
+  /* ── host: authoritative state ─────────────────────── */
+  function hostNewState(){
+    return { phase:"lobby", players:[], n:0, names:[], roles:[], leader:0, qi:0,
+             results:[], rejects:0, team:[], votes:{}, cards:{}, ready:{},
+             lastVote:null, lastQuest:null, winner:null, why:null, pick:null, props:0,
+             opts:NET.opts, novote:NET.novote };
+  }
+  function hostSeatOf(id){
+    var H = NET.H;
+    for(var i=0;i<H.players.length;i++) if(H.players[i].id === id) return i;
+    return -1;
+  }
+  function hostSend(pl, msg){
+    if(pl.conn && pl.conn.open){ try{ pl.conn.send(msg); }catch(e){} }
+  }
+  function hostBroadcast(){
+    var H = NET.H;
+    H.names = H.players.map(function(p){ return p.name; });
+    for(var i=0;i<H.players.length;i++){
+      var p = H.players[i];
+      if(p.id === "host"){ NET.view = viewFor(i); }
+      else hostSend(p, {t:"view", v:viewFor(i)});
+    }
+    netViewUpdate();
+  }
+
+  /* what one seat is allowed to see — never more */
+  function viewFor(seat){
+    var H = NET.H, need = TEAMS[H.n] ? TEAMS[H.n][H.qi] : 0;
+    var v = {
+      phase:H.phase, seat:seat, isHost:(seat === 0),
+      names:H.players.map(function(p){ return p.name; }),
+      online:H.players.map(function(p){ return p.id === "host" || !!(p.conn && p.conn.open); }),
+      n:H.n, leader:H.leader, qi:H.qi, results:H.results.slice(0), rejects:H.rejects,
+      team:H.team.slice(0), need:need, novote:H.novote,
+      twoFail: failsNeeded(H.qi, H.n) === 2,
+      propNo:(H.props || 0) + 1, dictator:(((H.props || 0) + 1) >= 5),
+      code:NET.code
+    };
+    if(H.phase === "lobby"){
+      v.opts = H.opts; v.ready = null;
+      return v;
+    }
+    if(H.roles.length){
+      v.role = H.roles[seat];
+      v.know = knowledge(seat, H);
+      v.knowNames = v.know.list.map(function(i){ return H.players[i].name; });
+    }
+    if(H.phase === "deal"){
+      v.ready = !!H.ready[seat];
+      v.waiting = H.players.map(function(p,i){ return i; }).filter(function(i){ return !H.ready[i]; })
+                   .map(function(i){ return H.players[i].name; });
+    }
+    if(H.phase === "vote"){
+      v.voted = (H.votes[seat] !== undefined);
+      v.waiting = H.players.map(function(p,i){ return i; }).filter(function(i){ return H.votes[i] === undefined; })
+                   .map(function(i){ return H.players[i].name; });
+    }
+    if(H.phase === "voteres") v.lastVote = H.lastVote;
+    if(H.phase === "quest"){
+      v.onTeam = H.team.indexOf(seat) >= 0;
+      v.played = (H.cards[seat] !== undefined);
+      v.mayFail = isEvil(H.roles[seat]);
+      v.waiting = H.team.filter(function(i){ return H.cards[i] === undefined; })
+                   .map(function(i){ return H.players[i].name; });
+    }
+    if(H.phase === "questres") v.lastQuest = H.lastQuest;
+    if(H.phase === "assassin"){
+      v.isAssassin = (H.roles[seat] === "assassin");
+      v.goodSeats = seatsWith(function(k){ return !isEvil(k); }, H);
+      v.assassinName = H.players[seatsWith(function(k){ return k === "assassin"; }, H)[0]].name;
+      v.pick = H.pick;
+    }
+    if(H.phase === "end"){
+      v.winner = H.winner; v.why = H.why; v.reveal = H.roles.slice(0);
+    }
+    return v;
+  }
+
+  function hostStartGame(){
+    var H = NET.H;
+    if(H.players.length < 5 || H.players.length > 10) return;
+    H.n = H.players.length;
+    H.opts = NET.opts; H.novote = NET.novote;
+    var ev = SPLIT[H.n][1];
+    if(1 + (H.opts.mordred?1:0) + (H.opts.morgana?1:0) + (H.opts.oberon?1:0) > ev) return;
+    H.roles = assignRoles(H.n, H.opts);
+    H.leader = Math.floor(Math.random()*H.n);
+    H.qi = 0; H.results = []; H.rejects = 0; H.team = [];
+    H.votes = {}; H.cards = {}; H.ready = {};
+    H.winner = null; H.why = null; H.pick = null; H.props = 0;
+    H.phase = "deal";
+    hostBroadcast();
+  }
+  function hostStartQuest(){
+    var H = NET.H;
+    H.rejects = 0; H.cards = {}; H.phase = "quest"; H.props = 0;   // proposal count starts over
+    hostBroadcast();
+  }
+  function hostFinish(winner, why){
+    var H = NET.H;
+    H.winner = winner; H.why = why; H.phase = "end";
+    hostBroadcast();
+  }
+
+  function hostAct(seat, m){
+    var H = NET.H;
+    if(seat < 0 || !m) return;
+    var a = m.a;
+
+    if(H.phase === "deal" && a === "ready"){
+      H.ready[seat] = true;
+      if(Object.keys(H.ready).length >= H.n){ H.phase = "propose"; H.team = []; }
+      hostBroadcast(); return;
+    }
+    if(H.phase === "propose" && a === "send" && seat === H.leader){
+      var need = TEAMS[H.n][H.qi];
+      var team = (m.team || []).filter(function(i){ return i >= 0 && i < H.n; });
+      team = team.filter(function(x,i){ return team.indexOf(x) === i; });
+      if(team.length !== need) return;
+      H.team = team;
+      var propNo = (H.props || 0) + 1;
+      H.props = propNo;
+      if(H.novote || propNo >= 5){ hostStartQuest(); }   // fifth proposal: the Leader is Dictator, no vote
+      else { H.votes = {}; H.phase = "vote"; hostBroadcast(); }
+      return;
+    }
+    if(H.phase === "vote" && a === "vote"){
+      if(H.votes[seat] !== undefined) return;
+      H.votes[seat] = !!m.v;
+      if(Object.keys(H.votes).length >= H.n){
+        var yes = 0;
+        for(var i=0;i<H.n;i++) if(H.votes[i]) yes++;
+        H.lastVote = { yes:yes, no:H.n - yes, ok:(yes > H.n - yes),
+                       votes:H.players.map(function(p,i){ return !!H.votes[i]; }) };
+        H.phase = "voteres";
+      }
+      hostBroadcast(); return;
+    }
+    if(H.phase === "voteres" && a === "next" && seat === 0){
+      if(H.lastVote.ok){ hostStartQuest(); return; }
+      H.rejects++;
+      if(H.rejects >= 5){ hostFinish("evil", {k:"why.five"}); return; }
+      H.leader = (H.leader + 1) % H.n;
+      H.team = []; H.phase = "propose";
+      hostBroadcast(); return;
+    }
+    if(H.phase === "quest" && a === "card"){
+      if(H.team.indexOf(seat) < 0) return;
+      if(H.cards[seat] !== undefined) return;
+      var success = !!m.s;
+      if(!isEvil(H.roles[seat])) success = true;   // Good can never fail, whatever arrives
+      H.cards[seat] = success;
+      var all = H.team.every(function(i){ return H.cards[i] !== undefined; });
+      if(all){
+        var deck = shuffle(H.team.map(function(i){ return H.cards[i]; }));
+        var need2 = failsNeeded(H.qi, H.n);
+        var f = deck.filter(function(c){ return !c; }).length;
+        H.lastQuest = { deck:deck, fails:f, need:need2, ok:(f < need2) };
+        H.phase = "questres";
+      }
+      hostBroadcast(); return;
+    }
+    if(H.phase === "questres" && a === "next" && seat === 0){
+      H.results[H.qi] = H.lastQuest.ok ? "pass" : "fail";
+      var p = H.results.filter(function(r){ return r === "pass"; }).length;
+      var fl = H.results.filter(function(r){ return r === "fail"; }).length;
+      if(fl >= 3){ hostFinish("evil", {k:"why.three"}); return; }
+      if(p >= 3){ H.phase = "assassin"; H.pick = null; hostBroadcast(); return; }
+      H.qi++; H.leader = (H.leader + 1) % H.n; H.rejects = 0; H.team = []; H.cards = {};
+      H.phase = "propose";
+      hostBroadcast(); return;
+    }
+    if(H.phase === "assassin" && H.roles[seat] === "assassin"){
+      if(a === "pick"){ H.pick = m.target; hostBroadcast(); return; }
+      if(a === "strike" && H.pick != null && !isEvil(H.roles[H.pick])){
+        if(H.roles[H.pick] === "merlin")
+          hostFinish("evil", {k:"why.hit", name:H.players[H.pick].name});
+        else
+          hostFinish("good", {k:"why.miss", name:H.players[H.pick].name});
+        return;
+      }
+    }
+    if(H.phase === "end" && a === "again" && seat === 0){
+      var keep = H.players;
+      NET.H = hostNewState();
+      NET.H.players = keep;
+      hostBroadcast(); return;
+    }
+  }
+
+  function hostWire(conn){
+    conn.on("data", function(m){
+      if(!m || !NET.H) return;
+      if(m.t === "join"){
+        var H = NET.H, nmj = String(m.name || "").slice(0,14).trim() || t("player", {n:""}).trim();
+        var seat = -1;
+        for(var i=0;i<H.players.length;i++){
+          if(H.players[i].name.toLowerCase() === nmj.toLowerCase() &&
+             !(H.players[i].conn && H.players[i].conn.open) && H.players[i].id !== "host"){ seat = i; break; }
+        }
+        if(seat >= 0){                       // someone rejoining under the same name
+          H.players[seat].id = conn.peer;
+          H.players[seat].conn = conn;
+        } else if(H.phase === "lobby" && H.players.length < 10){
+          H.players.push({ id:conn.peer, name:nmj, conn:conn });
+          seat = H.players.length - 1;
+        } else {
+          try{ conn.send({t:"kick", k: H.phase === "lobby" ? "kick.full" : "kick.started"}); }catch(e){}
+          return;
+        }
+        try{ conn.send({t:"seated", seat:seat}); }catch(e){}
+        hostBroadcast();
+        return;
+      }
+      if(m.t === "act") hostAct(hostSeatOf(conn.peer), m);
+    });
+    conn.on("close", function(){ hostBroadcast(); });
+    conn.on("error", function(){ hostBroadcast(); });
+  }
+
+  function hostOpen(){
+    NET.mode = "host"; NET.status = "opening"; NET.err = "";
+    NET.H = hostNewState();
+    NET.H.players.push({ id:"host", name:(NET.name || t("host")), conn:null });
+    NET.seat = 0;
+    renderNet();
+    loadPeer(function(err){
+      if(err){ NET.err = {k:"ne.lib"}; NET.status = "failed"; renderNet(); return; }
+      hostTry(0);
+    });
+  }
+  function hostTry(attempt){
+    if(attempt > 4){ NET.err = {k:"ne.noroom"}; NET.status = "failed"; renderNet(); return; }
+    NET.code = makeCode();
+    var p;
+    try{ p = new window.Peer(peerIdFor(NET.code), {debug:0}); }
+    catch(e){ NET.err = {k:"ne.nostart"}; NET.status = "failed"; renderNet(); return; }
+    NET.peer = p;
+    p.on("open", function(){ NET.status = "open"; NET.err = ""; hostBroadcast(); });
+    p.on("connection", hostWire);
+    p.on("error", function(e){
+      if(e && e.type === "unavailable-id"){ try{ p.destroy(); }catch(_){} hostTry(attempt+1); return; }
+      NET.err = netErrFor(e);
+      if(NET.status !== "open") NET.status = "failed";
+      renderNet();
+    });
+    p.on("disconnected", function(){ if(NET.status === "open"){ try{ p.reconnect(); }catch(_){} } });
+  }
+
+  /* ── guest ─────────────────────────────────────────── */
+  function guestJoin(code){
+    NET.mode = "guest"; NET.status = "joining"; NET.err = ""; NET.code = code;
+    renderNet();
+    loadPeer(function(err){
+      if(err){ NET.err = {k:"ne.libShort"}; NET.status = "failed"; renderNet(); return; }
+      var p;
+      try{ p = new window.Peer({debug:0}); }
+      catch(e){ NET.err = {k:"ne.nostart"}; NET.status = "failed"; renderNet(); return; }
+      NET.peer = p;
+      p.on("open", function(){
+        var c = p.connect(peerIdFor(code), {reliable:true});
+        NET.conn = c;
+        c.on("open", function(){
+          NET.status = "joined"; NET.err = "";
+          c.send({t:"join", name:NET.name});
+          renderNet();
+        });
+        c.on("data", function(m){
+          if(!m) return;
+          if(m.t === "view"){ NET.view = m.v; NET.seat = m.v.seat; NET.status = "joined"; netViewUpdate(); }
+          else if(m.t === "seated"){ NET.seat = m.seat; }
+          else if(m.t === "kick"){ NET.err = {k:m.k || "kick.full"}; NET.status = "failed"; NET.view = null; renderNet(); }
+        });
+        c.on("close", function(){
+          if(NET.status !== "failed"){ NET.status = "lost"; renderNet(); }
+        });
+        c.on("error", function(e){ NET.err = netErrFor(e); NET.status = "failed"; renderNet(); });
+      });
+      p.on("error", function(e){
+        NET.err = netErrFor(e);
+        if(NET.status !== "joined") NET.status = "failed";
+        renderNet();
+      });
+    });
+  }
+  function netAct(obj){
+    obj.t = "act";
+    if(NET.mode === "host") hostAct(0, obj);
+    else if(NET.conn && NET.conn.open){ try{ NET.conn.send(obj); }catch(e){} }
+  }
+  function netLeave(){
+    try{ if(NET.peer) NET.peer.destroy(); }catch(e){}
+    netReset();
+    try{ NET.name = localStorage.getItem("avalon_name") || ""; }catch(e){}
+  }
+
+  /* ── online screens ────────────────────────────────── */
+  function netBar(v){
+    var r = document.getElementById("barRound"), tr = document.getElementById("barTrack"),
+        l = document.getElementById("barLeader"), rj = document.getElementById("barRej");
+    document.getElementById("barRejLbl").textContent = t("bar.rej");
+    if(!v || v.phase === "lobby"){
+      r.textContent = NET.code ? (t("net.roomCode") + " " + NET.code) : "Online";
+      tr.innerHTML = ""; l.textContent = ""; rj.hidden = true; return;
+    }
+    r.textContent = v.phase === "end" ? t("bar.over") : t("bar.quest", {n:Math.min(v.qi + 1, 5)});
+    var h = "";
+    for(var i=0;i<5;i++){
+      var c = "mini";
+      if(v.results[i] === "pass") c += " pass";
+      else if(v.results[i] === "fail") c += " fail";
+      else if(i === v.qi && v.phase !== "end") c += " now";
+      h += '<span class="' + c + '">' + (TEAMS[v.n] ? TEAMS[v.n][i] : "") + '</span>';
+    }
+    tr.innerHTML = h;
+    l.textContent = v.phase === "end" ? "" : t("bar.leader", {name:v.names[v.leader]});
+    rj.hidden = (v.phase === "end") || !!v.novote;
+    var d = rj.querySelectorAll("i");
+    for(var k=0;k<5;k++) d[k].className = (k < v.rejects) ? "on" : "";
+  }
+
+  function waitInner(list, what){
+    if(!list || !list.length) return '<p class="g-note">'+esc(t("net.done"))+'</p>';
+    return '<div class="panel"><span class="ph">'+esc(what)+'</span><div class="waitrow">'+
+      list.map(function(n){ return '<span class="waitchip">'+esc(n)+'</span>'; }).join("")+
+    '</div></div>';
+  }
+  function waitBlock(list, what){
+    return '<div class="waitslot" data-what="'+esc(what)+'">'+waitInner(list, what)+'</div>';
+  }
+  /* A view update repaints this screen only if something *you* can see changed.
+     Someone else tapping "I know who I am" no longer wipes your card or resets your scroll;
+     the "still reading" list just updates in place. */
+  function netSig(v){
+    if(!v) return "none|" + NET.status + "|" + JSON.stringify(NET.err) + "|" + NET.mode;
+    var c = {};
+    for(var k in v){
+      if(k === "waiting") continue;
+      if(k === "online" && v.phase !== "lobby") continue;
+      c[k] = v[k];
+    }
+    return JSON.stringify(c) + "|" + NET.status + "|" + JSON.stringify(NET.err) + "|" + NET.mode;
+  }
+  function netViewUpdate(){
+    if(gv.hidden) return;
+    var v = NET.view, sig = netSig(v);
+    if(NET.lastSig === sig && v){
+      var slot = gBody.querySelector(".waitslot");
+      if(slot && v.waiting) slot.innerHTML = waitInner(v.waiting, slot.getAttribute("data-what") || "");
+      return;
+    }
+    NET.lastSig = sig;
+    renderNet(true);
+  }
+  function roleCardHtml(v, compact){
+    var c = ROLE[v.role], ev = isEvil(v.role), k = v.know;
+    var chips = (v.knowNames || []).map(function(n){
+      return '<span class="know '+(k.cls || (v.role === "percival" ? "q" : ""))+'">'+esc(n)+'</span>';
+    }).join("");
+    return '<div class="rolecard">'+
+      '<div class="rc-top">'+
+        '<div class="art">'+portrait(c)+'</div>'+
+        '<div><div class="rc-name">'+esc(cn(c,"name"))+'</div>'+
+          '<div class="rc-side '+(ev?"e":"g")+'">'+esc(ev ? t("rc.evil") : t("rc.good"))+'</div>'+
+          (compact ? '' : '<p class="rc-blurb">'+esc(cn(c,"power"))+'</p>')+
+        '</div>'+
+      '</div>'+
+      '<div class="rc-know"><div class="kt">'+esc(t(k.tk))+'</div>'+
+        (chips ? '<div class="knows">'+chips+'</div>' : '<div class="knows"><span class="know g">'+esc(t("rc.nobody"))+'</span></div>')+
+        '<p>'+esc(t(k.nk))+'</p></div>'+
+    '</div>';
+  }
+
+  function renderNet(fromView){
+    if(fromView !== true) NET.lastSig = null;
+    if(gv.hidden) return;
+    var v = NET.view;
+    netBar(v);
+
+    /* entry */
+    if(!NET.mode){
+      put(
+        '<p class="g-eyebrow">'+esc(t("net.eye"))+'</p>'+
+        '<h2 class="g-h">'+esc(t("net.h"))+'</h2>'+
+        '<p class="g-sub">'+esc(t("net.sub"))+'</p>'+
+        '<div class="panel"><span class="ph">'+esc(t("net.yourName"))+'</span>'+
+          '<label class="namein"><span>'+esc(t("you"))+'</span><input type="text" id="myName" maxlength="14" value="'+esc(NET.name)+'" placeholder="'+esc(t("net.namePh"))+'" aria-label="'+esc(t("net.yourName"))+'"></label>'+
+        '</div>'+
+        '<div class="panel"><span class="ph">'+esc(t("net.hostH"))+'</span>'+
+          '<p style="color:var(--vellum-dim);font-size:15px;margin-bottom:14px">'+esc(t("net.hostP"))+'</p>'+
+          '<button class="btn-lg" id="doHost">'+esc(t("net.open"))+'</button>'+
+        '</div>'+
+        '<div class="panel"><span class="ph">'+esc(t("net.joinH"))+'</span>'+
+          '<label class="namein" style="margin-bottom:12px"><span>'+esc(t("net.code"))+'</span><input type="text" id="joinCode" maxlength="4" value="'+esc(NET.joinCode)+'" placeholder="ABCD" autocapitalize="characters" autocomplete="off" aria-label="'+esc(t("net.roomCode"))+'" style="text-transform:uppercase;letter-spacing:.3em;font-family:var(--f-mono);direction:ltr"></label>'+
+          '<button class="btn-lg" id="doJoin">'+esc(t("net.join"))+'</button>'+
+        '</div>'+
+        (NET.err ? '<div class="warnbox">'+esc(netErrText())+'</div>' : '')+
+        (inFrame() ? '<div class="okbox">'+esc(t("net.frame"))+'</div>' : '')+
+        '<div class="g-actions"><button class="btn-ghost" id="netBack">'+esc(t("net.back"))+'</button></div>'
+      );
+      on("#myName", function(){ NET.name = this.value; try{ localStorage.setItem("avalon_name", NET.name); }catch(e){} }, "input");
+      on("#joinCode", function(){ NET.joinCode = this.value.toUpperCase().replace(/[^A-Z0-9]/g,""); }, "input");
+      on("#doHost", function(){
+        if(!String(NET.name||"").trim()){ NET.err = t("net.needName"); renderNet(); return; }
+        NET.err = ""; hostOpen();
+      });
+      on("#doJoin", function(){
+        if(!String(NET.name||"").trim()){ NET.err = t("net.needName"); renderNet(); return; }
+        if(NET.joinCode.length !== 4){ NET.err = t("net.needCode"); renderNet(); return; }
+        NET.err = ""; guestJoin(NET.joinCode);
+      });
+      on("#netBack", function(){ netLeave(); mode = "solo"; render(); });
+      return;
+    }
+
+    /* connecting / failed / lost */
+    if(NET.status === "opening" || NET.status === "joining"){
+      put('<p class="g-eyebrow">'+esc(NET.mode==="host" ? t("net.opening") : t("net.finding"))+'</p>'+
+          '<h2 class="g-h">'+esc(NET.mode==="host" ? t("net.moment") : t("net.knock", {code:NET.code}))+'</h2>'+
+          '<p class="g-sub">'+esc(t("net.connecting"))+'</p>'+
+          '<div class="g-actions"><button class="btn-ghost" id="netBack">'+esc(t("net.cancel"))+'</button></div>');
+      on("#netBack", function(){ netLeave(); renderNet(); });
+      return;
+    }
+    if(NET.status === "failed" || NET.status === "lost"){
+      put('<p class="g-eyebrow">'+esc(NET.status==="lost" ? t("net.lost") : t("net.noluck"))+'</p>'+
+          '<h2 class="g-h">'+esc(NET.status==="lost" ? t("net.lostH") : t("net.failH"))+'</h2>'+
+          (NET.err ? '<div class="warnbox">'+esc(netErrText())+'</div>' : '')+
+          (NET.status==="lost" ? '<p class="g-sub">'+esc(t("net.lostP"))+'</p>' : '')+
+          '<div class="g-actions">'+
+            (NET.status==="lost" ? '<button class="btn-lg" id="reJoin">'+esc(t("net.rejoin", {code:NET.code}))+'</button>' : '')+
+            '<button class="btn-ghost" id="netBack">'+esc(t("net.back"))+'</button></div>');
+      on("#reJoin", function(){ var c = NET.code, n = NET.name; netLeave(); NET.name = n; guestJoin(c); });
+      on("#netBack", function(){ netLeave(); renderNet(); });
+      return;
+    }
+
+    if(!v){
+      put('<p class="g-eyebrow">'+esc(t("net.waiting"))+'</p><h2 class="g-h">'+esc(t("net.waitHost"))+'</h2>'+
+          '<div class="g-actions"><button class="btn-ghost" id="netBack">'+esc(t("net.leave"))+'</button></div>');
+      on("#netBack", function(){ netLeave(); renderNet(); });
+      return;
+    }
+
+    /* ── lobby ── */
+    if(v.phase === "lobby"){
+      var rows = v.names.map(function(n,i){
+        return '<div class="lobbyrow'+(v.online[i]?'':' off')+'">'+
+          '<span class="ln">'+esc(n)+'</span>'+
+          (i===0 ? '<span class="tagl">'+esc(t("tag.host"))+'</span>' : '')+
+          '<span class="dotlive'+(v.online[i]?' on':'')+'"></span></div>';
+      }).join("");
+      var n = v.names.length, ok = n >= 5 && n <= 10;
+      var sp = SPLIT[n];
+      var optRows = v.isHost ? ["percival","mordred","morgana","oberon"].map(function(k){
+        return '<button class="tg '+(k==="percival"?"g":"e")+'" data-c="'+k+'" aria-pressed="'+(NET.opts[k]?"true":"false")+'">'+
+               '<span class="box"></span>'+esc(t("c."+k+".name"))+'</button>';
+      }).join("") : "";
+      var tooMany = v.isHost && ok &&
+        (1 + (NET.opts.mordred?1:0) + (NET.opts.morgana?1:0) + (NET.opts.oberon?1:0)) > SPLIT[n][1];
+
+      put(
+        '<p class="g-eyebrow">'+esc(t("net.roomCode"))+'</p>'+
+        '<div class="codebox"><span>'+esc(v.code || NET.code)+'</span></div>'+
+        '<p class="g-sub">'+t("net.lobbySub")+'</p>'+
+        '<div class="panel"><span class="ph">'+esc(t("net.at", {n:n}) + (ok ? "" : t("net.need")))+'</span>'+
+          '<div class="lobbylist">'+rows+'</div>'+
+          (ok ? '<p style="margin-top:12px;color:var(--mist);font-size:14px"><b style="color:var(--arthur);font-weight:400">'+esc(t("g.split.good",{n:sp[0]}))+'</b> · <b style="color:var(--mordred);font-weight:400">'+esc(t("g.split.evil",{n:sp[1]}))+'</b></p>' : '')+
+        '</div>'+
+        (v.isHost
+          ? '<div class="panel"><span class="ph">'+esc(t("g.opt"))+'</span><div class="opts">'+optRows+'</div>'+
+              (tooMany ? '<div class="warnbox" style="margin-top:12px">'+esc(t("net.tooMany", {n:n}))+'</div>' : '')+
+            '</div>'+
+            '<div class="panel"><span class="ph">'+esc(t("g.house"))+'</span>'+
+              '<button class="tg" data-h="novote" aria-pressed="'+(NET.novote?"true":"false")+'"><span class="box"></span>'+esc(t("h.novote"))+'</button>'+
+            '</div>'+
+            '<div class="g-actions"><button class="btn-lg" id="startNet"'+((ok && !tooMany)?'':' disabled style="opacity:.4;cursor:not-allowed"')+'>'+esc(t("g.deal"))+'</button>'+
+            '<button class="btn-ghost" id="netBack">'+esc(t("net.close"))+'</button></div>'
+          : '<p class="g-note">'+esc(t("net.waitDeal", {name:v.names[0]}))+'</p>'+
+            '<div class="g-actions"><button class="btn-ghost" id="netBack">'+esc(t("net.leave"))+'</button></div>')
+      );
+      on(".tg[data-c]", function(){ NET.opts[this.dataset.c] = !NET.opts[this.dataset.c]; NET.H.opts = NET.opts; hostBroadcast(); });
+      on(".tg[data-h]", function(){ NET.novote = !NET.novote; NET.H.novote = NET.novote; hostBroadcast(); });
+      on("#startNet", hostStartGame);
+      on("#netBack", function(){ netLeave(); renderNet(); });
+      return;
+    }
+
+    /* ── your card ── */
+    if(v.phase === "deal"){
+      put(
+        '<p class="g-eyebrow">'+esc(t("net.mine"))+'</p>'+
+        roleCardHtml(v)+
+        (v.ready
+          ? waitBlock(v.waiting, t("net.reading"))
+          : '<div class="g-actions"><button class="btn-lg" id="ready">'+esc(t("net.know"))+'</button></div>')
+      );
+      on("#ready", function(){ netAct({a:"ready"}); });
+      return;
+    }
+
+    var mine = '<div class="g-actions"><button class="btn-ghost" id="peek">'+esc(t("net.myCard"))+'</button></div>';
+
+    /* ── team building ── */
+    if(v.phase === "propose"){
+      if(v.seat === v.leader){
+        var rows2 = v.names.map(function(n,i){
+          return '<button class="seatbtn" data-i="'+i+'" aria-pressed="'+(NET.pickTeam && NET.pickTeam.indexOf(i)>=0)+'">'+
+            '<span class="dot"></span>'+esc(n)+(i===v.leader?'<span class="tagl">'+esc(t("tag.you"))+'</span>':'')+'</button>';
+        }).join("");
+        NET.pickTeam = NET.pickTeam || [];
+        var full = NET.pickTeam.length === v.need;
+        put(
+          '<p class="g-eyebrow">'+esc(t("net.leader", {n:v.qi+1}))+'</p>'+
+          '<h2 class="g-h">'+esc(t("net.pick", {n:v.need}))+'</h2>'+
+          (v.dictator && !v.novote ? '<div class="okbox" style="text-align:center">'+t("p.dict")+'</div>' : '')+
+          (v.twoFail ? '<div class="okbox" style="text-align:center">'+t("p.two")+'</div>' : '')+
+          '<div class="panel"><span class="ph">'+esc(t("p.chosen", {c:NET.pickTeam.length, n:v.need}))+'</span><div class="seatgrid">'+rows2+'</div></div>'+
+          '<div class="g-actions">'+
+            '<button class="btn-lg" id="sendTeam"'+(full?'':' disabled style="opacity:.4;cursor:not-allowed"')+'>'+
+              esc(v.dictator && !v.novote ? t("p.btnDict") : (v.novote ? t("p.btnSend") : t("p.btnVote")))+'</button>'+
+          '</div>'+
+          (v.novote ? '' : '<p class="hint">'+esc(v.dictator ? t("p.hintDict", {n:v.propNo}) : t("p.hint", {n:v.propNo}))+'</p>')+ mine
+        );
+        on(".seatbtn", function(){
+          var i = Number(this.dataset.i), at = NET.pickTeam.indexOf(i);
+          if(at >= 0) NET.pickTeam.splice(at,1);
+          else { if(NET.pickTeam.length >= v.need) return; NET.pickTeam.push(i); }
+          renderNet();
+        });
+        on("#sendTeam", function(){ var tm = NET.pickTeam.slice(0); NET.pickTeam = []; netAct({a:"send", team:tm}); });
+      } else {
+        NET.pickTeam = [];
+        put(
+          '<p class="g-eyebrow">'+esc(t("p.eye", {n:v.qi+1}))+'</p>'+
+          '<h2 class="g-h">'+th("net.choosing", {name:v.names[v.leader], n:v.need})+'</h2>'+
+          '<p class="g-sub">'+esc(t("net.talk"))+'</p>'+
+          (v.dictator && !v.novote ? '<div class="okbox" style="text-align:center">'+t("p.dict")+'</div>' : '')+ mine
+        );
+      }
+      on("#peek", peekCard);
+      return;
+    }
+
+    /* ── vote ── */
+    if(v.phase === "vote"){
+      var tn = v.team.map(function(i){ return v.names[i]; }).join(", ");
+      if(v.voted){
+        put('<p class="g-eyebrow">'+esc(t("net.voteIn"))+'</p>'+
+            '<h2 class="g-h">'+esc(t("net.face"))+'</h2>'+ faceDown(t("v.cast"))+
+            waitBlock(v.waiting, t("net.stillVoting"))+ mine);
+      } else {
+        put(
+          '<p class="g-eyebrow">'+esc(t("net.noSee"))+'</p>'+
+          '<h2 class="g-h">'+th("v.send", {team:tn})+'</h2>'+
+          '<div class="tokens-choice">'+
+            '<button class="vtok y" data-v="1"><div class="vt vt-y">'+sigilApprove()+'</div><span class="vt-label">'+esc(t("v.approve"))+'</span></button>'+
+            '<button class="vtok n" data-v="0"><div class="vt vt-n">'+sigilReject()+'</div><span class="vt-label">'+esc(t("v.reject"))+'</span></button>'+
+          '</div>'+ mine
+        );
+        on(".vtok", function(){ netAct({a:"vote", v:this.dataset.v === "1"}); });
+      }
+      on("#peek", peekCard);
+      return;
+    }
+
+    if(v.phase === "voteres"){
+      var lv = v.lastVote;
+      var cards = v.names.map(function(n,i){
+        return '<div class="rv '+(lv.votes[i]?"yes":"no")+' on"><div class="rv-in">'+
+          '<div class="rv-f">'+esc(t("vr.front"))+'</div><div class="rv-b">'+esc(lv.votes[i]?t("v.approve"):t("v.reject"))+'</div></div>'+
+          '<span class="cap">'+esc(n)+'</span></div>';
+      }).join("");
+      put(
+        '<p class="g-eyebrow">'+esc(t("vr.eye"))+'</p>'+
+        '<div class="reveal-row">'+cards+'</div>'+
+        '<p class="verdict '+(lv.ok?"good":"evil")+'">'+esc(t("vr.count", {y:lv.yes, n:lv.no}))+'<br>'+
+          esc(lv.ok ? t("vr.ok") : (lv.yes===lv.no ? t("vr.tie") : t("vr.no")))+'</p>'+
+        (v.isHost ? '<div class="g-actions"><button class="btn-lg" id="next">'+esc(t("continue"))+'</button></div>'
+                  : '<p class="g-note">'+esc(t("net.waitFor", {name:v.names[0]}))+'</p>')+ mine
+      );
+      on("#next", function(){ netAct({a:"next"}); });
+      on("#peek", peekCard);
+      return;
+    }
+
+    /* ── quest ── */
+    if(v.phase === "quest"){
+      if(!v.onTeam){
+        put('<p class="g-eyebrow">'+esc(t("net.qn", {n:v.qi+1}))+'</p>'+
+            '<h2 class="g-h">'+th("net.onQuest", {names:v.team.map(function(i){ return v.names[i]; }).join(", ")})+'</h2>'+
+            '<p class="g-sub">'+esc(t("net.notYou"))+'</p>'+
+            waitBlock(v.waiting, t("net.stillPlay"))+ mine);
+      } else if(v.played){
+        put('<p class="g-eyebrow">'+esc(t("net.cardIn"))+'</p>'+
+            '<h2 class="g-h">'+esc(t("net.face"))+'</h2>'+ faceDown(t("q.played"))+
+            '<p class="g-sub">'+esc(t("net.shuffled"))+'</p>'+
+            waitBlock(v.waiting, t("net.stillPlay"))+ mine);
+      } else {
+        put(
+          '<p class="g-eyebrow">'+esc(t("net.noSee"))+'</p>'+
+          '<h2 class="g-h">'+esc(t("q.playOne"))+'</h2>'+
+          '<div class="hand">'+
+            '<button class="playcard s" data-s="1"><div class="pc pc-s">'+sigilSuccess()+'</div><span class="pc-label">'+esc(t("q.success"))+'</span></button>'+
+            '<button class="playcard f" data-s="0"><div class="pc pc-f">'+sigilFail()+'</div><span class="pc-label">'+esc(t("q.fail"))+'</span></button>'+
+          '</div>'+
+          '<p class="refuse-note" id="refuse"></p>'+ mine
+        );
+        on(".playcard", function(){
+          var wantsFail = this.dataset.s === "0";
+          if(wantsFail && !v.mayFail){
+            var el = this; el.classList.remove("refuse"); void el.offsetWidth; el.classList.add("refuse");
+            document.getElementById("refuse").textContent = t("q.refuse");
+            return;
+          }
+          netAct({a:"card", s: !wantsFail});
+        });
+      }
+      on("#peek", peekCard);
+      return;
+    }
+
+    if(v.phase === "questres"){
+      var lq = v.lastQuest;
+      var introKeyN = "n:" + v.qi + ":" + v.rejects + ":" + lq.deck.join(",") + ":" + v.team.join(",");
+      if(qIntroDone !== introKeyN){
+        qIntroDone = introKeyN;
+        questSuspense(function(){ NET.lastSig = null; renderNet(); });
+        return;
+      }
+      setTimeout(function(){ playVerdict(lq.ok); }, 450);
+      var qc = lq.deck.map(function(c){
+        return '<div class="rv '+(c?"s":"f")+' on"><div class="rv-in"><div class="rv-f">'+esc(t("qr.front"))+'</div>'+
+               '<div class="rv-b">'+esc(c?t("q.success"):t("q.fail"))+'</div></div></div>';
+      }).join("");
+      put(
+        '<p class="g-eyebrow">'+esc(t("qr.eye", {n:v.qi+1}))+'</p>'+
+        '<div class="reveal-row">'+qc+'</div>'+
+        '<p class="verdict '+(lq.ok?"good":"evil")+'">'+
+          esc(failCountText(lq.fails, lq.need))+
+          '<br>'+esc(lq.ok ? t("qr.ok") : t("qr.no"))+'</p>'+
+        (v.isHost ? '<div class="g-actions"><button class="btn-lg" id="next">'+esc(t("continue"))+'</button></div>'
+                  : '<p class="g-note">'+esc(t("net.waitFor", {name:v.names[0]}))+'</p>')+ mine
+      );
+      on("#next", function(){ netAct({a:"next"}); });
+      on("#peek", peekCard);
+      return;
+    }
+
+    /* ── assassination ── */
+    if(v.phase === "assassin"){
+      if(v.isAssassin){
+        var gs = v.goodSeats.map(function(i){
+          return '<button class="seatbtn" data-i="'+i+'" aria-pressed="'+(v.pick===i)+'"><span class="dot"></span>'+esc(v.names[i])+'</button>';
+        }).join("");
+        put(
+          '<p class="g-eyebrow">'+esc(t("net.aHold"))+'</p>'+
+          '<h2 class="g-h">'+esc(t("net.aName"))+'</h2>'+
+          '<p class="g-sub">'+esc(t("net.aTalk"))+'</p>'+
+          '<div class="panel"><span class="ph">'+esc(t("a.panel"))+'</span><div class="seatgrid">'+gs+'</div></div>'+
+          '<div class="g-actions"><button class="btn-lg" id="strike"'+(v.pick==null?' disabled style="opacity:.4;cursor:not-allowed"':'')+'>'+
+            (v.pick!=null ? th("a.strikeN", {name:v.names[v.pick]}) : esc(t("a.strike")))+'</button></div>'
+        );
+        on(".seatbtn", function(){ netAct({a:"pick", target:Number(this.dataset.i)}); });
+        on("#strike", function(){ netAct({a:"strike"}); });
+      } else {
+        put('<p class="g-eyebrow">'+esc(t("net.aThree"))+'</p>'+
+            '<h2 class="g-h">'+esc(t("net.aChoosing"))+'</h2>'+
+            '<p class="g-sub">'+esc(t("net.aOther", {name:v.assassinName}))+'</p>'+ mine);
+        on("#peek", peekCard);
+      }
+      return;
+    }
+
+    /* ── end ── */
+    if(v.phase === "end"){
+      var good = v.winner === "good";
+      var grid = v.names.map(function(n,i){
+        var c = ROLE[v.reveal[i]], ev = isEvil(v.reveal[i]);
+        return '<div class="fin '+(ev?"e":"g")+'"><div class="art">'+portrait(c)+'</div>'+
+          '<div class="lab"><b>'+esc(n)+'</b><span>'+esc(cn(c,"name"))+'</span></div></div>';
+      }).join("");
+      put(
+        '<p class="g-eyebrow">'+esc(good ? t("e.goodEye") : t("e.evilEye"))+'</p>'+
+        '<h2 class="g-h" style="color:'+(good?"var(--arthur)":"var(--mordred)")+'">'+esc(good?t("e.good"):t("e.evil"))+'</h2>'+
+        '<p class="g-sub">'+esc(whyText(v.why))+'</p>'+
+        '<div class="panel"><span class="ph">'+esc(t("e.revealed"))+'</span><div class="final">'+grid+'</div></div>'+
+        '<div class="g-actions">'+
+          (v.isHost ? '<button class="btn-lg" id="again2">'+esc(t("net.again"))+'</button>' : '<p class="g-note">'+esc(t("net.waitAgain", {name:v.names[0]}))+'</p>')+
+          '<button class="btn-ghost" id="netBack">'+esc(t("net.leave"))+'</button></div>', true
+      );
+      on("#again2", function(){ netAct({a:"again"}); });
+      on("#netBack", function(){ netLeave(); renderNet(); });
+      return;
+    }
+  }
+
+  function peekCard(){
+    var v = NET.view;
+    if(!v || !v.role) return;
+    put('<p class="g-eyebrow">'+esc(t("net.yours"))+'</p>'+ roleCardHtml(v) +
+        '<div class="g-actions"><button class="btn-lg" id="unpeek">'+esc(t("net.hideIt"))+'</button></div>');
+    on("#unpeek", renderNet);
+  }
+
+
+  // headless self-test hook — only when the page is opened with #selftest
+  if(location.hash === "#selftest"){
+    window.__avalon = {
+      get NET(){ return NET; },
+      setNET:function(x){ NET = x; },
+      hostNewState:hostNewState, hostAct:hostAct, viewFor:viewFor, hostStartGame:hostStartGame,
+      assignRoles:assignRoles, isEvil:isEvil, SPLIT:SPLIT, TEAMS:TEAMS, knowledge:knowledge,
+      failsNeeded:failsNeeded, silence:function(){ muted = true; },
+      renderNet:function(){ renderNet(); }, hostBroadcast:hostBroadcast,
+      openNet:function(){ mode = "net"; gv.hidden = false; },
+      t:t, setLang:function(l){ setLang(l); }, get LANG(){ return LANG; }
+    };
+  }
+
+  /* ── language switching ── */
+  function applyLang(){
+    var h = document.documentElement;
+    h.lang = LANG;
+    h.dir = LANG === "he" ? "rtl" : "ltr";
+    var els = document.querySelectorAll("[data-i]");
+    for(var i=0;i<els.length;i++) els[i].innerHTML = t(els[i].getAttribute("data-i"));
+    var as = document.querySelectorAll("[data-ia]");
+    for(var j=0;j<as.length;j++){
+      var p = as[j].getAttribute("data-ia").split(":");
+      as[j].setAttribute(p[0], t(p[1]));
+    }
+    document.title = t("meta.title");
+    var md = document.getElementById("metaDesc");
+    if(md) md.setAttribute("content", t("meta.desc"));
+    document.querySelectorAll("#langbar button").forEach(function(b){
+      b.setAttribute("aria-pressed", b.dataset.lang === LANG ? "true" : "false");
+    });
+    // anything built by script
+    buildCards();
+    setPlayers(players);
+    renderScript();
+    if(narrating){ clearInterval(narrating); narrating = null; }
+    document.getElementById("narrateBtn").textContent = t("narr.btn");
+    var vb = document.getElementById("voiceBtn");
+    vb.textContent = muted ? t("voice.off") : t("voice.on");
+    var qb = document.getElementById("quitBtn"); qb.textContent = t("quit");
+    if(!gv.hidden){ if(mode === "net") renderNet(); else render(); }
+    else bar();
+  }
+  function setLang(l){
+    if(l !== "en" && l !== "he") return;
+    if(l === LANG) return;
+    var from = DEFAULT_NAMES[LANG], to = DEFAULT_NAMES[l];
+    LANG = l;
+    try{ localStorage.setItem("avalon_lang", LANG); }catch(e){}
+    // names that are still the stock ones follow the language; names someone typed stay
+    for(var i=0;i<cfg.names.length;i++){
+      if(cfg.names[i] === from[i]) cfg.names[i] = to[i];
+    }
+    shush();
+    pickVoice();
+    applyLang();
+  }
+
+  /* ── game chrome wiring ── */
+  document.getElementById("quitBtn").addEventListener("click", function(){
+    if(!quitArmed){ quitArmed = true; this.textContent = t("quit.sure"); return; }
+    if(mode === "net"){ netLeave(); mode = "solo"; }
+    clearSave(); G = null; closeGame();
+  });
+  document.getElementById("voiceBtn").addEventListener("click", function(){
+    muted = !muted;
+    this.setAttribute("aria-pressed", muted ? "false" : "true");
+    this.textContent = muted ? t("voice.off") : t("voice.on");
+    try{ localStorage.setItem("avalon_mute", muted ? "1" : "0"); }catch(e){}
+    if(muted) shush(); else speak(t("voice.said"));
+  });
+  document.querySelectorAll("#langbar button").forEach(function(b){
+    b.addEventListener("click", function(){ setLang(b.dataset.lang); });
+  });
+
+  /* ───────────── wire up ───────────── */
+  drawCandles();
+  motes();
+
+  document.querySelectorAll(".pbtn").forEach(function(b){
+    b.addEventListener("click", function(){ setPlayers(Number(b.dataset.n)); renderScript(); });
+  });
+  document.getElementById("narrateBtn").addEventListener("click", narrate);
+
+  function launch(){ mode = "solo"; G = null; openGame(null); }
+  function launchNet(){
+    mode = "net";
+    gv.hidden = false;
+    document.body.style.overflow = "hidden";
+    renderNet();
+  }
+  document.getElementById("startBtn").addEventListener("click", launch);
+  document.getElementById("startBtn2").addEventListener("click", launch);
+  document.getElementById("netBtn").addEventListener("click", launchNet);
+  document.getElementById("resumeBtn").addEventListener("click", function(){
+    mode = "solo";
+    var s = loadSaved();
+    if(s && s.screen) openGame(s); else launch();
+  });
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape" && !gv.hidden) closeGame();
+  });
+  refreshResume();
+  document.querySelectorAll(".tg[data-c]").forEach(function(b){
+    if(b.closest("#gv")) return;
+    b.setAttribute("aria-pressed","false");
+    b.addEventListener("click", function(){
+      var k = b.dataset.c;
+      opt[k] = !opt[k];
+      b.setAttribute("aria-pressed", opt[k] ? "true" : "false");
+      if(narrating){ clearInterval(narrating); narrating = null; document.getElementById("narrateBtn").textContent = t("narr.btn"); }
+      renderScript();
+    });
+  });
+
+  /* leader drifts clockwise on its own, slowly */
+  if(!reduce){
+    setInterval(function(){
+      if(document.getElementById("gv") && !document.getElementById("gv").hidden) return;
+      leaderIdx = (leaderIdx + 1) % players;
+      moveLeader();
+    }, 5200);
+  }
+
+  /* first paint in the saved/detected language */
+  buildCards();
+  setPlayers(7);
+  renderScript();
+  if(LANG !== "en") applyLang();
+  else document.querySelectorAll("#langbar button").forEach(function(b){
+    b.setAttribute("aria-pressed", b.dataset.lang === LANG ? "true" : "false");
+  });
+})();
+</script>
+
+</body>
+</html>
