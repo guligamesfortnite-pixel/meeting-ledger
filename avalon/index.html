@@ -380,6 +380,10 @@ footer p + p{margin-top:10px}
   color:var(--gilt-hi);display:block;text-indent:.22em;direction:ltr;
 }
 .lobbylist{display:flex;flex-direction:column;gap:1px;background:var(--edge);border:1px solid var(--edge);border-radius:2px;overflow:hidden}
+.specbar{display:block;width:fit-content;align-self:flex-start;font-family:var(--f-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;border:1px solid var(--edge);color:var(--vellum-dim);padding:5px 10px;border-radius:2px;margin-bottom:12px}
+.histrow{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;background:var(--ink-2);padding:10px 12px;margin-bottom:6px;font-size:14.5px;color:var(--vellum-dim)}
+.histrow b{font-weight:400;color:var(--vellum)}
+.histrow .ok{color:var(--arthur)}.histrow .bad{color:var(--mordred)}
 .lobbyrow{display:flex;align-items:center;gap:11px;background:var(--ink-2);padding:12px 14px}
 .lobbyrow .ln{font-family:var(--f-head);font-size:16.5px;color:var(--vellum)}
 .lobbyrow.off .ln{color:var(--mist);text-decoration:line-through}
@@ -1586,6 +1590,8 @@ footer p + p{margin-top:10px}
   I18N.he["foot.p2"] = "כל האיורים בדף הזה צוירו עבור המלווה הזה ואינם מהמשחק שפורסם. נוסח החוקים מנוסח מחדש מתוך חוברת החוקים — חוברת החוקים המודפסת היא הסמכות בשולחן שלכם.";
 
   /* English for the static keys is read straight off the page, once */
+  Object.assign(I18N.en, {"sp.join": "Watch as spectator", "sp.joinP": "See the table without a role. You never see anyone's card.", "sp.eye": "Spectator", "sp.noRoles": "Roles stay hidden until the game ends.", "sp.waitStart": "Waiting for {name} to deal.", "sp.count": "Spectators: {n}", "sp.quest": "Quest {n}", "sp.leader": "{name} is the Leader", "sp.choosing": "{name} is choosing {n} players", "sp.prop": "Proposal {p} of 5", "sp.dictTurn": "Dictator turn: {name} decides the team alone. No vote.", "sp.team": "Team", "sp.voting": "The table is voting on this team", "sp.stillVoting": "Still voting", "sp.playing": "The team is on the quest", "sp.stillPlay": "Still playing a card", "sp.assassin": "Three quests succeeded. The Assassin is choosing.", "sp.hist": "History", "sp.histEmpty": "Nothing yet.", "sp.dictTag": "Dictator", "sp.vOk": "Approved {y}–{n}", "sp.vNo": "Rejected {y}–{n}", "sp.qOk": "Quest passed", "sp.qNo": "Quest failed", "sp.votesIn": "Votes are in", "sp.pending": "…"});
+  Object.assign(I18N.he, {"sp.join": "צפייה כצופה מהצד", "sp.joinP": "רואים את השולחן בלי תפקיד. אף פעם לא רואים קלפים של אחרים.", "sp.eye": "צופה מהצד", "sp.noRoles": "התפקידים נשארים נסתרים עד סוף המשחק.", "sp.waitStart": "מחכים ש{name} יחלק.", "sp.count": "צופים: {n}", "sp.quest": "משימה {n}", "sp.leader": "{name} הוא המנהיג", "sp.choosing": "{name} בוחר {n} שחקנים", "sp.prop": "הצעה {p} מתוך 5", "sp.dictTurn": "תור דיקטטור: {name} מחליט לבד על הצוות. אין הצבעה.", "sp.team": "הצוות", "sp.voting": "השולחן מצביע על הצוות הזה", "sp.stillVoting": "עדיין מצביעים", "sp.playing": "הצוות יצא למשימה", "sp.stillPlay": "עדיין לא שיחקו קלף", "sp.assassin": "שלוש משימות הצליחו. המתנקש בוחר.", "sp.hist": "היסטוריה", "sp.histEmpty": "עוד אין כלום.", "sp.dictTag": "דיקטטור", "sp.vOk": "אושר {y}–{n}", "sp.vNo": "נדחה {y}–{n}", "sp.qOk": "המשימה הצליחה", "sp.qNo": "המשימה נכשלה", "sp.votesIn": "ההצבעות נכנסו", "sp.pending": "…"});
   function captureEnglish(){
     var els = document.querySelectorAll("[data-i]");
     for(var i=0;i<els.length;i++){
@@ -2825,7 +2831,7 @@ footer p + p{margin-top:10px}
     return { phase:"lobby", players:[], n:0, names:[], roles:[], leader:0, qi:0,
              results:[], rejects:0, team:[], votes:{}, cards:{}, ready:{},
              lastVote:null, lastQuest:null, winner:null, why:null, pick:null, props:0,
-             opts:NET.opts, novote:NET.novote };
+             opts:NET.opts, novote:NET.novote, specs:[], log:[], cur:null };
   }
   function hostSeatOf(id){
     var H = NET.H;
@@ -2843,7 +2849,36 @@ footer p + p{margin-top:10px}
       if(p.id === "host"){ NET.view = viewFor(i); }
       else hostSend(p, {t:"view", v:viewFor(i)});
     }
+    H.specs = (H.specs || []).filter(function(sp){ return sp.conn && sp.conn.open; });
+    H.specs.forEach(function(sp){ hostSend(sp, {t:"view", v:viewSpec()}); });
     netViewUpdate();
+  }
+
+  /* the spectator sees only what is public: never a role, never a card, until the game ends */
+  function viewSpec(){
+    var H = NET.H, need = TEAMS[H.n] ? TEAMS[H.n][H.qi] : 0;
+    var v = {
+      spec:true, phase:H.phase, seat:-1, isHost:false,
+      names:H.players.map(function(p){ return p.name; }),
+      online:H.players.map(function(p){ return p.id === "host" || !!(p.conn && p.conn.open); }),
+      n:H.n, leader:H.leader, qi:H.qi, results:H.results.slice(0), rejects:H.rejects,
+      team:H.team.slice(0), need:need, novote:H.novote,
+      propNo:(H.props || 0) + 1, dictator:(((H.props || 0) + 1) >= 5),
+      code:NET.code, specN:(H.specs || []).length, log:(H.log || []).slice(0)
+    };
+    if(H.phase === "lobby"){ v.opts = H.opts; return v; }
+    if(H.phase === "vote"){
+      v.waiting = H.players.map(function(p,i){ return i; }).filter(function(i){ return H.votes[i] === undefined; })
+                   .map(function(i){ return H.players[i].name; });
+    }
+    if(H.phase === "voteres") v.lastVote = H.lastVote;
+    if(H.phase === "quest"){
+      v.waiting = H.team.filter(function(i){ return H.cards[i] === undefined; })
+                   .map(function(i){ return H.players[i].name; });
+    }
+    if(H.phase === "questres") v.lastQuest = H.lastQuest;
+    if(H.phase === "end"){ v.winner = H.winner; v.why = H.why; v.reveal = H.roles.slice(0); }
+    return v;
   }
 
   /* what one seat is allowed to see — never more */
@@ -2857,7 +2892,7 @@ footer p + p{margin-top:10px}
       team:H.team.slice(0), need:need, novote:H.novote,
       twoFail: failsNeeded(H.qi, H.n) === 2,
       propNo:(H.props || 0) + 1, dictator:(((H.props || 0) + 1) >= 5),
-      code:NET.code
+      code:NET.code, specN:(H.specs || []).length
     };
     if(H.phase === "lobby"){
       v.opts = H.opts; v.ready = null;
@@ -2911,6 +2946,7 @@ footer p + p{margin-top:10px}
     H.qi = 0; H.results = []; H.rejects = 0; H.team = [];
     H.votes = {}; H.cards = {}; H.ready = {};
     H.winner = null; H.why = null; H.pick = null; H.props = 0;
+    H.log = []; H.cur = null;
     H.phase = "deal";
     hostBroadcast();
   }
@@ -2943,6 +2979,8 @@ footer p + p{margin-top:10px}
       H.team = team;
       var propNo = (H.props || 0) + 1;
       H.props = propNo;
+      H.cur = { q:H.qi + 1, leader:H.leader, team:team.slice(0), dict:(propNo >= 5 || !!H.novote), vote:null, quest:null };
+      H.log.push(H.cur);
       if(H.novote || propNo >= 5){ hostStartQuest(); }   // fifth proposal: the Leader is Dictator, no vote
       else { H.votes = {}; H.phase = "vote"; hostBroadcast(); }
       return;
@@ -2956,6 +2994,7 @@ footer p + p{margin-top:10px}
         H.lastVote = { yes:yes, no:H.n - yes, ok:(yes > H.n - yes),
                        votes:H.players.map(function(p,i){ return !!H.votes[i]; }) };
         H.phase = "voteres";
+        if(H.cur) H.cur.vote = { yes:yes, no:H.n - yes, ok:H.lastVote.ok };
       }
       hostBroadcast(); return;
     }
@@ -2980,6 +3019,7 @@ footer p + p{margin-top:10px}
         var f = deck.filter(function(c){ return !c; }).length;
         H.lastQuest = { deck:deck, fails:f, need:need2, ok:(f < need2) };
         H.phase = "questres";
+        if(H.cur) H.cur.quest = { ok:H.lastQuest.ok, fails:f };
       }
       hostBroadcast(); return;
     }
@@ -3004,9 +3044,9 @@ footer p + p{margin-top:10px}
       }
     }
     if(H.phase === "end" && a === "again" && seat === 0){
-      var keep = H.players;
+      var keep = H.players, keepS = H.specs || [];
       NET.H = hostNewState();
-      NET.H.players = keep;
+      NET.H.players = keep; NET.H.specs = keepS;
       hostBroadcast(); return;
     }
   }
@@ -3014,6 +3054,14 @@ footer p + p{margin-top:10px}
   function hostWire(conn){
     conn.on("data", function(m){
       if(!m || !NET.H) return;
+      if(m.t === "join" && m.spectator){
+        var HS = NET.H;
+        HS.specs = (HS.specs || []).filter(function(sp){ return sp.id !== conn.peer; });
+        HS.specs.push({ id:conn.peer, name:String(m.name || "").slice(0,14), conn:conn });
+        try{ conn.send({t:"spec"}); }catch(e){}
+        hostBroadcast();
+        return;
+      }
       if(m.t === "join"){
         var H = NET.H, nmj = String(m.name || "").slice(0,14).trim() || t("player", {n:""}).trim();
         var seat = -1;
@@ -3071,7 +3119,8 @@ footer p + p{margin-top:10px}
   }
 
   /* ── guest ─────────────────────────────────────────── */
-  function guestJoin(code){
+  function guestJoin(code, spectator){
+    NET.spectator = !!spectator;
     NET.mode = "guest"; NET.status = "joining"; NET.err = ""; NET.code = code;
     renderNet();
     loadPeer(function(err){
@@ -3085,12 +3134,12 @@ footer p + p{margin-top:10px}
         NET.conn = c;
         c.on("open", function(){
           NET.status = "joined"; NET.err = "";
-          c.send({t:"join", name:NET.name});
+          c.send({t:"join", name:NET.name, spectator:NET.spectator});
           renderNet();
         });
         c.on("data", function(m){
           if(!m) return;
-          if(m.t === "view"){ NET.view = m.v; NET.seat = m.v.seat; NET.status = "joined"; netViewUpdate(); }
+          if(m.t === "view"){ NET.view = m.v; NET.seat = m.v.spec ? null : m.v.seat; NET.status = "joined"; netViewUpdate(); }
           else if(m.t === "seated"){ NET.seat = m.seat; }
           else if(m.t === "kick"){ NET.err = {k:m.k || "kick.full"}; NET.status = "failed"; NET.view = null; renderNet(); }
         });
@@ -3194,6 +3243,83 @@ footer p + p{margin-top:10px}
     '</div>';
   }
 
+
+  /* ── spectator screen ── */
+  function specTeam(v){
+    return '<div class="waitrow">'+v.team.map(function(i){ return '<span class="waitchip">'+esc(v.names[i])+'</span>'; }).join("")+'</div>';
+  }
+  function specHist(v){
+    var rows = (v.log || []).slice().reverse().map(function(e){
+      var res = e.quest ? '<span class="'+(e.quest.ok?'ok':'bad')+'">'+esc(e.quest.ok ? t("sp.qOk") : t("sp.qNo"))+'</span>'
+              : e.vote ? '<span class="'+(e.vote.ok?'ok':'bad')+'">'+esc(t(e.vote.ok ? "sp.vOk" : "sp.vNo", {y:e.vote.yes, n:e.vote.no}))+'</span>'
+              : (e.dict ? '' : '<span>'+esc(t("sp.pending"))+'</span>');
+      return '<div class="histrow"><b>'+esc(t("sp.quest",{n:e.q}))+'</b>'+
+        '<span>'+esc(v.names[e.leader])+' → '+esc(e.team.map(function(i){ return v.names[i]; }).join(", "))+'</span>'+
+        (e.dict ? '<span class="bad">'+esc(t("sp.dictTag"))+'</span>' : '')+ res +'</div>';
+    }).join("");
+    return '<div class="panel"><span class="ph">'+esc(t("sp.hist"))+'</span>'+(rows || '<p class="g-note">'+esc(t("sp.histEmpty"))+'</p>')+'</div>';
+  }
+  function renderSpec(v){
+    var head = '<span class="specbar">'+esc(t("sp.eye"))+'</span>';
+    var leave = '<div class="g-actions"><button class="btn-ghost" id="netBack">'+esc(t("net.leave"))+'</button></div>';
+    var body = "";
+    if(v.phase === "lobby"){
+      var rows = v.names.map(function(n,i){
+        return '<div class="lobbyrow'+(v.online[i]?'':' off')+'"><span class="ln">'+esc(n)+'</span>'+
+          (i===0 ? '<span class="tagl">'+esc(t("tag.host"))+'</span>' : '')+'<span class="dotlive'+(v.online[i]?' on':'')+'"></span></div>';
+      }).join("");
+      body = '<p class="g-eyebrow">'+esc(t("net.roomCode"))+'</p><div class="codebox"><span>'+esc(v.code)+'</span></div>'+
+        '<div class="panel"><span class="ph">'+esc(t("net.at",{n:v.names.length})+"")+'</span><div class="lobbylist">'+rows+'</div></div>'+
+        '<p class="g-note">'+esc(t("sp.waitStart",{name:v.names[0]}))+'</p>';
+      put(head+body+leave);
+      on("#netBack", function(){ netLeave(); renderNet(); });
+      return;
+    }
+    var status = '<p class="g-eyebrow">'+esc(t("sp.quest",{n:Math.min(v.qi+1,5)}))+' · '+esc(t("sp.leader",{name:v.names[v.leader]}))+'</p>';
+    if(v.phase === "deal"){
+      body = '<h2 class="g-h">'+esc(t("net.reading"))+'</h2><p class="g-sub">'+esc(t("sp.noRoles"))+'</p>';
+    } else if(v.phase === "propose"){
+      body = '<h2 class="g-h">'+esc(t("sp.choosing",{name:v.names[v.leader], n:v.need}))+'</h2>'+
+        '<p class="g-sub">'+esc(v.novote ? "" : (v.dictator ? t("sp.dictTurn",{name:v.names[v.leader]}) : t("sp.prop",{p:v.propNo})))+'</p>';
+    } else if(v.phase === "vote"){
+      body = '<h2 class="g-h">'+esc(t("sp.voting"))+'</h2>'+specTeam(v)+waitBlock(v.waiting, t("sp.stillVoting"));
+    } else if(v.phase === "voteres"){
+      var lv = v.lastVote;
+      var cards = v.names.map(function(n,i){
+        return '<div class="rv '+(lv.votes[i]?"yes":"no")+' on"><div class="rv-in"><div class="rv-f">'+esc(t("vr.front"))+'</div>'+
+          '<div class="rv-b">'+esc(lv.votes[i]?t("v.approve"):t("v.reject"))+'</div></div><span class="cap">'+esc(n)+'</span></div>';
+      }).join("");
+      body = '<h2 class="g-h">'+esc(t("sp.votesIn"))+'</h2>'+specTeam(v)+'<div class="reveal-row">'+cards+'</div>'+
+        '<p class="verdict '+(lv.ok?"good":"evil")+'">'+esc(t(lv.ok?"sp.vOk":"sp.vNo",{y:lv.yes,n:lv.no}))+'</p>';
+    } else if(v.phase === "quest"){
+      body = '<h2 class="g-h">'+esc(t("sp.playing"))+'</h2>'+specTeam(v)+waitBlock(v.waiting, t("sp.stillPlay"));
+    } else if(v.phase === "questres"){
+      var lq = v.lastQuest;
+      var qc = lq.deck.map(function(c){
+        return '<div class="rv '+(c?"s":"f")+' on"><div class="rv-in"><div class="rv-f">'+esc(t("qr.front"))+'</div>'+
+          '<div class="rv-b">'+esc(c?t("q.success"):t("q.fail"))+'</div></div></div>';
+      }).join("");
+      body = '<h2 class="g-h">'+esc(t("qr.eye",{n:v.qi+1}))+'</h2>'+specTeam(v)+'<div class="reveal-row">'+qc+'</div>'+
+        '<p class="verdict '+(lq.ok?"good":"evil")+'">'+esc(failCountText(lq.fails, lq.need))+'<br>'+esc(lq.ok?t("qr.ok"):t("qr.no"))+'</p>';
+    } else if(v.phase === "assassin"){
+      body = '<h2 class="g-h">'+esc(t("sp.assassin"))+'</h2>';
+    } else if(v.phase === "end"){
+      var good = v.winner === "good";
+      var grid = v.names.map(function(n,i){
+        var c = ROLE[v.reveal[i]], ev = isEvil(v.reveal[i]);
+        return '<div class="fin '+(ev?"e":"g")+'"><div class="art">'+portrait(c)+'</div><div class="lab"><b>'+esc(n)+'</b><span>'+esc(cn(c,"name"))+'</span></div></div>';
+      }).join("");
+      put(head+'<p class="g-eyebrow">'+esc(good?t("e.goodEye"):t("e.evilEye"))+'</p>'+
+        '<h2 class="g-h" style="color:'+(good?"var(--arthur)":"var(--mordred)")+'">'+esc(good?t("e.good"):t("e.evil"))+'</h2>'+
+        '<p class="g-sub">'+esc(whyText(v.why))+'</p>'+
+        '<div class="panel"><span class="ph">'+esc(t("e.revealed"))+'</span><div class="final">'+grid+'</div></div>'+specHist(v)+leave, true);
+      on("#netBack", function(){ netLeave(); renderNet(); });
+      return;
+    }
+    put(head+status+body+specHist(v)+leave);
+    on("#netBack", function(){ netLeave(); renderNet(); });
+  }
+
   function renderNet(fromView){
     if(fromView !== true) NET.lastSig = null;
     if(gv.hidden) return;
@@ -3216,6 +3342,8 @@ footer p + p{margin-top:10px}
         '<div class="panel"><span class="ph">'+esc(t("net.joinH"))+'</span>'+
           '<label class="namein" style="margin-bottom:12px"><span>'+esc(t("net.code"))+'</span><input type="text" id="joinCode" maxlength="4" value="'+esc(NET.joinCode)+'" placeholder="ABCD" autocapitalize="characters" autocomplete="off" aria-label="'+esc(t("net.roomCode"))+'" style="text-transform:uppercase;letter-spacing:.3em;font-family:var(--f-mono);direction:ltr"></label>'+
           '<button class="btn-lg" id="doJoin">'+esc(t("net.join"))+'</button>'+
+          '<p style="color:var(--vellum-dim);font-size:14px;margin:16px 0 10px">'+esc(t("sp.joinP"))+'</p>'+
+          '<button class="btn-ghost" id="doSpec" style="width:100%">'+esc(t("sp.join"))+'</button>'+
         '</div>'+
         (NET.err ? '<div class="warnbox">'+esc(netErrText())+'</div>' : '')+
         (inFrame() ? '<div class="okbox">'+esc(t("net.frame"))+'</div>' : '')+
@@ -3231,6 +3359,10 @@ footer p + p{margin-top:10px}
         if(!String(NET.name||"").trim()){ NET.err = t("net.needName"); renderNet(); return; }
         if(NET.joinCode.length !== 4){ NET.err = t("net.needCode"); renderNet(); return; }
         NET.err = ""; guestJoin(NET.joinCode);
+      });
+      on("#doSpec", function(){
+        if(NET.joinCode.length !== 4){ NET.err = t("net.needCode"); renderNet(); return; }
+        NET.err = ""; guestJoin(NET.joinCode, true);
       });
       on("#netBack", function(){ netLeave(); mode = "solo"; render(); });
       return;
@@ -3253,7 +3385,7 @@ footer p + p{margin-top:10px}
           '<div class="g-actions">'+
             (NET.status==="lost" ? '<button class="btn-lg" id="reJoin">'+esc(t("net.rejoin", {code:NET.code}))+'</button>' : '')+
             '<button class="btn-ghost" id="netBack">'+esc(t("net.back"))+'</button></div>');
-      on("#reJoin", function(){ var c = NET.code, n = NET.name; netLeave(); NET.name = n; guestJoin(c); });
+      on("#reJoin", function(){ var c = NET.code, n = NET.name, sp = NET.spectator; netLeave(); NET.name = n; guestJoin(c, sp); });
       on("#netBack", function(){ netLeave(); renderNet(); });
       return;
     }
@@ -3264,6 +3396,8 @@ footer p + p{margin-top:10px}
       on("#netBack", function(){ netLeave(); renderNet(); });
       return;
     }
+
+    if(v.spec){ renderSpec(v); return; }
 
     /* ── lobby ── */
     if(v.phase === "lobby"){
@@ -3286,6 +3420,7 @@ footer p + p{margin-top:10px}
         '<p class="g-eyebrow">'+esc(t("net.roomCode"))+'</p>'+
         '<div class="codebox"><span>'+esc(v.code || NET.code)+'</span></div>'+
         '<p class="g-sub">'+t("net.lobbySub")+'</p>'+
+        (v.specN ? '<p class="g-note" style="margin-top:-6px">'+esc(t("sp.count",{n:v.specN}))+'</p>' : '')+
         '<div class="panel"><span class="ph">'+esc(t("net.at", {n:n}) + (ok ? "" : t("net.need")))+'</span>'+
           '<div class="lobbylist">'+rows+'</div>'+
           (ok ? '<p style="margin-top:12px;color:var(--mist);font-size:14px"><b style="color:var(--arthur);font-weight:400">'+esc(t("g.split.good",{n:sp[0]}))+'</b> · <b style="color:var(--mordred);font-weight:400">'+esc(t("g.split.evil",{n:sp[1]}))+'</b></p>' : '')+
@@ -3532,7 +3667,7 @@ footer p + p{margin-top:10px}
     window.__avalon = {
       get NET(){ return NET; },
       setNET:function(x){ NET = x; },
-      hostNewState:hostNewState, hostAct:hostAct, viewFor:viewFor, hostStartGame:hostStartGame,
+      hostNewState:hostNewState, hostAct:hostAct, viewFor:viewFor, viewSpec:viewSpec, hostStartGame:hostStartGame,
       assignRoles:assignRoles, isEvil:isEvil, SPLIT:SPLIT, TEAMS:TEAMS, knowledge:knowledge,
       failsNeeded:failsNeeded, silence:function(){ muted = true; },
       renderNet:function(){ renderNet(); }, hostBroadcast:hostBroadcast,
