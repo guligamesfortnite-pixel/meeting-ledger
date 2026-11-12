@@ -6,9 +6,9 @@
    HUD on top, big tap tiles at the bottom. Single dark look by choice. */
 :root{
   color-scheme:dark;
-  --night:#1B0D2E; --bone:#F4EFE6; --dim:#A99BC2; --tile:#24143A; --edge:#3D2760;
+  --night:#0B0514; --bone:#F4EFE6; --dim:#9486AE; --tile:#140A22; --edge:#2C1A47;
   --pumpkin:#FF7A1A; --slime:#8FE04A;
-  --t-common:#8C84A0; --t-uncommon:#8FE04A; --t-rare:#B07CFF; --t-epic:#FF7A1A; --t-legend:#FFD23F;
+  --t-common:#8C84A0; --t-uncommon:#8FE04A; --t-rare:#B07CFF; --t-epic:#FF7A1A; --t-legend:#FFD23F; --t-miss:#6E5F86;
   --display:"Creepster","Chalkduster","Impact",fantasy;
   --body:"Rubik","Segoe UI",system-ui,sans-serif;
 }
@@ -46,8 +46,8 @@ body{background:var(--night);color:var(--bone);font-family:var(--body);font-size
 .big:active{transform:translateY(5px);box-shadow:0 1px 0 #A8480A}
 .big.alt2{background:var(--t-rare);box-shadow:0 6px 0 #6B3FC0}
 .big.alt2:active{box-shadow:0 1px 0 #6B3FC0}
-.big.flat{background:var(--tile);color:var(--bone);box-shadow:0 6px 0 #120A20;font-size:15px;padding:16px}
-.big.flat:active{box-shadow:0 1px 0 #120A20}
+.big.flat{background:#1C0F2E;color:var(--bone);box-shadow:0 6px 0 #05020A;font-size:15px;padding:16px}
+.big.flat:active{box-shadow:0 1px 0 #05020A}
 .btns{display:flex;flex-direction:column;gap:14px;padding-bottom:6px}
 .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
@@ -57,20 +57,27 @@ body{background:var(--night);color:var(--bone);font-family:var(--body);font-size
 .hint{font:700 11px/1 var(--body);letter-spacing:.18em;text-transform:uppercase;color:var(--slime)}
 .q{font:800 clamp(22px,6.4vw,30px)/1.12 var(--body);margin:0;text-wrap:balance;text-shadow:0 2px 0 rgba(0,0,0,.45)}
 
-.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-bottom:6px}
-.tile{position:relative;overflow:hidden;min-height:62px;border-radius:16px;border:2px solid var(--edge);background:var(--tile);color:var(--bone);font:700 16px/1.15 var(--body);padding:10px 12px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;gap:8px;box-shadow:0 5px 0 #120A20;transition:transform .08s,box-shadow .08s,opacity .3s,border-color .2s;animation:drop .4s cubic-bezier(.3,1.4,.5,1) both;animation-delay:var(--d)}
-@keyframes drop{from{opacity:0;transform:translateY(30px) scale(.9)}to{opacity:1;transform:none}}
-.tile:active{transform:translateY(4px);box-shadow:0 1px 0 #120A20}
-.tile .fill{position:absolute;inset:0 auto 0 0;width:0;background:var(--c);opacity:.38;transition:width .6s cubic-bezier(.2,.8,.2,1)}
-.tile .n,.tile .p{position:relative;min-width:0;overflow-wrap:anywhere}
-.tile .p{font-weight:800;font-variant-numeric:tabular-nums;color:var(--c);display:none}
-.tiles.done .tile{cursor:default;justify-content:space-between;text-align:left;opacity:.62}
-.tiles.done .tile .p{display:block}
-.tiles.done .tile .fill{width:var(--w)}
-.tiles.done .tile.me{opacity:1;border-color:var(--c);transform:scale(1.03)}
-.t-common{--c:var(--t-common)}.t-uncommon{--c:var(--t-uncommon)}.t-rare{--c:var(--t-rare)}.t-epic{--c:var(--t-epic)}.t-legend{--c:var(--t-legend)}
+.top{width:100%}
+.ask{display:flex;gap:8px;width:100%;margin-top:4px}
+.ask input{flex:1;min-width:0;font:700 18px/1 var(--body);color:var(--bone);background:#07030D;border:2px solid var(--edge);border-radius:16px;padding:15px 16px;user-select:text;-webkit-user-select:text}
+.ask input:focus{outline:0;border-color:var(--pumpkin)}
+.ask input::placeholder{color:#5E5177}
+.ask .big{width:auto;flex:none;padding:0 22px;font-size:17px;align-items:center}
+.shake{animation:quake .36s}
+.under{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:28px}
+.lives{display:flex;gap:7px;align-items:center}
+.lives i{width:13px;height:13px;border-radius:50%;background:var(--pumpkin);transition:all .3s}
+.lives i.gone{background:var(--edge);transform:scale(.6)}
+.skip{background:none;border:0;color:var(--dim);font:700 12px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;cursor:pointer;padding:8px;margin-right:-8px;border-radius:8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;min-height:36px}
+.chipx{font:700 13px/1 var(--body);padding:8px 10px;border-radius:10px;background:var(--tile);border:2px solid var(--edge);color:var(--dim);animation:drop .35s cubic-bezier(.3,1.4,.5,1) both;animation-delay:var(--d)}
+.chipx b{color:var(--c);margin-left:6px;font-variant-numeric:tabular-nums}
+.chipx.me{border-color:var(--c);color:var(--bone)}
+@keyframes drop{from{opacity:0;transform:translateY(20px) scale(.8)}to{opacity:1;transform:none}}
+.t-common{--c:var(--t-common)}.t-uncommon{--c:var(--t-uncommon)}.t-rare{--c:var(--t-rare)}.t-epic{--c:var(--t-epic)}.t-legend{--c:var(--t-legend)}.t-miss{--c:var(--t-miss)}
+.pair .big{padding:18px 8px;font-size:17px}
 
-#pop{position:fixed;left:0;right:0;top:22%;z-index:3;text-align:center;pointer-events:none}
+#pop{position:fixed;left:0;right:0;top:30%;z-index:3;text-align:center;pointer-events:none}
 #pop div{animation:pop 1.7s cubic-bezier(.2,.9,.3,1) both;color:var(--c)}
 #pop b{display:block;font:400 clamp(54px,17vw,84px)/1 var(--display);text-shadow:0 4px 0 rgba(0,0,0,.55)}
 #pop span{font:800 14px/1 var(--body);letter-spacing:.22em;text-transform:uppercase}
@@ -80,7 +87,7 @@ body{background:var(--night);color:var(--bone);font-family:var(--body);font-size
 .score small{font-size:.35em;margin-left:.1em}
 .dots{display:flex;gap:8px;justify-content:center}
 .dots i{width:22px;height:22px;border-radius:7px;background:var(--c);animation:drop .4s cubic-bezier(.3,1.6,.5,1) both;animation-delay:var(--d)}
-@media (max-height:640px){.tile{min-height:50px;font-size:15px}.q{font-size:21px}.big{padding:15px}.title{font-size:60px}}
+@media (max-height:640px){.q{font-size:21px}.big{padding:15px}.title{font-size:60px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -102,47 +109,70 @@ body{background:var(--night);color:var(--bone);font-family:var(--body);font-size
 "use strict";
 /* ---------- question bank: "Answer:percent" (percent = estimated share of people who pick it) ---------- */
 const BANK=[
-["Space","Name a planet in our solar system","Mars:24;Earth:22;Jupiter:14;Saturn:13;Venus:8;Mercury:7;Neptune:5;Uranus:4"],
-["Geography","Name a country in South America","Brazil:34:brasil;Argentina:20;Peru:10;Colombia:10;Chile:9;Venezuela:5;Ecuador:4;Bolivia:3;Uruguay:2.5;Paraguay:1.5;Guyana:0.6;Suriname:0.4"],
-["Colour","Name a colour of the rainbow","Red:30;Blue:22;Green:12;Yellow:11;Orange:9;Violet:6:purple;Indigo:5"],
-["Games","Name a chess piece","Queen:26;King:22;Knight:18:horse;Pawn:14;Rook:9:castle;Bishop:8"],
-["Geography","Name one of the Great Lakes","Superior:30;Michigan:28;Erie:18;Huron:12;Ontario:10"],
-["Geography","Name a continent","Europe:22;Asia:20;Africa:20;North America:14;South America:8;Australia:8:oceania/australasia;Antarctica:7:antartica"],
-["Geography","Name an ocean","Pacific:38;Atlantic:34;Indian:12;Arctic:10;Southern:4:antarctic"],
-["Science","Name a noble gas","Helium:34;Neon:30;Argon:16;Xenon:8;Krypton:8;Radon:3;Oganesson:0.3"],
-["Stars","Name a sign of the zodiac","Leo:14;Scorpio:11;Aries:10;Gemini:10;Virgo:9;Taurus:9;Cancer:8;Libra:8;Pisces:7;Capricorn:6;Aquarius:6;Sagittarius:5"],
-["Calendar","Name a month of the year","December:16;January:14;July:12;June:9;October:9;May:8;August:7;March:6;April:6;February:6;September:5;November:4"],
-["Calendar","Name a day of the week","Friday:28;Saturday:20;Monday:18;Sunday:16;Wednesday:8;Tuesday:6;Thursday:4"],
-["Geography","Name a US state with a Pacific coastline","California:55;Hawaii:14;Oregon:12;Washington:12;Alaska:7"],
-["Geography","Name a Nordic country","Sweden:32;Norway:28;Denmark:18;Finland:14;Iceland:8"],
-["Geography","Name a country that shares a land border with France","Spain:26;Germany:24;Italy:18;Belgium:12;Switzerland:10;Luxembourg:4;Monaco:4;Andorra:2;Brazil:0.4;Netherlands:0.3:holland;Suriname:0.2"],
-["Body","Name one of the five senses","Sight:34:vision/seeing/see;Smell:20;Taste:18;Hearing:15:sound/hear;Touch:13:feeling/feel"],
-["Food","Name one of the five basic tastes","Sweet:36;Sour:20;Salty:18:salt;Bitter:16;Umami:10:savory/savoury"],
-["Music","Name a member of The Beatles","John Lennon:36:john/lennon;Paul McCartney:30:paul/mccartney;Ringo Starr:20:ringo/starr;George Harrison:14:george/harrison"],
-["Games","Name a suit in a deck of cards","Hearts:34;Spades:30;Diamonds:20;Clubs:16:club"],
-["World","Name a G7 country","United States:30:usa/us/america/unitedstatesofamerica;Germany:16;France:14;United Kingdom:14:uk/britain/greatbritain/england;Japan:12;Canada:8;Italy:6"],
-["Science","Name an element with a one-letter chemical symbol","Oxygen:24;Hydrogen:22;Carbon:16;Nitrogen:10;Potassium:6;Sulfur:4:sulphur;Fluorine:3;Phosphorus:3;Iodine:3;Boron:2.5;Uranium:2.5;Tungsten:1.5;Vanadium:1;Yttrium:0.5"],
-["Culture","Name an animal of the Chinese zodiac","Dragon:22;Tiger:14;Rat:12;Monkey:9;Rabbit:8;Snake:8;Horse:6;Dog:6;Ox:5;Pig:4;Rooster:4;Goat:2:sheep/ram"],
-["Sport","Name a tennis Grand Slam tournament","Wimbledon:52;US Open:22;French Open:14:rolandgarros;Australian Open:12"],
-["Sport","Name a colour of the Olympic rings","Blue:28;Red:24;Yellow:18;Green:16;Black:14"],
-["Geography","Name a country of the United Kingdom","England:46;Scotland:28;Wales:16;Northern Ireland:10"],
-["Geography","Name a Canadian province","Ontario:28;Quebec:22;British Columbia:20:bc;Alberta:12;Manitoba:5;Nova Scotia:5;Saskatchewan:4;Newfoundland and Labrador:2:newfoundland;New Brunswick:1.2;Prince Edward Island:0.8:pei"],
-["Animals","Name a big cat in the genus Panthera","Lion:36;Tiger:30;Leopard:16;Jaguar:14;Snow Leopard:4"],
-["Geography","Name a country the equator crosses on land","Ecuador:30;Brazil:22;Kenya:16;Indonesia:10;Colombia:7;Uganda:5;Democratic Republic of the Congo:3:drc/drcongo/congo/congokinshasa;Somalia:2.5;Gabon:2;Republic of the Congo:1:congobrazzaville;Sao Tome and Principe:0.5:saotome"],
-["Geography","Name a country in Central America","Costa Rica:26;Panama:22;Guatemala:16;Honduras:12;Nicaragua:9;El Salvador:8;Belize:7"],
-["Language","Name a vowel in the English alphabet","A:38;E:24;I:14;O:14;U:10"],
-["Calendar","Name a season","Summer:38;Winter:24;Autumn:22:fall;Spring:16"],
-["Geography","Name one of the ten largest countries by area","Russia:30;Canada:16;China:16;United States:14:usa/us/america;Brazil:8;Australia:8;India:5;Argentina:1.5;Kazakhstan:1;Algeria:0.5"],
-["Geography","Name a Baltic state","Estonia:38;Latvia:32;Lithuania:30"],
-["Space","Name one of Jupiter's four Galilean moons","Europa:40;Ganymede:24;Io:22;Callisto:14"],
-["Body","Name an ABO blood group","O:38;A:26;B:18;AB:18"],
-["Geography","Name a US state that starts with M","Michigan:20;Massachusetts:16;Maine:12;Montana:12;Mississippi:12;Minnesota:10;Missouri:10;Maryland:8"],
-["Geography","Name a country that starts with I","Italy:28;India:24;Ireland:16;Iceland:9;Indonesia:8;Israel:6;Iran:5;Iraq:4"],
-["Numbers","Name a prime number below 30","2:22:two;7:20:seven;3:16:three;5:12:five;13:8:thirteen;11:7:eleven;17:5:seventeen;19:4:nineteen;23:4:twentythree;29:2:twentynine"],
-["Geography","Name an African country on the Mediterranean Sea","Egypt:44;Morocco:24;Tunisia:14;Libya:10;Algeria:8"],
-["Science","Name one of the five main layers of Earth's atmosphere","Stratosphere:34;Troposphere:24;Mesosphere:12;Thermosphere:10;Exosphere:8"]
+["One of the seven deadly sins","Lust:22;Greed:20:avarice;Sloth:16:laziness;Gluttony:14;Wrath:14:anger/rage;Envy:12:jealousy;Pride:10:vanity"],
+["A horseman of the apocalypse","Death:46;War:24;Famine:18:hunger;Pestilence:12:conquest/plague"],
+["A river of the Greek underworld","Styx:70;Lethe:10;Acheron:9;Phlegethon:6;Cocytus:5"],
+["A phase of the Moon","Full Moon:46:full;New Moon:20:new;Waxing Crescent:9:crescent;First Quarter:7:halfmoon/half;Waning Crescent:5;Waxing Gibbous:5:gibbous;Waning Gibbous:4;Last Quarter:4:thirdquarter"],
+["A major Greek god","Zeus:30;Hades:14;Poseidon:12;Athena:10;Apollo:8;Ares:8;Aphrodite:7;Hermes:6;Hera:5;Artemis:4;Dionysus:3;Hephaestus:3;Demeter:2.5;Hestia:1.5"],
+["A dwarf planet","Pluto:78;Ceres:9;Eris:7;Makemake:3;Haumea:3"],
+["A country in Africa","Egypt:14;South Africa:14;Nigeria:12;Kenya:9;Morocco:6;Ghana:5;Ethiopia:5;Algeria:3;Tanzania:3;Uganda:3;Zimbabwe:3;Madagascar:3;Tunisia:2;Libya:2;Sudan:2;Somalia:2;Senegal:1.5;Cameroon:1.5;Democratic Republic of the Congo:1.5:drc/drcongo/congo/congokinshasa/zaire;Angola:1.2;Mali:1.2;Zambia:1.2;Rwanda:1.2;Namibia:1;Botswana:1;Mozambique:1;Ivory Coast:1:cotedivoire;Niger:0.8;Chad:0.8;Liberia:0.6;Sierra Leone:0.6;Togo:0.5;Malawi:0.5;Republic of the Congo:0.5:congobrazzaville;Benin:0.4;Gabon:0.4;South Sudan:0.4;Burkina Faso:0.4;Guinea:0.4;Mauritius:0.4;Eritrea:0.3;Djibouti:0.3;Burundi:0.3;Mauritania:0.3;Seychelles:0.3;Gambia:0.3;Lesotho:0.3;Guinea-Bissau:0.2;Equatorial Guinea:0.2;Eswatini:0.2:swaziland;Cape Verde:0.2:caboverde;Central African Republic:0.2:car;Comoros:0.1;Sao Tome and Principe:0.1:saotome"],
+["A country that borders Germany","France:24;Poland:18;Netherlands:12:holland;Austria:12;Switzerland:10;Belgium:8;Denmark:7;Czech Republic:6:czechia/czech;Luxembourg:3"],
+["A country that borders China","Russia:22;India:20;Mongolia:14;North Korea:10;Vietnam:8;Nepal:7;Pakistan:5;Kazakhstan:3;Myanmar:3:burma;Laos:2.5;Afghanistan:2;Bhutan:1.5;Kyrgyzstan:1;Tajikistan:1"],
+["A US state that starts with N","New York:34;Nevada:14;New Jersey:14;New Mexico:9;North Carolina:9;Nebraska:8;North Dakota:6;New Hampshire:6"],
+["A US state that borders Mexico","Texas:42;California:28;Arizona:18;New Mexico:12"],
+["A president on Mount Rushmore","Abraham Lincoln:34:lincoln/abe/abelincoln;George Washington:34:washington;Theodore Roosevelt:18:roosevelt/teddy/teddyroosevelt;Thomas Jefferson:14:jefferson"],
+["A US state with a four-letter name","Ohio:44;Utah:30;Iowa:26"],
+["A country that starts with J","Japan:70;Jamaica:20;Jordan:10"],
+["One of the first ten elements","Hydrogen:30;Helium:22;Carbon:12;Oxygen:12;Lithium:8;Nitrogen:6;Neon:4;Beryllium:3;Boron:3;Fluorine:2"],
+["A planet in our solar system","Mars:24;Earth:22;Jupiter:14;Saturn:13;Venus:8;Mercury:7;Neptune:5;Uranus:4"],
+["A country in South America","Brazil:34:brasil;Argentina:20;Peru:10;Colombia:10;Chile:9;Venezuela:5;Ecuador:4;Bolivia:3;Uruguay:2.5;Paraguay:1.5;Guyana:0.6;Suriname:0.4"],
+["A colour of the rainbow","Red:30;Blue:22;Green:12;Yellow:11;Orange:9;Violet:6:purple;Indigo:5"],
+["A chess piece","Queen:26;King:22;Knight:18:horse;Pawn:14;Rook:9:castle;Bishop:8"],
+["One of the Great Lakes","Superior:30;Michigan:28;Erie:18;Huron:12;Ontario:10"],
+["A continent","Europe:22;Asia:20;Africa:20;North America:14;South America:8;Australia:8:oceania/australasia;Antarctica:7:antartica"],
+["An ocean","Pacific:38;Atlantic:34;Indian:12;Arctic:10;Southern:4:antarctic"],
+["A noble gas","Helium:34;Neon:30;Argon:16;Xenon:8;Krypton:8;Radon:3;Oganesson:0.3"],
+["A sign of the zodiac","Leo:14;Scorpio:11;Aries:10;Gemini:10;Virgo:9;Taurus:9;Cancer:8;Libra:8;Pisces:7;Capricorn:6;Aquarius:6;Sagittarius:5"],
+["A month of the year","December:16;January:14;July:12;June:9;October:9;May:8;August:7;March:6;April:6;February:6;September:5;November:4"],
+["A day of the week","Friday:28;Saturday:20;Monday:18;Sunday:16;Wednesday:8;Tuesday:6;Thursday:4"],
+["A US state on the Pacific","California:55;Hawaii:14;Oregon:12;Washington:12;Alaska:7"],
+["A Nordic country","Sweden:32;Norway:28;Denmark:18;Finland:14;Iceland:8"],
+["A country that borders France","Spain:26;Germany:24;Italy:18;Belgium:12;Switzerland:10;Luxembourg:4;Monaco:4;Andorra:2;Brazil:0.4;Netherlands:0.3:holland;Suriname:0.2"],
+["One of the five senses","Sight:34:vision/seeing/see;Smell:20;Taste:18;Hearing:15:sound/hear;Touch:13:feeling/feel"],
+["One of the five basic tastes","Sweet:36;Sour:20;Salty:18:salt;Bitter:16;Umami:10:savory/savoury"],
+["A member of The Beatles","John Lennon:36:john/lennon;Paul McCartney:30:paul/mccartney;Ringo Starr:20:ringo/starr;George Harrison:14:george/harrison"],
+["A suit in a deck of cards","Hearts:34:heart;Spades:30;Diamonds:20;Clubs:16:club"],
+["A G7 country","United States:30:usa/us/america/unitedstatesofamerica;Germany:16;France:14;United Kingdom:14:uk/britain/greatbritain/england;Japan:12;Canada:8;Italy:6"],
+["An element with a one-letter symbol","Oxygen:24;Hydrogen:22;Carbon:16;Nitrogen:10;Potassium:6;Sulfur:4:sulphur;Fluorine:3;Phosphorus:3;Iodine:3;Boron:2.5;Uranium:2.5;Tungsten:1.5;Vanadium:1;Yttrium:0.5"],
+["An animal of the Chinese zodiac","Dragon:22;Tiger:14;Rat:12;Monkey:9;Rabbit:8;Snake:8;Horse:6;Dog:6;Ox:5;Pig:4;Rooster:4;Goat:2:sheep/ram"],
+["A tennis Grand Slam","Wimbledon:52;US Open:22;French Open:14:rolandgarros;Australian Open:12"],
+["A colour of the Olympic rings","Blue:28;Red:24;Yellow:18;Green:16;Black:14"],
+["A country of the United Kingdom","England:46;Scotland:28;Wales:16;Northern Ireland:10"],
+["A Canadian province","Ontario:28;Quebec:22;British Columbia:20:bc;Alberta:12;Manitoba:5;Nova Scotia:5;Saskatchewan:4;Newfoundland and Labrador:2:newfoundland;New Brunswick:1.2;Prince Edward Island:0.8:pei"],
+["A big cat in the genus Panthera","Lion:36;Tiger:30;Leopard:16;Jaguar:14;Snow Leopard:4"],
+["A country on the equator","Ecuador:30;Brazil:22;Kenya:16;Indonesia:10;Colombia:7;Uganda:5;Democratic Republic of the Congo:3:drc/drcongo/congo/congokinshasa;Somalia:2.5;Gabon:2;Republic of the Congo:1:congobrazzaville;Sao Tome and Principe:0.5:saotome"],
+["A country in Central America","Costa Rica:26;Panama:22;Guatemala:16;Honduras:12;Nicaragua:9;El Salvador:8;Belize:7"],
+["A season","Summer:38;Winter:24;Autumn:22:fall;Spring:16"],
+["One of the ten largest countries","Russia:30;Canada:16;China:16;United States:14:usa/us/america;Brazil:8;Australia:8;India:5;Argentina:1.5;Kazakhstan:1;Algeria:0.5"],
+["A Baltic state","Estonia:38;Latvia:32;Lithuania:30"],
+["One of Jupiter's four big moons","Europa:40;Ganymede:24;Io:22;Callisto:14"],
+["A US state that starts with M","Michigan:20;Massachusetts:16;Maine:12;Montana:12;Mississippi:12;Minnesota:10;Missouri:10;Maryland:8"],
+["A country that starts with I","Italy:28;India:24;Ireland:16;Iceland:9;Indonesia:8;Israel:6;Iran:5;Iraq:4"],
+["A prime number below 30","2:22:two;7:20:seven;3:16:three;5:12:five;13:8:thirteen;11:7:eleven;17:5:seventeen;19:4:nineteen;23:4:twentythree;29:2:twentynine"],
+["A layer of Earth's atmosphere","Stratosphere:34;Troposphere:24;Mesosphere:12;Thermosphere:10;Exosphere:8"]
 ];
-const QS=BANK.map(([cat,q,raw])=>({q:q.replace(/^Name /,"").replace(/^./,c=>c.toUpperCase()),answers:raw.split(";").map(s=>{const[name,p]=s.split(":");return{name,p:+p}})}));
+const norm=s=>String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/&/g,"and").trim().replace(/^(the|lake|a|an)\s+/,"").replace(/[^a-z0-9]/g,"");
+const QS=BANK.map(([q,raw])=>({q,answers:raw.split(";").map(s=>{const[name,p,al]=s.split(":");return{name,p:+p,keys:[norm(name),...(al?al.split("/").map(norm):[])]}})}));
+function lev(a,b){const m=a.length,n=b.length;if(Math.abs(m-n)>2)return 9;let prev=Array.from({length:n+1},(_,i)=>i);for(let i=1;i<=m;i++){const cur=[i];for(let j=1;j<=n;j++)cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));prev=cur}return prev[n]}
+function match(q,text){
+  const t=norm(text);if(!t)return null;
+  for(const a of q.answers)if(a.keys.includes(t))return a;
+  const tol=t.length>=9?2:t.length>=5?1:0;if(!tol)return null;
+  let best=null,bd=9,tie=false;
+  for(const a of q.answers)for(const k of a.keys){if(k.length<4)continue;const d=lev(t,k);if(d<bd){bd=d;best=a;tie=false}else if(d===bd&&a!==best)tie=true}
+  return bd<=tol&&!tie?best:null;
+}
+
 
 const MAXQ=1562, MOON=10934; // seven perfect picks reach the moon
 const riseFor=p=>Math.max(40,Math.round(MAXQ*(1-Math.sqrt(Math.min(p,60)/60))));
@@ -151,7 +181,7 @@ const fmt=n=>Math.round(n).toLocaleString("en-US");
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const reduced=matchMedia("(prefers-reduced-motion:reduce)").matches;
 const cssVar=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-const TCOL={};["common","uncommon","rare","epic","legend"].forEach(k=>TCOL[k]=cssVar("--t-"+k));
+const TCOL={};["common","uncommon","rare","epic","legend","miss"].forEach(k=>TCOL[k]=cssVar("--t-"+k));
 
 /* ---------- storage ---------- */
 const KEY="phantom.v1";
@@ -177,16 +207,16 @@ sndBtn.addEventListener("click",()=>{save.sound=!save.sound;persist();sndLabel()
 
 /* ---------- scene ---------- */
 const cv=document.getElementById("sky"),cx=cv.getContext("2d");
-const SKY=[[0,[58,24,84]],[.25,[34,15,60]],[.65,[15,8,34]],[1,[6,4,16]]];
+const SKY=[[0,[24,9,38]],[.25,[14,6,26]],[.65,[7,3,15]],[1,[2,1,7]]];
 const PPM=.42;
-let W=0,H=0,target=0,shown=0,rush=0,last=0,clock=0,mood=0,moodUntil=0;
+let gyT=300,gyC=300,W=0,H=0,target=0,shown=0,rush=0,last=0,clock=0,mood=0,moodUntil=0;
 const stars=Array.from({length:90},()=>({x:Math.random(),y:Math.random(),r:.6+Math.random()*1.6,ph:Math.random()*6}));
 const clouds=Array.from({length:26},(_,i)=>({alt:260+i*420+Math.random()*200,x:Math.random(),w:90+Math.random()*120,v:(Math.random()-.5)*.00012}));
 const bats=Array.from({length:6},(_,i)=>({x:Math.random(),y:.1+Math.random()*.5,dir:i%2?1:-1,v:.5+Math.random()*.7,s:7+Math.random()*7,ph:Math.random()*6}));
 let parts=[];
 function resize(){const d=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0)}
 function skyAt(t){t=Math.max(0,Math.min(1,t));for(let i=1;i<SKY.length;i++){if(t<=SKY[i][0]){const[a,ca]=SKY[i-1],[b,cb]=SKY[i],k=(t-a)/(b-a);return ca.map((v,j)=>Math.round(v+(cb[j]-v)*k))}}return SKY[SKY.length-1][1]}
-function burst(color,n){const gy=H*.42;for(let i=0;i<n;i++){const a=Math.random()*6.28,s=2+Math.random()*6;parts.push({x:W/2,y:gy,vx:Math.cos(a)*s,vy:Math.sin(a)*s-1,life:1,c:color,r:2+Math.random()*4})}}
+function burst(color,n){const gy=gyC;for(let i=0;i<n;i++){const a=Math.random()*6.28,s=2+Math.random()*6;parts.push({x:W/2,y:gy,vx:Math.cos(a)*s,vy:Math.sin(a)*s-1,life:1,c:color,r:2+Math.random()*4})}}
 
 function pumpkin(x,y,s){
   cx.fillStyle="#FF7A1A";cx.beginPath();cx.ellipse(x,y,s,s*.8,0,0,7);cx.fill();
@@ -198,22 +228,22 @@ function pumpkin(x,y,s){
   cx.beginPath();cx.moveTo(x-s*.5,y+s*.18);cx.lineTo(x-s*.25,y+s*.42);cx.lineTo(x,y+s*.24);cx.lineTo(x+s*.25,y+s*.42);cx.lineTo(x+s*.5,y+s*.18);cx.lineTo(x,y+s*.36);cx.fill();
 }
 function tomb(x,y,w,h,tilt,cross){
-  cx.save();cx.translate(x,y);cx.rotate(tilt);cx.fillStyle="#2B1B45";
+  cx.save();cx.translate(x,y);cx.rotate(tilt);cx.fillStyle="#1D1131";
   if(cross){cx.fillRect(-w*.14,-h,w*.28,h);cx.fillRect(-w*.5,-h*.72,w,h*.2)}
-  else{cx.beginPath();cx.moveTo(-w/2,0);cx.lineTo(-w/2,-h+w/2);cx.arc(0,-h+w/2,w/2,Math.PI,0);cx.lineTo(w/2,0);cx.fill();cx.fillStyle="#3D2760";cx.fillRect(-w*.22,-h*.62,w*.44,3);cx.fillRect(-w*.22,-h*.46,w*.3,3)}
+  else{cx.beginPath();cx.moveTo(-w/2,0);cx.lineTo(-w/2,-h+w/2);cx.arc(0,-h+w/2,w/2,Math.PI,0);cx.lineTo(w/2,0);cx.fill();cx.fillStyle="#2C1A47";cx.fillRect(-w*.22,-h*.62,w*.44,3);cx.fillRect(-w*.22,-h*.46,w*.3,3)}
   cx.restore();
 }
 function tree(x,y,s){
-  cx.strokeStyle="#0B0614";cx.lineCap="round";
+  cx.strokeStyle="#040208";cx.lineCap="round";
   const br=(x1,y1,a,l,w,d)=>{const x2=x1+Math.cos(a)*l,y2=y1+Math.sin(a)*l;cx.lineWidth=w;cx.beginPath();cx.moveTo(x1,y1);cx.lineTo(x2,y2);cx.stroke();if(d>0){br(x2,y2,a-.55,l*.68,w*.62,d-1);br(x2,y2,a+.45,l*.62,w*.62,d-1)}};
   br(x,y,-Math.PI/2+.08,s,s*.16,3);
 }
 function ground(g){
   if(g>H+140)return;
-  const glow=cx.createLinearGradient(0,g-220,0,g);glow.addColorStop(0,"rgba(255,122,26,0)");glow.addColorStop(1,"rgba(255,122,26,.34)");cx.fillStyle=glow;cx.fillRect(0,g-220,W,220);
+  const glow=cx.createLinearGradient(0,g-220,0,g);glow.addColorStop(0,"rgba(255,122,26,0)");glow.addColorStop(1,"rgba(220,60,20,.26)");cx.fillStyle=glow;cx.fillRect(0,g-220,W,220);
   const u=Math.min(W,560)/400;
   tree(W*.12,g+6,74*u);tree(W*.9,g+6,58*u);
-  cx.fillStyle="#0B0614";cx.beginPath();cx.moveTo(0,g+10);cx.quadraticCurveTo(W*.25,g-22,W*.5,g+2);cx.quadraticCurveTo(W*.78,g+22,W,g-8);cx.lineTo(W,H+10);cx.lineTo(0,H+10);cx.fill();
+  cx.fillStyle="#040208";cx.beginPath();cx.moveTo(0,g+10);cx.quadraticCurveTo(W*.25,g-22,W*.5,g+2);cx.quadraticCurveTo(W*.78,g+22,W,g-8);cx.lineTo(W,H+10);cx.lineTo(0,H+10);cx.fill();
   tomb(W*.27,g-2,26*u,40*u,-.1);tomb(W*.42,g+2,22*u,44*u,.05,true);tomb(W*.66,g+8,28*u,36*u,.12);tomb(W*.8,g+4,20*u,38*u,-.06,true);
   pumpkin(W*.2,g+4,11*u);pumpkin(W*.56,g+6,14*u);pumpkin(W*.74,g+12,9*u);
 }
@@ -239,28 +269,28 @@ function frame(ts){
   if(reduced)shown=target;else shown+=gap*Math.min(1,.05*dt);
   if(Math.abs(target-shown)<.6)shown=target;
   rush=reduced?0:Math.min(1,Math.abs(gap)/450);
-  const t=shown/MOON,c=skyAt(t),dir=gapDir();
+  const t=Math.min(1,shown/MOON),c=skyAt(t),dir=gapDir();
   altRead.textContent=fmt(shown);
   cx.globalAlpha=1;cx.fillStyle=`rgb(${c})`;cx.fillRect(0,0,W,H);
   document.body.style.background=`rgb(${c})`;
-  const gy=H*.42;
+  gyC+=(gyT-gyC)*Math.min(1,.12*dt);const gy=gyC;
   // stars
   cx.fillStyle="#F4EFE6";
   for(const s of stars){const y=((s.y*H+shown*.05)%H+H)%H,x=s.x*W;cx.globalAlpha=(.3+.6*t)*(.6+.4*Math.sin(clock*2+s.ph));
     if(rush>.15)cx.fillRect(x,y,1.5,dir*rush*26);else{cx.beginPath();cx.arc(x,y,s.r,0,7);cx.fill()}}
   // moon: far away at first, fills the sky by the top
-  const mr=26+(Math.min(W,H)*.34-26)*t,mx=W*.84+(W/2-W*.84)*t,my=H*.3+(gy-H*.3)*t;
+  const mr=26+(Math.min(W,H)*.34-26)*t,mx=W*.84+(W/2-W*.84)*t,my=gy-120+120*t;
   cx.globalAlpha=.1;cx.fillStyle="#FFE9A8";cx.beginPath();cx.arc(mx,my,mr*1.35,0,7);cx.fill();
   cx.globalAlpha=1;cx.fillStyle="#F6E7B0";cx.beginPath();cx.arc(mx,my,mr,0,7);cx.fill();
   cx.fillStyle="#E2CD8A";for(const[a,b,r]of[[-.35,-.25,.2],[.3,.1,.14],[-.1,.45,.17],[.42,-.42,.09]]){cx.beginPath();cx.arc(mx+a*mr,my+b*mr,r*mr,0,7);cx.fill()}
   // clouds at fixed altitudes
-  cx.fillStyle="#2A1746";
+  cx.fillStyle="#170C29";
   for(const cl of clouds){const y=gy+(shown-cl.alt)*PPM;cl.x+=cl.v*dt;if(cl.x>1.3)cl.x=-.3;if(cl.x<-.3)cl.x=1.3;if(y<-60||y>H+60)continue;const x=cl.x*W,w=cl.w;cx.globalAlpha=.8;
     cx.beginPath();cx.ellipse(x,y,w*.5,w*.13,0,0,7);cx.ellipse(x-w*.2,y-w*.08,w*.22,w*.14,0,0,7);cx.ellipse(x+w*.14,y-w*.1,w*.26,w*.17,0,0,7);cx.fill()}
   cx.globalAlpha=1;
   ground(gy+H*.17+shown*PPM);
   // bats
-  cx.fillStyle="#0B0614";
+  cx.fillStyle="#040208";
   for(const b of bats){b.x+=b.dir*b.v*.0022*dt;b.ph+=.3*dt;b.y+=dir*rush*.03*dt;if(b.x>1.1){b.x=-.1;b.y=.08+Math.random()*.5}if(b.x<-.1){b.x=1.1;b.y=.08+Math.random()*.5}if(b.y>1.1)b.y=-.05;
     const x=b.x*W,y=b.y*H+Math.sin(b.ph*.3)*6,s=b.s,f=Math.sin(b.ph)*s*.7;
     cx.beginPath();cx.moveTo(x,y);cx.quadraticCurveTo(x-s,y-s*.9-f,x-s*2,y-f*.6);cx.quadraticCurveTo(x-s*1.2,y+s*.1,x-s*.6,y+s*.45);cx.lineTo(x,y+s*.25);cx.lineTo(x+s*.6,y+s*.45);cx.quadraticCurveTo(x+s*1.2,y+s*.1,x+s*2,y-f*.6);cx.quadraticCurveTo(x+s,y-s*.9-f,x,y);cx.fill()}
@@ -275,14 +305,21 @@ addEventListener("resize",resize);resize();requestAnimationFrame(frame);
 
 /* ---------- game ---------- */
 const stage=document.getElementById("stage"),app=document.getElementById("app"),pop=document.getElementById("pop");
-let G=null,recent=[],timer=0;
-const show=html=>{clearTimeout(timer);pop.innerHTML="";stage.innerHTML=html};
+let G=null,timer=0;
+const show=html=>{clearTimeout(timer);pop.innerHTML="";stage.innerHTML=html;place()};
+// keep the ghost in the free space below the UI (and above a phone keyboard)
+function place(){
+  const vh=(window.visualViewport&&visualViewport.height)||innerHeight,chips=document.getElementById("chips");
+  let pt;if(chips){const top=chips.getBoundingClientRect().bottom;gyT=Math.max(top+90,top+(vh-top)*.52);pt=top+52}else{gyT=vh*.45;pt=gyT-170}
+  pop.style.top=Math.max(60,pt)+"px";
+}
+addEventListener("resize",place);if(window.visualViewport)visualViewport.addEventListener("resize",place);
 
 function home(){
   G=null;target=0;
   const done=save.daily&&save.daily.date===today();
   show(`<section class="screen">
-    <div class="top"><h1 class="title">Phantom</h1><p class="tag">Pick what nobody picks. Float to the moon.</p></div>
+    <div class="top"><h1 class="title">Phantom</h1><p class="tag">Type what nobody types. Float to the moon.</p></div>
     <div class="btns">
       ${save.plays?`<p class="meta" style="text-align:center">Best ${fmt(save.best)} m · Streak ${save.streak}</p>`:""}
       <button class="big" data-act="${done?"daily-result":"daily"}" type="button">Daily Rise${done?`<small>${fmt(save.daily.total)} m today</small>`:""}</button>
@@ -290,61 +327,86 @@ function home(){
     </div>
   </section>`);
 }
+function draw7(rand){
+  let pool=QS.map((_,i)=>i).filter(i=>!G.used.has(i));
+  if(pool.length<7){G.used.clear();pool=QS.map((_,i)=>i)}
+  const qs=shuffle(pool,rand).slice(0,7);qs.forEach(i=>G.used.add(i));G.qs.push(...qs);
+}
 function start(mode){
-  const rand=mode==="daily"?rng("phantom-"+today()):Math.random;
-  let pool=QS.map((_,i)=>i);if(mode==="free")pool=pool.filter(i=>!recent.includes(i));
-  const qs=shuffle(pool,rand).slice(0,7);
-  if(mode==="free")recent=qs.concat(recent).slice(0,21);
-  const opts=qs.map(i=>shuffle(shuffle(QS[i].answers,rand).slice(0,6),rand));
-  G={mode,qs,opts,i:0,total:0,results:[],locked:false};
+  G={mode,qs:[],used:new Set(),i:0,total:0,results:[],phase:"ask",lives:3,counted:false};
+  draw7(mode==="daily"?rng("phantom2-"+today()):Math.random);
   tone(200,500,.25);question();
 }
+function more(){if(!G)return start("free");draw7(Math.random);tone(200,500,.25);question()}
+const livesHtml=()=>[0,1,2].map(k=>`<i class="${k<G.lives?"":"gone"}"></i>`).join("");
 function question(){
-  const q=QS[G.qs[G.i]],o=G.opts[G.i];G.locked=false;
-  show(`<section class="screen">
+  const q=QS[G.qs[G.i]],r0=G.i-G.i%7;G.phase="ask";G.lives=3;
+  clearTimeout(timer);pop.innerHTML="";
+  if(!document.getElementById("answer"))show(`<section class="screen">
     <div class="top">
-      <div class="pips">${G.qs.map((_,k)=>{const r=G.results[k];return`<span class="pip ${k===G.i?"now":""}" ${r?`style="background:${TCOL[r.tier]}"`:""}></span>`}).join("")}</div>
-      <span class="hint">Pick the rarest</span>
-      <h2 class="q">${esc(q.q)}</h2>
-    </div>
-    <div class="tiles" id="tiles">${o.map((a,k)=>`<button class="tile t-${tierFor(a.p)[0]}" data-pick="${k}" type="button" style="--d:${k*.05}s;--w:${Math.max(6,a.p/Math.max(...o.map(x=>x.p))*100)}%"><span class="fill"></span><span class="n">${esc(a.name)}</span><span class="p">${a.p}%</span></button>`).join("")}</div>
+      <div class="pips" id="pips"></div>
+      <span class="hint">Type a rare one</span>
+      <h2 class="q" id="qtext"></h2>
+      <form class="ask" id="ask" autocomplete="off"><input id="answer" type="text" placeholder="Your answer" aria-label="Your answer" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go"><button class="big" type="submit">Go</button></form>
+      <div class="under"><span class="lives" id="lives" aria-label="Tries left"></span><button class="skip" type="button" data-act="skip">Skip</button></div>
+      <div class="chips" id="chips"></div>
+    </div><div></div>
   </section>`);
+  document.getElementById("pips").innerHTML=[0,1,2,3,4,5,6].map(k=>{const r=G.results[r0+k];return`<span class="pip ${r0+k===G.i?"now":""}" ${r?`style="background:${TCOL[r.tier]}"`:""}></span>`}).join("");
+  const qt=document.getElementById("qtext");qt.textContent=q.q;qt.style.animation="none";void qt.offsetWidth;qt.style.animation="fade .35s both";
+  document.getElementById("lives").innerHTML=livesHtml();
+  document.getElementById("chips").innerHTML="";
+  const input=document.getElementById("answer");input.value="";input.focus({preventScroll:true});place();
 }
-function pick(k,btn){
-  if(!G||G.locked)return;G.locked=true;G.lockedAt=performance.now();
-  const a=G.opts[G.i][k],rise=riseFor(a.p),[tier,label]=tierFor(a.p);
+function submit(){
+  if(!G||G.phase!=="ask")return;
+  const input=document.getElementById("answer");
+  if(!input.value.trim()){input.focus();return}
+  const a=match(QS[G.qs[G.i]],input.value);
+  if(a)return reveal(a);
+  G.lives--;document.getElementById("lives").innerHTML=livesHtml();
+  tone(170,80,.22,"sawtooth",.07);
+  if(G.lives<=0)return reveal(null);
+  const box=input.parentElement;box.classList.remove("shake");void box.offsetWidth;box.classList.add("shake");input.select();
+}
+function reveal(a){
+  G.phase="reveal";G.lockedAt=performance.now();
+  const q=QS[G.qs[G.i]],rise=a?riseFor(a.p):0,[tier,label]=a?tierFor(a.p):["miss","Lost"];
   G.results[G.i]={tier,rise};G.total+=rise;target=G.total;
-  document.getElementById("tiles").classList.add("done");btn.classList.add("me");
+  const pip=document.querySelectorAll(".pip")[G.i%7];if(pip)pip.style.background=TCOL[tier];
+  const sorted=[...q.answers].sort((x,y)=>y.p-x.p),rows=[...new Set([...sorted.slice(0,3),a,sorted[sorted.length-1]].filter(Boolean))].sort((x,y)=>y.p-x.p);
+  document.getElementById("chips").innerHTML=rows.map((x,k)=>`<span class="chipx t-${tierFor(x.p)[0]} ${x===a?"me":""}" style="--d:${k*.07}s">${esc(x.name)}<b>${x.p}%</b></span>`).join("");
+  place();
   const rank=["common","uncommon","rare","epic","legend"].indexOf(tier);
-  mood=rank>=2?1:rank===0?2:0;moodUntil=clock+1.8;
-  burst(TCOL[tier],10+rank*12);
+  mood=rank>=2?1:rank<=0?2:0;moodUntil=clock+2;
+  if(a){burst(TCOL[tier],10+rank*12);tone(180,260+rise*.75,.45,"triangle");if(rank>=3)setTimeout(()=>tone(700,1400,.3,"sine",.08),160)}
   if(rank>=3&&!reduced){app.classList.remove("quake");void app.offsetWidth;app.classList.add("quake")}
-  tone(180,260+rise*.75,.45,"triangle");if(rank>=3)setTimeout(()=>tone(700,1400,.3,"sine",.08),160);
   pop.innerHTML=`<div class="t-${tier}"><b>+${fmt(rise)}</b><span>${label}</span></div>`;
-  timer=setTimeout(next,2100);
+  timer=setTimeout(next,2600);
 }
 function next(){
-  clearTimeout(timer);if(!G)return;
-  G.i++;if(G.i<7)return question();
-  save.plays++;save.best=Math.max(save.best,G.total);
-  if(G.mode==="daily"){const y=new Date();y.setDate(y.getDate()-1);save.streak=save.lastDaily===dayKey(y)?save.streak+1:1;save.lastDaily=today();save.daily={date:today(),total:G.total,results:G.results}}
-  persist();end(G.mode,G.total,G.results);
+  clearTimeout(timer);if(!G||G.phase!=="reveal")return;
+  G.i++;if(G.i%7)return question();
+  if(!G.counted){G.counted=true;save.plays++;
+    if(G.mode==="daily"){const y=new Date();y.setDate(y.getDate()-1);save.streak=save.lastDaily===dayKey(y)?save.streak+1:1;save.lastDaily=today();save.daily={date:today(),total:G.total,results:G.results.slice(0,7)}}}
+  save.best=Math.max(save.best,G.total);persist();
+  G.phase="end";end(G.mode,G.total,G.results.slice(-7),G.i/7);
 }
-const SQ={common:"⬜",uncommon:"🟩",rare:"🟪",epic:"🟧",legend:"🟨"};
+const SQ={common:"⬜",uncommon:"🟩",rare:"🟪",epic:"🟧",legend:"🟨",miss:"⬛"};
 let shareText="";
-function end(mode,total,res){
-  G=null;target=total;const left=MOON-total;
-  shareText=`Phantom ${mode==="daily"?"Daily Rise":"Free Rise"}\n${fmt(total)} m 👻\n${res.map(r=>SQ[r.tier]).join("")}`;
+function end(mode,total,res,round=1){
+  target=total;const left=MOON-total;
+  shareText=`Phantom ${mode==="daily"&&round===1?"Daily Rise":"Free Rise"}${round>1?" x"+round:""}\n${fmt(total)} m 👻\n${res.map(r=>SQ[r.tier]).join("")}`;
   tone(300,900,.5,"sine");
   show(`<section class="screen">
     <div class="top">
       <div class="score"><span id="score">0</span><small>m</small></div>
       <div class="dots">${res.map((r,k)=>`<i style="--c:${TCOL[r.tier]};--d:${.3+k*.09}s"></i>`).join("")}</div>
-      <p class="meta">${left<300?"You reached the moon":fmt(left)+" m to the moon"}</p>
+      <p class="meta">${left<=0?"Past the moon":fmt(left)+" m to the moon"}</p>
     </div>
     <div class="btns">
-      <button class="big" data-act="free" type="button">Rise again</button>
-      <div class="pair"><button class="big flat" data-act="share" id="share" type="button">Copy score</button><button class="big flat" data-act="home" type="button">Home</button></div>
+      <div class="pair"><button class="big" data-act="more" type="button">7 more</button><button class="big flat" data-act="home" type="button">Stop</button></div>
+      <button class="big flat" data-act="share" id="share" type="button">Copy score</button>
     </div>
   </section>`);
   const el=document.getElementById("score");if(reduced){el.textContent=fmt(total);return}
@@ -354,18 +416,18 @@ function share(){
   const b=document.getElementById("share");
   try{navigator.clipboard.writeText(shareText).then(()=>{b.textContent="Copied"},()=>{b.textContent="Copy blocked"})}catch(e){b.textContent="Copy blocked"}
 }
+stage.addEventListener("submit",e=>{e.preventDefault();submit()});
 stage.addEventListener("click",e=>{
-  const t=e.target.closest("[data-pick]");
-  if(t){if(G&&!G.locked)pick(+t.dataset.pick,t);return}
-  const b=e.target.closest("[data-act]");
-  if(!b){return}
+  const b=e.target.closest("[data-act]");if(!b)return;
   const act=b.dataset.act;
   if(act==="daily")start("daily");else if(act==="free")start("free");
+  else if(act==="more")more();
+  else if(act==="skip"){if(G&&G.phase==="ask")reveal(null)}
   else if(act==="daily-result")end("daily",save.daily.total,save.daily.results);
   else if(act==="share")share();else if(act==="home")home();
 });
-// tap anywhere during a reveal to move on
-document.addEventListener("click",()=>{if(G&&G.locked&&performance.now()-G.lockedAt>500)next()});
+// tap or press Enter during a reveal to move on
+document.addEventListener("click",()=>{if(G&&G.phase==="reveal"&&performance.now()-G.lockedAt>500)next()});
 document.getElementById("home-btn").addEventListener("click",home);
 home();
 })();
