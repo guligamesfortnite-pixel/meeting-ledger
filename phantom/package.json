@@ -1,0 +1,10 @@
+{
+  "name": "phantom",
+  "private": true,
+  "type": "module",
+  "scripts": { "build": "node build.mjs" },
+  "dependencies": {
+    "@netlify/blobs": "^11.1.9",
+    "@netlify/functions": "^6.1.1"
+  }
+}

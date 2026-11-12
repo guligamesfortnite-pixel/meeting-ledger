@@ -69,7 +69,22 @@ body{background:var(--night);color:var(--bone);font-family:var(--body);font-size
 .lives{display:flex;gap:7px;align-items:center}
 .lives i{width:13px;height:13px;border-radius:50%;background:var(--pumpkin);transition:all .3s}
 .lives i.gone{background:var(--edge);transform:scale(.6)}
-.skip{background:none;border:0;color:var(--dim);font:700 12px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;cursor:pointer;padding:8px;margin-right:-8px;border-radius:8px}
+.skip{background:none;border:0;color:var(--dim);font:700 12px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;cursor:pointer;padding:8px;border-radius:8px}
+.fuse{width:100%;height:6px;border-radius:3px;background:var(--edge);overflow:hidden}
+.fuse i{display:block;height:100%;background:var(--pumpkin);transform-origin:left;border-radius:3px}
+.combo{display:flex;align-items:center;gap:6px}
+.combo i{width:10px;height:10px;transform:rotate(45deg);background:var(--edge);border-radius:2px;transition:background .3s}
+.combo i.on{background:var(--t-rare)}
+.combo b{font:800 15px/1 var(--body);color:var(--t-legend);margin-left:4px}
+.tools{display:flex;gap:2px}
+.skip:disabled{opacity:.3;cursor:default}
+#pop em{display:block;font:800 12px/1.8 var(--body);font-style:normal;letter-spacing:.1em;text-transform:uppercase;color:var(--bone);text-shadow:0 2px 0 rgba(0,0,0,.6)}
+.later{width:100%;text-align:left;display:flex;flex-direction:column;gap:6px;max-height:56vh;overflow:auto}
+.later h3{font:800 12px/1 var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--slime);margin:10px 0 2px}
+.later p{margin:0;padding:11px 14px;border-radius:12px;background:var(--tile);border:2px solid var(--edge);font-weight:500;font-size:14px;line-height:1.35;color:var(--dim)}
+.later p b{color:var(--bone);display:block}
+.textlink{background:none;border:0;color:var(--dim);font:700 12px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;cursor:pointer;padding:6px;align-self:center;border-radius:8px}
+.board:empty{display:none}
 .chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;min-height:36px}
 .chipx{font:700 13px/1 var(--body);padding:8px 10px;border-radius:10px;background:var(--tile);border:2px solid var(--edge);color:var(--dim);animation:drop .35s cubic-bezier(.3,1.4,.5,1) both;animation-delay:var(--d)}
 .chipx b{color:var(--c);margin-left:6px;font-variant-numeric:tabular-nums}
@@ -100,7 +115,7 @@ body{background:var(--night);color:var(--bone);font-family:var(--body);font-size
 .score small{font-size:.35em;margin-left:.1em}
 .dots{display:flex;gap:8px;justify-content:center}
 .dots i{width:22px;height:22px;border-radius:7px;background:var(--c);animation:drop .4s cubic-bezier(.3,1.6,.5,1) both;animation-delay:var(--d)}
-@media (max-height:700px){.btns{gap:10px}.big{padding:15px}.title{font-size:60px}}
+@media (max-height:760px){.btns{gap:10px}.big{padding:15px}.title{font-size:60px}}
 @media (max-height:640px){.q{font-size:21px}.big{padding:15px}.title{font-size:60px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -173,10 +188,62 @@ const BANK=[
 ["A US state that starts with M","Michigan:20;Massachusetts:16;Maine:12;Montana:12;Mississippi:12;Minnesota:10;Missouri:10;Maryland:8"],
 ["A country that starts with I","Italy:28;India:24;Ireland:16;Iceland:9;Indonesia:8;Israel:6;Iran:5;Iraq:4"],
 ["A prime number below 30","2:22:two;7:20:seven;3:16:three;5:12:five;13:8:thirteen;11:7:eleven;17:5:seventeen;19:4:nineteen;23:4:twentythree;29:2:twentynine"],
-["A layer of Earth's atmosphere","Stratosphere:34;Troposphere:24;Mesosphere:12;Thermosphere:10;Exosphere:8"]
+["A layer of Earth's atmosphere","Stratosphere:34;Troposphere:24;Mesosphere:12;Thermosphere:10;Exosphere:8"],
+["A classic Universal movie monster","Dracula:34;Frankenstein:30:frankensteinsmonster;The Wolf Man:12:wolfman/werewolf;The Mummy:12:mummy;The Invisible Man:5:invisibleman;Creature from the Black Lagoon:4:creature/gillman/blacklagoon;Bride of Frankenstein:2:bride;Phantom of the Opera:1:phantom"],
+["A ghost in Pac-Man","Blinky:30;Pinky:26;Inky:24;Clyde:20"],
+["A weapon in Cluedo","Candlestick:24;Knife:20:dagger;Lead Pipe:16:pipe/leadpiping;Rope:14;Revolver:14:gun/pistol;Wrench:12:spanner"],
+["One of the four classical elements","Fire:36;Water:26;Earth:20;Air:18:wind"],
+["One of the seven wonders of the ancient world","Great Pyramid of Giza:46:pyramids/pyramid/greatpyramid/pyramidofgiza/giza/pyramidsofgiza;Hanging Gardens of Babylon:20:hanginggardens/gardensofbabylon;Colossus of Rhodes:12:colossus;Lighthouse of Alexandria:9:lighthouse/pharos;Statue of Zeus:5:zeus/statueofzeusatolympia;Temple of Artemis:4:artemis;Mausoleum at Halicarnassus:4:mausoleum/mausoleumofhalicarnassus/halicarnassus"],
+["One of the four Hogwarts houses","Gryffindor:52;Slytherin:26;Hufflepuff:12;Ravenclaw:10"],
+["One of the seven dwarfs","Dopey:22;Grumpy:22;Doc:16;Sleepy:12;Happy:10;Sneezy:10;Bashful:8"],
+["A member of the Fellowship of the Ring","Frodo:30;Gandalf:20;Aragorn:14:strider;Legolas:12;Sam:8:samwise;Gimli:6;Boromir:4;Merry:3:meriadoc;Pippin:3:peregrin"],
+["One of the six original film Avengers","Iron Man:34:tonystark;Captain America:20:cap;Thor:16;Hulk:14:thehulk/incrediblehulk;Black Widow:10;Hawkeye:6"],
+["A Teenage Mutant Ninja Turtle","Leonardo:28:leo;Michelangelo:28:mikey;Donatello:22:donnie;Raphael:22:raph"],
+["One of the six main Friends characters","Rachel:24;Joey:20;Ross:18;Chandler:16;Monica:12;Phoebe:10"],
+["A Pixar film released before 2010","Toy Story:34;Finding Nemo:16;Monsters Inc:10:monstersinc;Cars:8;Up:8;WALL-E:6:walle;The Incredibles:6:incredibles;Ratatouille:5;Toy Story 2:4;A Bug's Life:3:bugslife"],
+["One of the Three Musketeers, or their friend","Athos:30;Porthos:26;Aramis:24;D'Artagnan:20"],
+["A Spice Girl","Posh:22:victoria/poshspice;Scary:22:melb/scaryspice;Baby:20:emma/babyspice;Ginger:20:geri/gingerspice;Sporty:16:melc/sportyspice"],
+["A member of Queen","Freddie Mercury:70:freddie/mercury;Brian May:18:brian/may;Roger Taylor:8:roger/taylor;John Deacon:4:john/deacon"],
+["A note in do-re-mi","Do:30;Mi:18;Re:14;Fa:12;La:10;Sol:8:so;Ti:8:si"],
+["A section of the orchestra","Strings:36;Brass:22;Percussion:22;Woodwind:20:woodwinds"],
+["An instrument in a string quartet","Violin:60;Cello:26;Viola:14"],
+["A men's football World Cup winner before 2026","Brazil:30;Germany:16;Argentina:16;France:12;Italy:10;Spain:7;England:7;Uruguay:2"],
+["A Summer Olympics host city since 2000","London:22;Beijing:18;Sydney:14;Rio de Janeiro:14:rio;Athens:12;Tokyo:12;Paris:8"],
+["A men's golf major","The Masters:46:masters/augusta;The Open:22:open/britishopen/openchampionship;US Open:20;PGA Championship:12:pga"],
+["A swimming stroke","Freestyle:34:frontcrawl/crawl;Butterfly:26;Breaststroke:22;Backstroke:18"],
+["One of the big four US sports leagues","NFL:40;NBA:30;MLB:18;NHL:12"],
+["A colour of snooker ball","Red:22;Black:22;White:12;Pink:12;Blue:10;Yellow:8;Green:7;Brown:7"],
+["A French mother sauce","Béchamel:36;Hollandaise:28;Tomato:14:saucetomate/tomate;Espagnole:12:espagnol/brown;Velouté:10"],
+["A flavour in Neapolitan ice cream","Chocolate:40;Vanilla:34;Strawberry:26"],
+["A primary colour of paint","Red:40;Blue:36;Yellow:24"],
+["A state of matter","Solid:34;Liquid:30;Gas:26;Plasma:10;Bose-Einstein condensate:0.5:bec"],
+["A base in DNA","Adenine:34;Guanine:22;Cytosine:22;Thymine:22"],
+["A planet with rings","Saturn:80;Uranus:8;Jupiter:6;Neptune:6"],
+["A giant planet","Jupiter:44;Saturn:30;Neptune:14;Uranus:12"],
+["A planet closer to the Sun than Earth","Mercury:55;Venus:45"],
+["A traffic light colour","Red:40;Green:36;Amber:24:yellow/orange"],
+["A Roman numeral letter","X:26;I:22;V:22;M:12;C:8;L:6;D:4"],
+["A compass point","North:38;South:22;West:22;East:18"],
+["A time zone of the mainland US","Eastern:40:est;Pacific:30:pst;Central:18:cst;Mountain:12:mst"],
+["A leg bone between hip and ankle","Femur:46:thighbone;Tibia:22:shin/shinbone;Fibula:18;Patella:14:kneecap"],
+["A type of human tooth","Molar:36;Canine:28;Incisor:24;Premolar:12"],
+["A finger","Thumb:30;Index:22:pointer/forefinger/indexfinger;Middle:20:middlefinger;Pinky:16:little/littlefinger/pinkie;Ring:12:ringfinger"],
+["One of the original thirteen US colonies","Virginia:18;Massachusetts:16;New York:16;Pennsylvania:10;Georgia:7;Maryland:6;New Jersey:6;Connecticut:5;North Carolina:4;South Carolina:4;Delaware:3;Rhode Island:3;New Hampshire:2"],
+["A permanent member of the UN Security Council","United States:34:usa/us/america;China:20;Russia:20;United Kingdom:14:uk/britain/greatbritain/england;France:12"],
+["A Nordic capital city","Stockholm:30;Oslo:26;Copenhagen:22;Helsinki:14;Reykjavik:8"],
+["An Australian state or mainland territory","New South Wales:30:nsw;Queensland:24;Victoria:22;Western Australia:10:wa;Tasmania:8;South Australia:6:sa;Northern Territory:3:nt;Australian Capital Territory:2:act/canberra"],
+["A borough of New York City","Manhattan:40;Brooklyn:28;Queens:14;The Bronx:12;Staten Island:6"],
+["An Ivy League university","Harvard:40;Yale:22;Princeton:12;Columbia:8;Cornell:6;Brown:4;Dartmouth:4;University of Pennsylvania:4:penn/upenn"],
+["A US state on the Gulf of Mexico","Florida:40;Texas:30;Louisiana:16;Alabama:7;Mississippi:7"],
+["A country that starts with A","Australia:26;Argentina:16;Austria:10;Afghanistan:10;Algeria:6;Albania:6;Angola:5;Armenia:5;Azerbaijan:4;Andorra:4;Antigua and Barbuda:2:antigua"],
+["A country that starts with C","Canada:28;China:26;Chile:8;Colombia:8;Cuba:8;Croatia:5;Cambodia:3;Costa Rica:3;Czech Republic:3:czechia;Cameroon:2.5;Cyprus:2.5;Chad:1.5;Congo:0.8:republicofthecongo/drc/democraticrepublicofthecongo;Central African Republic:0.5:car;Cape Verde:0.4:caboverde;Comoros:0.3;Côte d'Ivoire:0.3:ivorycoast"],
+["A face card","King:36;Jack:34:knave;Queen:30"],
+["A US coin in everyday use","Quarter:34;Penny:26:cent;Dime:20;Nickel:20"],
+["A colour on a Rubik's cube","Red:22;Blue:20;Green:16;Yellow:16;White:14;Orange:12"],
+["A month with exactly 30 days","June:30;September:26;April:24;November:20"]
 ];
 const norm=s=>String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/&/g,"and").trim().replace(/^(the|lake|a|an)\s+/,"").replace(/[^a-z0-9]/g,"");
-const QS=BANK.map(([q,raw])=>({q,answers:raw.split(";").map(s=>{const[name,p,al]=s.split(":");return{name,p:+p,keys:[norm(name),...(al?al.split("/").map(norm):[])]}})}));
+const QS=BANK.map(([q,raw])=>{const answers=raw.split(";").map(s=>{const[name,p,al]=s.split(":");return{name,p:+p,keys:[norm(name),...(al?al.split("/").map(norm):[])]}});return{q,id:norm(q),sum:answers.reduce((t,a)=>t+a.p,0),answers}});
 function lev(a,b){const m=a.length,n=b.length;if(Math.abs(m-n)>2)return 9;let prev=Array.from({length:n+1},(_,i)=>i);for(let i=1;i<=m;i++){const cur=[i];for(let j=1;j<=n;j++)cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));prev=cur}return prev[n]}
 function match(q,text){
   const t=norm(text);if(!t)return null;
@@ -263,7 +330,7 @@ function ground(g){
 }
 function ghost(x,y,s){
   const up=gapDir()*rush,st=1+Math.abs(up)*.22;
-  cx.save();cx.translate(x,y);cx.scale(1/Math.sqrt(st),st);
+  cx.save();cx.translate(x,y);cx.rotate(Math.sin(clock*20)*knock*.45);cx.scale(1/Math.sqrt(st),st);
   cx.fillStyle="rgba(244,239,230,.12)";cx.beginPath();cx.arc(0,s*.2,s*1.7,0,7);cx.fill();
   cx.fillStyle="#F4EFE6";cx.beginPath();cx.arc(0,0,s,Math.PI,0);cx.lineTo(s,s*1.25);
   for(let i=0;i<4;i++){const x1=s-(i+.5)*(s/2),x2=s-(i+1)*(s/2),w=Math.sin(clock*5+i*1.4)*s*.07;cx.quadraticCurveTo(x1,s*1.25+(i%2?-s*.24:s*.24)+w,x2,s*1.25)}
@@ -306,21 +373,38 @@ function frame(ts){
   // bats
   cx.fillStyle="#040208";
   for(const b of bats){b.x+=b.dir*b.v*.0022*dt;b.ph+=.3*dt;b.y+=dir*rush*.03*dt;if(b.x>1.1){b.x=-.1;b.y=.08+Math.random()*.5}if(b.x<-.1){b.x=1.1;b.y=.08+Math.random()*.5}if(b.y>1.1)b.y=-.05;
-    const x=b.x*W,y=b.y*H+Math.sin(b.ph*.3)*6,s=b.s,f=Math.sin(b.ph)*s*.7;
-    cx.beginPath();cx.moveTo(x,y);cx.quadraticCurveTo(x-s,y-s*.9-f,x-s*2,y-f*.6);cx.quadraticCurveTo(x-s*1.2,y+s*.1,x-s*.6,y+s*.45);cx.lineTo(x,y+s*.25);cx.lineTo(x+s*.6,y+s*.45);cx.quadraticCurveTo(x+s*1.2,y+s*.1,x+s*2,y-f*.6);cx.quadraticCurveTo(x+s,y-s*.9-f,x,y);cx.fill()}
+    drawBat(b.x*W,b.y*H+Math.sin(b.ph*.3)*6,b.s,Math.sin(b.ph)*b.s*.7)}
   // trail + particles
   if(rush>.12&&!reduced)for(let i=0;i<2;i++)parts.push({x:W/2+(Math.random()-.5)*40,y:gy+44,vx:(Math.random()-.5)*1.2,vy:dir*(3+Math.random()*5),life:.8,c:"#F4EFE6",r:2+Math.random()*4});
   for(const p of parts){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=.12*dt;p.life-=.022*dt;if(p.life<=0)continue;cx.globalAlpha=Math.max(0,p.life)*.9;cx.fillStyle=p.c;cx.beginPath();cx.arc(p.x,p.y,p.r,0,7);cx.fill()}
   parts=parts.filter(p=>p.life>0);cx.globalAlpha=1;
+  drawFx(gy,dt);tick();
   ghost(W/2,gy+Math.sin(clock*2.2)*7,Math.min(42,H*.055));
   requestAnimationFrame(frame);
 }
 addEventListener("resize",resize);resize();requestAnimationFrame(frame);
 
+/* ---------- live data: real answer counts and leaderboards when the game is hosted with its server ---------- */
+const inViewer=()=>!!window.claude||/claude/.test(location.hostname);
+const API=/^http/.test(location.protocol)&&!inViewer()?"/api":null;
+let stats={},online=false;
+async function api(path,body){
+  if(!API)return null;
+  try{const r=await fetch(API+path,body?{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)}:{});return r.ok?await r.json():null}catch(e){return null}
+}
+async function loadStats(){const s=await api("/stats");if(s&&s.counts){stats=s.counts;online=true;const el=document.getElementById("live");if(el)el.hidden=false}}
+// estimate blended with what players really typed; real answers take over as they pile up
+function pct(q,a){const s=stats[q.id]||{};let n=0;for(const k in s)n+=s[k];return(a.p/q.sum*12+(s[a.keys[0]]||0))/(12+n)*100}
+const show1=p=>p>=10?Math.round(p):Math.round(p*10)/10;
+const RANKS=["common","uncommon","rare","epic","legend"];
+const cleanName=s=>String(s||"").toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,10);
+const boardHtml=(rows,me)=>rows.length?rows.sort((a,b)=>b[1]-a[1]).slice(0,12).map(([n,s],k)=>`<div class="rowb ${n===me?"me":""}" style="--d:${.1+k*.05}s"><span>${k+1}</span><span>${esc(n)}</span><span>${fmt(s)} m</span></div>`).join(""):"";
+
 /* ---------- game ---------- */
 const stage=document.getElementById("stage"),app=document.getElementById("app"),pop=document.getElementById("pop");
-let G=null,timer=0;
-const show=html=>{clearTimeout(timer);pop.innerHTML="";stage.innerHTML=html;place()};
+const TIME=25000;
+let G=null,timer=0,pollT=0,fx=null,knock=0;
+const show=html=>{clearTimeout(timer);clearInterval(pollT);pop.innerHTML="";stage.innerHTML=html;place()};
 // keep the ghost in the free space below the UI (and above a phone keyboard)
 function place(){
   const vh=(window.visualViewport&&visualViewport.height)||innerHeight,chips=document.getElementById("chips");
@@ -329,17 +413,74 @@ function place(){
 }
 addEventListener("resize",place);if(window.visualViewport)visualViewport.addEventListener("resize",place);
 
+// burning fuse: answer before it runs out, faster answers rise further
+function tick(){
+  if(!G||G.phase!=="ask")return;
+  const f=Math.max(0,(G.tEnd-performance.now())/TIME),el=document.getElementById("fuse");
+  if(el){el.style.transform=`scaleX(${f})`;el.style.background=f<.3?"#E0321E":""}
+  if(f<=0)reveal(null,"Too slow");
+}
+function drawBat(x,y,s,f){
+  cx.beginPath();cx.moveTo(x,y);cx.quadraticCurveTo(x-s,y-s*.9-f,x-s*2,y-f*.6);cx.quadraticCurveTo(x-s*1.2,y+s*.1,x-s*.6,y+s*.45);cx.lineTo(x,y+s*.25);cx.lineTo(x+s*.6,y+s*.45);cx.quadraticCurveTo(x+s*1.2,y+s*.1,x+s*2,y-f*.6);cx.quadraticCurveTo(x+s,y-s*.9-f,x,y);cx.fill();
+}
+// one-off events: a bat that knocks you, a witch and a shooting star that lift you
+function drawFx(gy,dt){
+  knock*=Math.pow(.94,dt);
+  if(!fx)return;
+  fx.t+=dt/60;const k=fx.t/fx.d;if(k>=1){fx=null;return}
+  if(fx.type==="bat"){
+    const x=W*(1.2-1.4*k),y=gy-90+Math.sin(k*Math.PI)*95,s=24;
+    cx.fillStyle="#040208";drawBat(x,y,s,Math.sin(clock*26)*s*.7);
+    cx.fillStyle="#E0321E";cx.beginPath();cx.arc(x-5,y+3,2.4,0,7);cx.arc(x+5,y+3,2.4,0,7);cx.fill();
+    if(k>.42&&!fx.hit){fx.hit=1;knock=1;burst("#E0321E",14)}
+  }else if(fx.type==="star"){
+    const x=W*(-.15+1.3*k),y=gy-H*.28+k*H*.14;
+    const g=cx.createLinearGradient(x-170,y-52,x,y);g.addColorStop(0,"rgba(255,210,63,0)");g.addColorStop(1,"rgba(255,210,63,.95)");
+    cx.strokeStyle=g;cx.lineWidth=5;cx.lineCap="round";cx.beginPath();cx.moveTo(x-170,y-52);cx.lineTo(x,y);cx.stroke();
+    cx.fillStyle="#FFF3C4";cx.beginPath();for(let i=0;i<10;i++){const a=i*Math.PI/5+clock*3,r=i%2?5:13;cx.lineTo(x+Math.cos(a)*r,y+Math.sin(a)*r)}cx.fill();
+  }else{
+    const x=W*(-.25+1.5*k),y=gy-150+Math.sin(k*9)*12,s=26;
+    cx.strokeStyle="#040208";cx.fillStyle="#040208";cx.lineWidth=4;cx.lineCap="round";
+    cx.beginPath();cx.moveTo(x-s*1.9,y+s*.25);cx.lineTo(x+s*1.5,y);cx.stroke();
+    cx.beginPath();cx.moveTo(x-s*1.5,y+s*.2);cx.lineTo(x-s*2.6,y-s*.15);cx.lineTo(x-s*2.6,y+s*.7);cx.fill();
+    cx.beginPath();cx.moveTo(x+s*.3,y-s*.1);cx.lineTo(x-s*.1,y-s*1.0);cx.lineTo(x-s*1.5,y-s*.3);cx.lineTo(x-s*.5,y+s*.1);cx.fill();
+    cx.beginPath();cx.arc(x+s*.15,y-s*1.1,s*.27,0,7);cx.fill();
+    cx.beginPath();cx.moveTo(x-s*.35,y-s*1.25);cx.lineTo(x+s*.7,y-s*1.3);cx.lineTo(x+s*.05,y-s*2.2);cx.fill();
+    cx.fillStyle="#B07CFF";cx.fillRect(x-s*.2,y-s*1.42,s*.62,s*.12);
+  }
+}
+
 function home(){
   G=null;target=0;setHash("");
   const done=save.daily&&save.daily.date===today();
   show(`<section class="screen">
     <div class="top"><h1 class="title">Phantom</h1><p class="tag">Type what nobody types. Float to the moon.</p></div>
     <div class="btns">
-      ${save.plays?`<p class="meta" style="text-align:center">Best ${fmt(save.best)} m · Streak ${save.streak}</p>`:""}
+      <p class="meta" style="text-align:center">${save.plays?`Best ${fmt(save.best)} m · Streak ${save.streak}`:""}<span id="live" ${online?"":"hidden"}>${save.plays?" · ":""}Live rarity</span></p>
       <button class="big" data-act="${done?"daily-result":"daily"}" type="button">Daily Rise${done?`<small>${fmt(save.daily.total)} m today</small>`:""}</button>
       <button class="big alt2" data-act="free" type="button">Free Rise<small>unlimited</small></button>
       <button class="big green" data-act="vs-new" type="button">Challenge<small>vs friends</small></button>
+      <button class="textlink" data-act="later" type="button">Coming later</button>
     </div>
+  </section>`);
+}
+function later(){
+  const item=(t,d)=>`<p><b>${t}</b>${d}</p>`;
+  show(`<section class="screen">
+    <div class="top"><span class="hint">Not built yet</span><h2 class="q">Coming later</h2>
+      <div class="later">
+        <h3>Keeps you coming back</h3>
+        ${item("Unlockable ghosts","Pumpkin head, skeleton, vampire, witch hat. Earned by streaks and heights.")}
+        ${item("Badges","Reached the moon, 7 legendaries in a run, 30-day streak.")}
+        ${item("Stats page","Average height, rarest answer ever, a calendar of daily results.")}
+        ${item("Share card","A picture of your ghost at its height instead of plain text.")}
+        <h3>Polish</h3>
+        ${item("Spooky music","Background music and richer sound effects.")}
+        ${item("Install as an app","Add to the home screen and open it like an app.")}
+        ${item("Seasonal skins","Winter, summer and more on the same game.")}
+      </div>
+    </div>
+    <div class="btns"><button class="big flat" data-act="home" type="button">Back</button></div>
   </section>`);
 }
 function draw7(rand){
@@ -347,13 +488,15 @@ function draw7(rand){
   if(pool.length<7){G.used.clear();pool=QS.map((_,i)=>i)}
   const qs=shuffle(pool,rand).slice(0,7);qs.forEach(i=>G.used.add(i));G.qs.push(...qs);
 }
+const newRun=(mode,len,extra)=>Object.assign({mode,len,qs:[],used:new Set(),i:0,total:0,results:[],phase:"ask",lives:3,combo:0,peek:1,counted:false},extra);
 function start(mode){
-  G={mode,len:7,qs:[],used:new Set(),i:0,total:0,results:[],phase:"ask",lives:3,counted:false};
-  draw7(mode==="daily"?rng("phantom2-"+today()):Math.random);
+  G=newRun(mode,7);
+  draw7(mode==="daily"?rng("phantom3-"+today()):Math.random);
   tone(200,500,.25);question();
 }
-function more(){if(!G)return start("free");draw7(Math.random);tone(200,500,.25);question()}
+function more(){if(!G)return start("free");G.peek=1;draw7(Math.random);tone(200,500,.25);question()}
 const livesHtml=()=>[0,1,2].map(k=>`<i class="${k<G.lives?"":"gone"}"></i>`).join("");
+const comboHtml=()=>[0,1,2].map(k=>`<i class="${k<G.combo?"on":""}"></i>`).join("")+(G.combo>=3?"<b>x2</b>":"");
 function question(){
   const q=QS[G.qs[G.i]],r0=G.i-G.i%G.len;G.phase="ask";G.lives=3;
   clearTimeout(timer);pop.innerHTML="";
@@ -363,15 +506,27 @@ function question(){
       <span class="hint">Type a rare one</span>
       <h2 class="q" id="qtext"></h2>
       <form class="ask" id="ask" autocomplete="off"><input id="answer" type="text" placeholder="Your answer" aria-label="Your answer" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go"><button class="big" type="submit">Go</button></form>
-      <div class="under"><span class="lives" id="lives" aria-label="Tries left"></span><button class="skip" type="button" data-act="skip">Skip</button></div>
+      <div class="fuse" aria-hidden="true"><i id="fuse"></i></div>
+      <div class="under"><span class="lives" id="lives" aria-label="Tries left"></span><span class="combo" id="combo" aria-label="Rare streak"></span>
+        <span class="tools"><button class="skip" type="button" data-act="peek" id="peek">Peek</button><button class="skip" type="button" data-act="skip">Skip</button></span></div>
       <div class="chips" id="chips"></div>
     </div><div></div>
   </section>`);
-  document.getElementById("pips").innerHTML=Array.from({length:G.len},(_,k)=>k).map(k=>{const r=G.results[r0+k];return`<span class="pip ${r0+k===G.i?"now":""}" ${r?`style="background:${TCOL[r.tier]}"`:""}></span>`}).join("");
+  document.getElementById("pips").innerHTML=Array.from({length:G.len},(_,k)=>{const r=G.results[r0+k];return`<span class="pip ${r0+k===G.i?"now":""}" ${r?`style="background:${TCOL[r.tier]}"`:""}></span>`}).join("");
   const qt=document.getElementById("qtext");qt.textContent=q.q;qt.style.animation="none";void qt.offsetWidth;qt.style.animation="fade .35s both";
   document.getElementById("lives").innerHTML=livesHtml();
+  document.getElementById("combo").innerHTML=comboHtml();
+  document.getElementById("peek").disabled=!G.peek;
   document.getElementById("chips").innerHTML="";
   const input=document.getElementById("answer");input.value="";input.focus({preventScroll:true});place();
+  G.tEnd=performance.now()+TIME;
+}
+function peek(){
+  if(!G||G.phase!=="ask"||!G.peek)return;G.peek=0;
+  const q=QS[G.qs[G.i]],top=[...q.answers].sort((x,y)=>pct(q,y)-pct(q,x))[0];
+  document.getElementById("chips").innerHTML=`<span class="chipx t-common me">Everyone says ${esc(top.name)}</span>`;
+  document.getElementById("peek").disabled=true;tone(500,300,.2,"sine");place();
+  document.getElementById("answer").focus({preventScroll:true});
 }
 function submit(){
   if(!G||G.phase!=="ask")return;
@@ -384,19 +539,30 @@ function submit(){
   if(G.lives<=0)return reveal(null);
   const box=input.parentElement;box.classList.remove("shake");void box.offsetWidth;box.classList.add("shake");input.select();
 }
-function reveal(a){
-  G.phase="reveal";G.lockedAt=performance.now();
-  const q=QS[G.qs[G.i]],rise=a?riseFor(a.p):0,[tier,label]=a?tierFor(a.p):["miss","Lost"];
+function reveal(a,why){
+  const now=performance.now(),frac=Math.max(0,(G.tEnd-now)/TIME),q=QS[G.qs[G.i]];
+  G.phase="reveal";G.lockedAt=now;
+  let rise=0,tier="miss",label=why||"Lost",rank=-1;const tags=[];
+  if(a){
+    const p=pct(q,a);[tier,label]=tierFor(p);rank=RANKS.indexOf(tier);
+    const dbl=G.combo>=3;rise=Math.round(riseFor(p)*(dbl?2:1)*(1+.25*frac));
+    if(dbl)tags.push("x2");if(frac>.6)tags.push("Fast");
+    if(rank===0){rise=Math.max(0,rise-120);tags.push("Bat −120");fx={type:"bat",t:0,d:.9}}
+    else if(rank===3){rise+=200;tags.push("Witch +200");fx={type:"witch",t:0,d:1.5}}
+    else if(rank===4){rise+=400;tags.push("Star +400");fx={type:"star",t:0,d:1.1}}
+    G.combo=rank>=2?G.combo+1:0;
+  }else G.combo=0;
   G.results[G.i]={tier,rise};G.total+=rise;target=G.total;
   const pip=document.querySelectorAll(".pip")[G.i%G.len];if(pip)pip.style.background=TCOL[tier];
-  const sorted=[...q.answers].sort((x,y)=>y.p-x.p),rows=[...new Set([...sorted.slice(0,3),a,sorted[sorted.length-1]].filter(Boolean))].sort((x,y)=>y.p-x.p);
-  document.getElementById("chips").innerHTML=rows.map((x,k)=>`<span class="chipx t-${tierFor(x.p)[0]} ${x===a?"me":""}" style="--d:${k*.07}s">${esc(x.name)}<b>${x.p}%</b></span>`).join("");
+  const sorted=[...q.answers].sort((x,y)=>pct(q,y)-pct(q,x)),rows=[...new Set([...sorted.slice(0,3),a,sorted[sorted.length-1]].filter(Boolean))].sort((x,y)=>pct(q,y)-pct(q,x));
+  document.getElementById("chips").innerHTML=rows.map((x,k)=>`<span class="chipx t-${tierFor(pct(q,x))[0]} ${x===a?"me":""}" style="--d:${k*.07}s">${esc(x.name)}<b>${show1(pct(q,x))}%</b></span>`).join("");
+  document.getElementById("combo").innerHTML=comboHtml();
   place();
-  const rank=["common","uncommon","rare","epic","legend"].indexOf(tier);
+  if(a){const key=a.keys[0],s=stats[q.id]=stats[q.id]||{};s[key]=(s[key]||0)+1;api("/answer",{q:q.id,a:key})}
   mood=rank>=2?1:rank<=0?2:0;moodUntil=clock+2;
-  if(a){burst(TCOL[tier],10+rank*12);tone(180,260+rise*.75,.45,"triangle");if(rank>=3)setTimeout(()=>tone(700,1400,.3,"sine",.08),160)}
+  if(a){burst(TCOL[tier],10+rank*12);tone(180,260+Math.min(1500,rise)*.75,.45,"triangle");if(rank>=3)setTimeout(()=>tone(700,1400,.3,"sine",.08),160);if(rank===0)setTimeout(()=>tone(140,60,.3,"sawtooth",.08),380)}
   if(rank>=3&&!reduced){app.classList.remove("quake");void app.offsetWidth;app.classList.add("quake")}
-  pop.innerHTML=`<div class="t-${tier}"><b>+${fmt(rise)}</b><span>${label}</span></div>`;
+  pop.innerHTML=`<div class="t-${tier}"><b>+${fmt(rise)}</b><span>${label}</span>${tags.length?`<em>${tags.join(" · ")}</em>`:""}</div>`;
   timer=setTimeout(next,2600);
 }
 function next(){
@@ -405,38 +571,51 @@ function next(){
   if(G.mode==="vs")return vsDone();
   if(!G.counted){G.counted=true;save.plays++;
     if(G.mode==="daily"){const y=new Date();y.setDate(y.getDate()-1);save.streak=save.lastDaily===dayKey(y)?save.streak+1:1;save.lastDaily=today();save.daily={date:today(),total:G.total,results:G.results.slice(0,7)}}}
-  save.best=Math.max(save.best,G.total);persist();
+  save.best=Math.max(save.best,G.total);persist();loadStats();
   G.phase="end";end(G.mode,G.total,G.results.slice(-7),G.i/7);
 }
 const SQ={common:"⬜",uncommon:"🟩",rare:"🟪",epic:"🟧",legend:"🟨",miss:"⬛"};
 let shareText="";
 function end(mode,total,res,round=1){
-  target=total;const left=MOON-total;
-  shareText=`Phantom ${mode==="daily"&&round===1?"Daily Rise":"Free Rise"}${round>1?" x"+round:""}\n${fmt(total)} m 👻\n${res.map(r=>SQ[r.tier]).join("")}`;
+  target=total;const left=MOON-total,daily=mode==="daily"&&round===1;
+  shareText=`Phantom ${daily?"Daily Rise":"Free Rise"}${round>1?" x"+round:""}\n${fmt(total)} m 👻\n${res.map(r=>SQ[r.tier]).join("")}`;
   tone(300,900,.5,"sine");
   show(`<section class="screen">
     <div class="top">
       <div class="score"><span id="score">0</span><small>m</small></div>
       <div class="dots">${res.map((r,k)=>`<i style="--c:${TCOL[r.tier]};--d:${.3+k*.09}s"></i>`).join("")}</div>
       <p class="meta">${left<=0?"Past the moon":fmt(left)+" m to the moon"}</p>
+      ${daily&&API?`<div class="board" id="dboard"></div>`:""}
     </div>
     <div class="btns">
       <div class="pair"><button class="big" data-act="more" type="button">7 more</button><button class="big flat" data-act="home" type="button">Stop</button></div>
       <button class="big flat" data-act="share" id="share" type="button">Copy score</button>
     </div>
   </section>`);
+  if(daily)dailyBoard();
   const el=document.getElementById("score");if(reduced){el.textContent=fmt(total);return}
   const t0=performance.now();(function step(now){const k=Math.min(1,(now-t0)/1300),e=1-Math.pow(1-k,3);el.textContent=fmt(total*e);if(k<1&&el.isConnected)requestAnimationFrame(step)})(t0);
+}
+// today's leaderboard (hosted version only)
+async function dailyBoard(){
+  const el=document.getElementById("dboard");if(!el||!API||!save.daily)return;
+  const id="d-"+save.daily.date;
+  if(!save.daily.posted){
+    if(!save.name){el.innerHTML=`<form class="ask" id="nameform" autocomplete="off"><input class="field" id="pname" type="text" maxlength="10" placeholder="Name for the board" aria-label="Your name" autocapitalize="off" spellcheck="false"><button class="big" type="submit">Post</button></form>`;return}
+    if(await api("/score",{board:id,name:save.name,score:save.daily.total})){save.daily.posted=true;persist()}
+  }
+  const b=await api("/board?id="+id);
+  if(b&&el.isConnected)el.innerHTML=boardHtml(Object.entries(b.scores),save.name);
 }
 function share(){
   const b=document.getElementById("share");
   try{navigator.clipboard.writeText(shareText).then(()=>{b.textContent="Copied"},()=>{b.textContent="Copy blocked"})}catch(e){b.textContent="Copy blocked"}
 }
-/* ---------- challenge mode: same questions for everyone, scores travel in the link ---------- */
+
+/* ---------- challenge mode: same questions for everyone; scores travel in the link, and update live when hosted ---------- */
 const VS_RE=/^#?vs-(10|15|20)-([a-z0-9]{4,8})((?:-[a-z0-9]{1,10}-\d{1,6})*)$/;
 const LINK_BASE="https://claude.ai/artifact/7DBtvD6UNUxhhDMqa41scT";
 const setHash=h=>{try{if(location.hash.replace("#","")!==h)location.hash=h}catch(e){}};
-const cleanName=s=>String(s||"").toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,10);
 let V=null;
 function vsParse(hash){
   const m=VS_RE.exec(hash||"");if(!m)return null;
@@ -444,16 +623,13 @@ function vsParse(hash){
   for(let i=0;i<parts.length;i+=2)scores[parts[i]]=Math.max(scores[parts[i]]||0,+parts[i+1]);
   return{n:+m[1],seed:m[2],scores};
 }
+function vsMerge(st,scores){let changed=false;for(const[n,s]of Object.entries(scores||{}))if(!(st.scores[n]>=s)){st.scores[n]=s;changed=true}return changed}
 function vsLoad(v){
   save.vs=save.vs||{};const key=v.n+"-"+v.seed,st=save.vs[key]||(save.vs[key]={scores:{},mine:null});
-  for(const[n,s]of Object.entries(v.scores))st.scores[n]=Math.max(st.scores[n]||0,s);
-  persist();return{n:v.n,seed:v.seed,key,st};
+  vsMerge(st,v.scores);persist();return{n:v.n,seed:v.seed,key,st};
 }
-const vsRows=()=>Object.entries(V.st.scores).sort((a,b)=>b[1]-a[1]);
-const vsCode=()=>"vs-"+V.key+vsRows().slice(0,12).map(([n,s])=>"-"+n+"-"+s).join("");
-const inViewer=()=>!!window.claude||/claude/.test(location.hostname);
+const vsCode=()=>"vs-"+V.key+Object.entries(V.st.scores).sort((a,b)=>b[1]-a[1]).slice(0,12).map(([n,s])=>"-"+n+"-"+s).join("");
 const vsLink=()=>(inViewer()?LINK_BASE:location.href.split("#")[0])+"#"+vsCode();
-const board=()=>{const rows=vsRows();return rows.length?`<div class="board">${rows.map(([n,s],k)=>`<div class="rowb ${n===V.st.mine?"me":""}" style="--d:${.15+k*.06}s"><span>${k+1}</span><span>${esc(n)}</span><span>${fmt(s)} m</span></div>`).join("")}</div>`:""};
 function vsNew(){
   G=null;target=0;
   show(`<section class="screen">
@@ -466,6 +642,12 @@ function vsCreate(n){
   const abc="abcdefghjkmnpqrstuvwxyz23456789",seed=Array.from({length:6},()=>abc[Math.floor(Math.random()*abc.length)]).join("");
   V=vsLoad({n,seed,scores:{}});vsLobby();
 }
+async function vsPoll(){
+  if(!V)return;const key=V.key,b=await api("/board?id=vs-"+key);
+  if(!b||!V||V.key!==key||!vsMerge(V.st,b.scores))return;
+  persist();const el=document.getElementById("board"),link=document.getElementById("link");
+  if(el)el.innerHTML=boardHtml(Object.entries(V.st.scores),V.st.mine);if(link)link.value=vsLink();
+}
 function vsLobby(total){
   G=null;target=total||0;setHash(vsCode());
   const played=V.st.mine!=null;
@@ -474,7 +656,7 @@ function vsLobby(total){
       <span class="hint">Challenge · ${V.n} questions</span>
       ${total!=null?`<div class="score"><span>${fmt(total)}</span><small>m</small></div>`:`<h2 class="q">${played?"Send the link. Beat them all.":"Same questions for everyone"}</h2>`}
       ${played?"":`<input class="field" id="pname" type="text" maxlength="10" placeholder="Your name" aria-label="Your name" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(save.name||"")}">`}
-      ${board()}
+      <div class="board" id="board">${boardHtml(Object.entries(V.st.scores),V.st.mine)}</div>
     </div>
     <div class="btns">
       <input class="field link" id="link" type="text" readonly aria-label="Challenge link" value="${esc(vsLink())}">
@@ -482,16 +664,18 @@ function vsLobby(total){
         :`<button class="big" data-act="vs-play" type="button">Play</button><button class="big flat" data-act="vs-copy" id="share" type="button">Copy link</button>`}</div>
     </div>
   </section>`);
+  if(API){vsPoll();pollT=setInterval(vsPoll,4000)}
 }
 function vsPlay(){
   let name=cleanName(document.getElementById("pname").value)||"ghost"+(10+Math.floor(Math.random()*90));
   if(V.st.scores[name]!=null)name=name.slice(0,9)+"2";
   save.name=name;persist();
-  G={mode:"vs",len:V.n,name,qs:shuffle(QS.map((_,i)=>i),rng("vs-"+V.seed)).slice(0,V.n),used:new Set(),i:0,total:0,results:[],phase:"ask",lives:3,counted:true};
+  G=newRun("vs",V.n,{name,counted:true,qs:shuffle(QS.map((_,i)=>i),rng("vs-"+V.seed)).slice(0,V.n)});
   tone(200,500,.25);question();
 }
 function vsDone(){
   const total=G.total;V.st.mine=G.name;V.st.scores[G.name]=total;persist();
+  api("/score",{board:"vs-"+V.key,name:G.name,score:total});loadStats();
   tone(300,900,.5,"sine");vsLobby(total);
 }
 function vsCopy(){
@@ -506,7 +690,11 @@ function route(){
 }
 addEventListener("hashchange",route);
 
-stage.addEventListener("submit",e=>{e.preventDefault();submit()});
+stage.addEventListener("submit",e=>{
+  e.preventDefault();
+  if(e.target.id==="nameform"){save.name=cleanName(document.getElementById("pname").value)||"ghost"+(10+Math.floor(Math.random()*90));persist();return dailyBoard()}
+  submit();
+});
 stage.addEventListener("click",e=>{
   const n=e.target.closest("[data-vs]");if(n)return vsCreate(+n.dataset.vs);
   const b=e.target.closest("[data-act]");if(!b)return;
@@ -514,7 +702,9 @@ stage.addEventListener("click",e=>{
   if(act==="daily")start("daily");else if(act==="free")start("free");
   else if(act==="more")more();
   else if(act==="vs-new")vsNew();else if(act==="vs-play")vsPlay();else if(act==="vs-copy")vsCopy();
-  else if(act==="skip"){if(G&&G.phase==="ask")reveal(null)}
+  else if(act==="skip"){if(G&&G.phase==="ask")reveal(null,"Skipped")}
+  else if(act==="peek")peek();
+  else if(act==="later")later();
   else if(act==="daily-result")end("daily",save.daily.total,save.daily.results);
   else if(act==="share")share();else if(act==="home")home();
 });
@@ -522,5 +712,6 @@ stage.addEventListener("click",e=>{
 document.addEventListener("click",()=>{if(G&&G.phase==="reveal"&&performance.now()-G.lockedAt>500)next()});
 document.getElementById("home-btn").addEventListener("click",home);
 if(!route())home();
+loadStats();
 })();
 </script>
