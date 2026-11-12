@@ -52,7 +52,8 @@ body{background:var(--night);color:var(--bone);font-family:var(--body);font-size
 .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
 .pips{display:flex;gap:7px;justify-content:center}
-.pip{width:26px;height:8px;border-radius:4px;background:var(--edge);transition:background .3s}
+.pips{width:100%}
+.pip{flex:0 1 26px;height:8px;border-radius:4px;background:var(--edge);transition:background .3s}
 .pip.now{background:var(--bone)}
 .hint{font:700 11px/1 var(--body);letter-spacing:.18em;text-transform:uppercase;color:var(--slime)}
 .q{font:800 clamp(22px,6.4vw,30px)/1.12 var(--body);margin:0;text-wrap:balance;text-shadow:0 2px 0 rgba(0,0,0,.45)}
@@ -76,6 +77,18 @@ body{background:var(--night);color:var(--bone);font-family:var(--body);font-size
 @keyframes drop{from{opacity:0;transform:translateY(20px) scale(.8)}to{opacity:1;transform:none}}
 .t-common{--c:var(--t-common)}.t-uncommon{--c:var(--t-uncommon)}.t-rare{--c:var(--t-rare)}.t-epic{--c:var(--t-epic)}.t-legend{--c:var(--t-legend)}.t-miss{--c:var(--t-miss)}
 .pair .big{padding:18px 8px;font-size:17px}
+.big.green{background:var(--slime);box-shadow:0 6px 0 #4E8A1E}
+.big.green:active{box-shadow:0 1px 0 #4E8A1E}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.field{width:100%;font:700 18px/1 var(--body);color:var(--bone);background:#07030D;border:2px solid var(--edge);border-radius:16px;padding:15px 16px;text-align:center;user-select:text;-webkit-user-select:text}
+.field:focus{outline:0;border-color:var(--pumpkin)}
+.field::placeholder{color:#5E5177}
+.field.link{font-size:13px;font-weight:500;color:var(--dim);padding:12px;text-overflow:ellipsis}
+.board{width:100%;display:flex;flex-direction:column;gap:6px;max-height:32vh;overflow:auto}
+.rowb{display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:8px;padding:11px 14px;border-radius:12px;background:var(--tile);border:2px solid var(--edge);font-weight:700;text-align:left;font-variant-numeric:tabular-nums;animation:drop .35s both;animation-delay:var(--d)}
+.rowb span:first-child{color:var(--dim)}
+.rowb span:nth-child(2){overflow:hidden;text-overflow:ellipsis;text-transform:uppercase;letter-spacing:.04em}
+.rowb.me{border-color:var(--pumpkin)}
 
 #pop{position:fixed;left:0;right:0;top:30%;z-index:3;text-align:center;pointer-events:none}
 #pop div{animation:pop 1.7s cubic-bezier(.2,.9,.3,1) both;color:var(--c)}
@@ -87,6 +100,7 @@ body{background:var(--night);color:var(--bone);font-family:var(--body);font-size
 .score small{font-size:.35em;margin-left:.1em}
 .dots{display:flex;gap:8px;justify-content:center}
 .dots i{width:22px;height:22px;border-radius:7px;background:var(--c);animation:drop .4s cubic-bezier(.3,1.6,.5,1) both;animation-delay:var(--d)}
+@media (max-height:700px){.btns{gap:10px}.big{padding:15px}.title{font-size:60px}}
 @media (max-height:640px){.q{font-size:21px}.big{padding:15px}.title{font-size:60px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -316,7 +330,7 @@ function place(){
 addEventListener("resize",place);if(window.visualViewport)visualViewport.addEventListener("resize",place);
 
 function home(){
-  G=null;target=0;
+  G=null;target=0;setHash("");
   const done=save.daily&&save.daily.date===today();
   show(`<section class="screen">
     <div class="top"><h1 class="title">Phantom</h1><p class="tag">Type what nobody types. Float to the moon.</p></div>
@@ -324,6 +338,7 @@ function home(){
       ${save.plays?`<p class="meta" style="text-align:center">Best ${fmt(save.best)} m · Streak ${save.streak}</p>`:""}
       <button class="big" data-act="${done?"daily-result":"daily"}" type="button">Daily Rise${done?`<small>${fmt(save.daily.total)} m today</small>`:""}</button>
       <button class="big alt2" data-act="free" type="button">Free Rise<small>unlimited</small></button>
+      <button class="big green" data-act="vs-new" type="button">Challenge<small>vs friends</small></button>
     </div>
   </section>`);
 }
@@ -333,14 +348,14 @@ function draw7(rand){
   const qs=shuffle(pool,rand).slice(0,7);qs.forEach(i=>G.used.add(i));G.qs.push(...qs);
 }
 function start(mode){
-  G={mode,qs:[],used:new Set(),i:0,total:0,results:[],phase:"ask",lives:3,counted:false};
+  G={mode,len:7,qs:[],used:new Set(),i:0,total:0,results:[],phase:"ask",lives:3,counted:false};
   draw7(mode==="daily"?rng("phantom2-"+today()):Math.random);
   tone(200,500,.25);question();
 }
 function more(){if(!G)return start("free");draw7(Math.random);tone(200,500,.25);question()}
 const livesHtml=()=>[0,1,2].map(k=>`<i class="${k<G.lives?"":"gone"}"></i>`).join("");
 function question(){
-  const q=QS[G.qs[G.i]],r0=G.i-G.i%7;G.phase="ask";G.lives=3;
+  const q=QS[G.qs[G.i]],r0=G.i-G.i%G.len;G.phase="ask";G.lives=3;
   clearTimeout(timer);pop.innerHTML="";
   if(!document.getElementById("answer"))show(`<section class="screen">
     <div class="top">
@@ -352,7 +367,7 @@ function question(){
       <div class="chips" id="chips"></div>
     </div><div></div>
   </section>`);
-  document.getElementById("pips").innerHTML=[0,1,2,3,4,5,6].map(k=>{const r=G.results[r0+k];return`<span class="pip ${r0+k===G.i?"now":""}" ${r?`style="background:${TCOL[r.tier]}"`:""}></span>`}).join("");
+  document.getElementById("pips").innerHTML=Array.from({length:G.len},(_,k)=>k).map(k=>{const r=G.results[r0+k];return`<span class="pip ${r0+k===G.i?"now":""}" ${r?`style="background:${TCOL[r.tier]}"`:""}></span>`}).join("");
   const qt=document.getElementById("qtext");qt.textContent=q.q;qt.style.animation="none";void qt.offsetWidth;qt.style.animation="fade .35s both";
   document.getElementById("lives").innerHTML=livesHtml();
   document.getElementById("chips").innerHTML="";
@@ -373,7 +388,7 @@ function reveal(a){
   G.phase="reveal";G.lockedAt=performance.now();
   const q=QS[G.qs[G.i]],rise=a?riseFor(a.p):0,[tier,label]=a?tierFor(a.p):["miss","Lost"];
   G.results[G.i]={tier,rise};G.total+=rise;target=G.total;
-  const pip=document.querySelectorAll(".pip")[G.i%7];if(pip)pip.style.background=TCOL[tier];
+  const pip=document.querySelectorAll(".pip")[G.i%G.len];if(pip)pip.style.background=TCOL[tier];
   const sorted=[...q.answers].sort((x,y)=>y.p-x.p),rows=[...new Set([...sorted.slice(0,3),a,sorted[sorted.length-1]].filter(Boolean))].sort((x,y)=>y.p-x.p);
   document.getElementById("chips").innerHTML=rows.map((x,k)=>`<span class="chipx t-${tierFor(x.p)[0]} ${x===a?"me":""}" style="--d:${k*.07}s">${esc(x.name)}<b>${x.p}%</b></span>`).join("");
   place();
@@ -386,7 +401,8 @@ function reveal(a){
 }
 function next(){
   clearTimeout(timer);if(!G||G.phase!=="reveal")return;
-  G.i++;if(G.i%7)return question();
+  G.i++;if(G.i%G.len)return question();
+  if(G.mode==="vs")return vsDone();
   if(!G.counted){G.counted=true;save.plays++;
     if(G.mode==="daily"){const y=new Date();y.setDate(y.getDate()-1);save.streak=save.lastDaily===dayKey(y)?save.streak+1:1;save.lastDaily=today();save.daily={date:today(),total:G.total,results:G.results.slice(0,7)}}}
   save.best=Math.max(save.best,G.total);persist();
@@ -416,12 +432,88 @@ function share(){
   const b=document.getElementById("share");
   try{navigator.clipboard.writeText(shareText).then(()=>{b.textContent="Copied"},()=>{b.textContent="Copy blocked"})}catch(e){b.textContent="Copy blocked"}
 }
+/* ---------- challenge mode: same questions for everyone, scores travel in the link ---------- */
+const VS_RE=/^#?vs-(10|15|20)-([a-z0-9]{4,8})((?:-[a-z0-9]{1,10}-\d{1,6})*)$/;
+const LINK_BASE="https://claude.ai/artifact/7DBtvD6UNUxhhDMqa41scT";
+const setHash=h=>{try{if(location.hash.replace("#","")!==h)location.hash=h}catch(e){}};
+const cleanName=s=>String(s||"").toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,10);
+let V=null;
+function vsParse(hash){
+  const m=VS_RE.exec(hash||"");if(!m)return null;
+  const scores={},parts=m[3].split("-").filter(Boolean);
+  for(let i=0;i<parts.length;i+=2)scores[parts[i]]=Math.max(scores[parts[i]]||0,+parts[i+1]);
+  return{n:+m[1],seed:m[2],scores};
+}
+function vsLoad(v){
+  save.vs=save.vs||{};const key=v.n+"-"+v.seed,st=save.vs[key]||(save.vs[key]={scores:{},mine:null});
+  for(const[n,s]of Object.entries(v.scores))st.scores[n]=Math.max(st.scores[n]||0,s);
+  persist();return{n:v.n,seed:v.seed,key,st};
+}
+const vsRows=()=>Object.entries(V.st.scores).sort((a,b)=>b[1]-a[1]);
+const vsCode=()=>"vs-"+V.key+vsRows().slice(0,12).map(([n,s])=>"-"+n+"-"+s).join("");
+const inViewer=()=>!!window.claude||/claude/.test(location.hostname);
+const vsLink=()=>(inViewer()?LINK_BASE:location.href.split("#")[0])+"#"+vsCode();
+const board=()=>{const rows=vsRows();return rows.length?`<div class="board">${rows.map(([n,s],k)=>`<div class="rowb ${n===V.st.mine?"me":""}" style="--d:${.15+k*.06}s"><span>${k+1}</span><span>${esc(n)}</span><span>${fmt(s)} m</span></div>`).join("")}</div>`:""};
+function vsNew(){
+  G=null;target=0;
+  show(`<section class="screen">
+    <div class="top"><span class="hint">Challenge</span><h2 class="q">How many questions?</h2></div>
+    <div class="btns"><div class="trio">${[10,15,20].map(n=>`<button class="big green" data-vs="${n}" type="button">${n}</button>`).join("")}</div>
+      <button class="big flat" data-act="home" type="button">Back</button></div>
+  </section>`);
+}
+function vsCreate(n){
+  const abc="abcdefghjkmnpqrstuvwxyz23456789",seed=Array.from({length:6},()=>abc[Math.floor(Math.random()*abc.length)]).join("");
+  V=vsLoad({n,seed,scores:{}});vsLobby();
+}
+function vsLobby(total){
+  G=null;target=total||0;setHash(vsCode());
+  const played=V.st.mine!=null;
+  show(`<section class="screen">
+    <div class="top">
+      <span class="hint">Challenge · ${V.n} questions</span>
+      ${total!=null?`<div class="score"><span>${fmt(total)}</span><small>m</small></div>`:`<h2 class="q">${played?"Send the link. Beat them all.":"Same questions for everyone"}</h2>`}
+      ${played?"":`<input class="field" id="pname" type="text" maxlength="10" placeholder="Your name" aria-label="Your name" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(save.name||"")}">`}
+      ${board()}
+    </div>
+    <div class="btns">
+      <input class="field link" id="link" type="text" readonly aria-label="Challenge link" value="${esc(vsLink())}">
+      <div class="pair">${played?`<button class="big" data-act="vs-copy" id="share" type="button">Copy link</button><button class="big flat" data-act="home" type="button">Home</button>`
+        :`<button class="big" data-act="vs-play" type="button">Play</button><button class="big flat" data-act="vs-copy" id="share" type="button">Copy link</button>`}</div>
+    </div>
+  </section>`);
+}
+function vsPlay(){
+  let name=cleanName(document.getElementById("pname").value)||"ghost"+(10+Math.floor(Math.random()*90));
+  if(V.st.scores[name]!=null)name=name.slice(0,9)+"2";
+  save.name=name;persist();
+  G={mode:"vs",len:V.n,name,qs:shuffle(QS.map((_,i)=>i),rng("vs-"+V.seed)).slice(0,V.n),used:new Set(),i:0,total:0,results:[],phase:"ask",lives:3,counted:true};
+  tone(200,500,.25);question();
+}
+function vsDone(){
+  const total=G.total;V.st.mine=G.name;V.st.scores[G.name]=total;persist();
+  tone(300,900,.5,"sine");vsLobby(total);
+}
+function vsCopy(){
+  const b=document.getElementById("share"),box=document.getElementById("link"),pick=()=>{box.focus();box.select();b.textContent="Select + copy"};
+  try{navigator.clipboard.writeText(box.value).then(()=>{b.textContent="Copied"},pick)}catch(e){pick()}
+}
+function route(){
+  const v=vsParse(location.hash);if(!v)return false;
+  const key=v.n+"-"+v.seed,same=V&&V.key===key,fresh=Object.entries(v.scores).some(([n,s])=>!same||!(V.st.scores[n]>=s));
+  if(same&&(G||!fresh))return true;
+  V=vsLoad(v);vsLobby();return true;
+}
+addEventListener("hashchange",route);
+
 stage.addEventListener("submit",e=>{e.preventDefault();submit()});
 stage.addEventListener("click",e=>{
+  const n=e.target.closest("[data-vs]");if(n)return vsCreate(+n.dataset.vs);
   const b=e.target.closest("[data-act]");if(!b)return;
   const act=b.dataset.act;
   if(act==="daily")start("daily");else if(act==="free")start("free");
   else if(act==="more")more();
+  else if(act==="vs-new")vsNew();else if(act==="vs-play")vsPlay();else if(act==="vs-copy")vsCopy();
   else if(act==="skip"){if(G&&G.phase==="ask")reveal(null)}
   else if(act==="daily-result")end("daily",save.daily.total,save.daily.results);
   else if(act==="share")share();else if(act==="home")home();
@@ -429,6 +521,6 @@ stage.addEventListener("click",e=>{
 // tap or press Enter during a reveal to move on
 document.addEventListener("click",()=>{if(G&&G.phase==="reveal"&&performance.now()-G.lockedAt>500)next()});
 document.getElementById("home-btn").addEventListener("click",home);
-home();
+if(!route())home();
 })();
 </script>
