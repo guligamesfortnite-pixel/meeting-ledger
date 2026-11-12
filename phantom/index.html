@@ -614,7 +614,7 @@ function share(){
 
 /* ---------- challenge mode: same questions for everyone; scores travel in the link, and update live when hosted ---------- */
 const VS_RE=/^#?vs-(10|15|20)-([a-z0-9]{4,8})((?:-[a-z0-9]{1,10}-\d{1,6})*)$/;
-const LINK_BASE="https://claude.ai/artifact/7DBtvD6UNUxhhDMqa41scT";
+const LINK_BASE="https://phantom-rise.netlify.app/";
 const setHash=h=>{try{if(location.hash.replace("#","")!==h)location.hash=h}catch(e){}};
 let V=null;
 function vsParse(hash){
