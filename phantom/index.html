@@ -139,119 +139,100 @@ body{background:var(--night);color:var(--bone);font-family:var(--body);font-size
 /* ---------- question bank: "Answer:percent" (percent = estimated share of people who pick it) ---------- */
 const BANK=[
 ["One of the seven deadly sins","Lust:22;Greed:20:avarice;Sloth:16:laziness;Gluttony:14;Wrath:14:anger/rage;Envy:12:jealousy;Pride:10:vanity"],
-["A horseman of the apocalypse","Death:46;War:24;Famine:18:hunger;Pestilence:12:conquest/plague"],
-["A river of the Greek underworld","Styx:70;Lethe:10;Acheron:9;Phlegethon:6;Cocytus:5"],
 ["A phase of the Moon","Full Moon:46:full;New Moon:20:new;Waxing Crescent:9:crescent;First Quarter:7:halfmoon/half;Waning Crescent:5;Waxing Gibbous:5:gibbous;Waning Gibbous:4;Last Quarter:4:thirdquarter"],
 ["A major Greek god","Zeus:30;Hades:14;Poseidon:12;Athena:10;Apollo:8;Ares:8;Aphrodite:7;Hermes:6;Hera:5;Artemis:4;Dionysus:3;Hephaestus:3;Demeter:2.5;Hestia:1.5"],
-["A dwarf planet","Pluto:78;Ceres:9;Eris:7;Makemake:3;Haumea:3"],
 ["A country in Africa","Egypt:14;South Africa:14;Nigeria:12;Kenya:9;Morocco:6;Ghana:5;Ethiopia:5;Algeria:3;Tanzania:3;Uganda:3;Zimbabwe:3;Madagascar:3;Tunisia:2;Libya:2;Sudan:2;Somalia:2;Senegal:1.5;Cameroon:1.5;Democratic Republic of the Congo:1.5:drc/drcongo/congo/congokinshasa/zaire;Angola:1.2;Mali:1.2;Zambia:1.2;Rwanda:1.2;Namibia:1;Botswana:1;Mozambique:1;Ivory Coast:1:cotedivoire;Niger:0.8;Chad:0.8;Liberia:0.6;Sierra Leone:0.6;Togo:0.5;Malawi:0.5;Republic of the Congo:0.5:congobrazzaville;Benin:0.4;Gabon:0.4;South Sudan:0.4;Burkina Faso:0.4;Guinea:0.4;Mauritius:0.4;Eritrea:0.3;Djibouti:0.3;Burundi:0.3;Mauritania:0.3;Seychelles:0.3;Gambia:0.3;Lesotho:0.3;Guinea-Bissau:0.2;Equatorial Guinea:0.2;Eswatini:0.2:swaziland;Cape Verde:0.2:caboverde;Central African Republic:0.2:car;Comoros:0.1;Sao Tome and Principe:0.1:saotome"],
 ["A country that borders Germany","France:24;Poland:18;Netherlands:12:holland;Austria:12;Switzerland:10;Belgium:8;Denmark:7;Czech Republic:6:czechia/czech;Luxembourg:3"],
 ["A country that borders China","Russia:22;India:20;Mongolia:14;North Korea:10;Vietnam:8;Nepal:7;Pakistan:5;Kazakhstan:3;Myanmar:3:burma;Laos:2.5;Afghanistan:2;Bhutan:1.5;Kyrgyzstan:1;Tajikistan:1"],
 ["A US state that starts with N","New York:34;Nevada:14;New Jersey:14;New Mexico:9;North Carolina:9;Nebraska:8;North Dakota:6;New Hampshire:6"],
-["A US state that borders Mexico","Texas:42;California:28;Arizona:18;New Mexico:12"],
-["A president on Mount Rushmore","Abraham Lincoln:34:lincoln/abe/abelincoln;George Washington:34:washington;Theodore Roosevelt:18:roosevelt/teddy/teddyroosevelt;Thomas Jefferson:14:jefferson"],
-["A US state with a four-letter name","Ohio:44;Utah:30;Iowa:26"],
-["A country that starts with J","Japan:70;Jamaica:20;Jordan:10"],
 ["One of the first ten elements","Hydrogen:30;Helium:22;Carbon:12;Oxygen:12;Lithium:8;Nitrogen:6;Neon:4;Beryllium:3;Boron:3;Fluorine:2"],
 ["A planet in our solar system","Mars:24;Earth:22;Jupiter:14;Saturn:13;Venus:8;Mercury:7;Neptune:5;Uranus:4"],
 ["A country in South America","Brazil:34:brasil;Argentina:20;Peru:10;Colombia:10;Chile:9;Venezuela:5;Ecuador:4;Bolivia:3;Uruguay:2.5;Paraguay:1.5;Guyana:0.6;Suriname:0.4"],
 ["A colour of the rainbow","Red:30;Blue:22;Green:12;Yellow:11;Orange:9;Violet:6:purple;Indigo:5"],
 ["A chess piece","Queen:26;King:22;Knight:18:horse;Pawn:14;Rook:9:castle;Bishop:8"],
-["One of the Great Lakes","Superior:30;Michigan:28;Erie:18;Huron:12;Ontario:10"],
 ["A continent","Europe:22;Asia:20;Africa:20;North America:14;South America:8;Australia:8:oceania/australasia;Antarctica:7:antartica"],
-["An ocean","Pacific:38;Atlantic:34;Indian:12;Arctic:10;Southern:4:antarctic"],
 ["A noble gas","Helium:34;Neon:30;Argon:16;Xenon:8;Krypton:8;Radon:3;Oganesson:0.3"],
 ["A sign of the zodiac","Leo:14;Scorpio:11;Aries:10;Gemini:10;Virgo:9;Taurus:9;Cancer:8;Libra:8;Pisces:7;Capricorn:6;Aquarius:6;Sagittarius:5"],
 ["A month of the year","December:16;January:14;July:12;June:9;October:9;May:8;August:7;March:6;April:6;February:6;September:5;November:4"],
 ["A day of the week","Friday:28;Saturday:20;Monday:18;Sunday:16;Wednesday:8;Tuesday:6;Thursday:4"],
-["A US state on the Pacific","California:55;Hawaii:14;Oregon:12;Washington:12;Alaska:7"],
-["A Nordic country","Sweden:32;Norway:28;Denmark:18;Finland:14;Iceland:8"],
 ["A country that borders France","Spain:26;Germany:24;Italy:18;Belgium:12;Switzerland:10;Luxembourg:4;Monaco:4;Andorra:2;Brazil:0.4;Netherlands:0.3:holland;Suriname:0.2"],
-["One of the five senses","Sight:34:vision/seeing/see;Smell:20;Taste:18;Hearing:15:sound/hear;Touch:13:feeling/feel"],
-["One of the five basic tastes","Sweet:36;Sour:20;Salty:18:salt;Bitter:16;Umami:10:savory/savoury"],
-["A member of The Beatles","John Lennon:36:john/lennon;Paul McCartney:30:paul/mccartney;Ringo Starr:20:ringo/starr;George Harrison:14:george/harrison"],
-["A suit in a deck of cards","Hearts:34:heart;Spades:30;Diamonds:20;Clubs:16:club"],
 ["A G7 country","United States:30:usa/us/america/unitedstatesofamerica;Germany:16;France:14;United Kingdom:14:uk/britain/greatbritain/england;Japan:12;Canada:8;Italy:6"],
 ["An element with a one-letter symbol","Oxygen:24;Hydrogen:22;Carbon:16;Nitrogen:10;Potassium:6;Sulfur:4:sulphur;Fluorine:3;Phosphorus:3;Iodine:3;Boron:2.5;Uranium:2.5;Tungsten:1.5;Vanadium:1;Yttrium:0.5"],
 ["An animal of the Chinese zodiac","Dragon:22;Tiger:14;Rat:12;Monkey:9;Rabbit:8;Snake:8;Horse:6;Dog:6;Ox:5;Pig:4;Rooster:4;Goat:2:sheep/ram"],
-["A tennis Grand Slam","Wimbledon:52;US Open:22;French Open:14:rolandgarros;Australian Open:12"],
-["A colour of the Olympic rings","Blue:28;Red:24;Yellow:18;Green:16;Black:14"],
-["A country of the United Kingdom","England:46;Scotland:28;Wales:16;Northern Ireland:10"],
 ["A Canadian province","Ontario:28;Quebec:22;British Columbia:20:bc;Alberta:12;Manitoba:5;Nova Scotia:5;Saskatchewan:4;Newfoundland and Labrador:2:newfoundland;New Brunswick:1.2;Prince Edward Island:0.8:pei"],
-["A big cat in the genus Panthera","Lion:36;Tiger:30;Leopard:16;Jaguar:14;Snow Leopard:4"],
 ["A country on the equator","Ecuador:30;Brazil:22;Kenya:16;Indonesia:10;Colombia:7;Uganda:5;Democratic Republic of the Congo:3:drc/drcongo/congo/congokinshasa;Somalia:2.5;Gabon:2;Republic of the Congo:1:congobrazzaville;Sao Tome and Principe:0.5:saotome"],
 ["A country in Central America","Costa Rica:26;Panama:22;Guatemala:16;Honduras:12;Nicaragua:9;El Salvador:8;Belize:7"],
-["A season","Summer:38;Winter:24;Autumn:22:fall;Spring:16"],
 ["One of the ten largest countries","Russia:30;Canada:16;China:16;United States:14:usa/us/america;Brazil:8;Australia:8;India:5;Argentina:1.5;Kazakhstan:1;Algeria:0.5"],
-["A Baltic state","Estonia:38;Latvia:32;Lithuania:30"],
-["One of Jupiter's four big moons","Europa:40;Ganymede:24;Io:22;Callisto:14"],
 ["A US state that starts with M","Michigan:20;Massachusetts:16;Maine:12;Montana:12;Mississippi:12;Minnesota:10;Missouri:10;Maryland:8"],
 ["A country that starts with I","Italy:28;India:24;Ireland:16;Iceland:9;Indonesia:8;Israel:6;Iran:5;Iraq:4"],
 ["A prime number below 30","2:22:two;7:20:seven;3:16:three;5:12:five;13:8:thirteen;11:7:eleven;17:5:seventeen;19:4:nineteen;23:4:twentythree;29:2:twentynine"],
-["A layer of Earth's atmosphere","Stratosphere:34;Troposphere:24;Mesosphere:12;Thermosphere:10;Exosphere:8"],
 ["A classic Universal movie monster","Dracula:34;Frankenstein:30:frankensteinsmonster;The Wolf Man:12:wolfman/werewolf;The Mummy:12:mummy;The Invisible Man:5:invisibleman;Creature from the Black Lagoon:4:creature/gillman/blacklagoon;Bride of Frankenstein:2:bride;Phantom of the Opera:1:phantom"],
-["A ghost in Pac-Man","Blinky:30;Pinky:26;Inky:24;Clyde:20"],
 ["A weapon in Cluedo","Candlestick:24;Knife:20:dagger;Lead Pipe:16:pipe/leadpiping;Rope:14;Revolver:14:gun/pistol;Wrench:12:spanner"],
-["One of the four classical elements","Fire:36;Water:26;Earth:20;Air:18:wind"],
 ["One of the seven wonders of the ancient world","Great Pyramid of Giza:46:pyramids/pyramid/greatpyramid/pyramidofgiza/giza/pyramidsofgiza;Hanging Gardens of Babylon:20:hanginggardens/gardensofbabylon;Colossus of Rhodes:12:colossus;Lighthouse of Alexandria:9:lighthouse/pharos;Statue of Zeus:5:zeus/statueofzeusatolympia;Temple of Artemis:4:artemis;Mausoleum at Halicarnassus:4:mausoleum/mausoleumofhalicarnassus/halicarnassus"],
-["One of the four Hogwarts houses","Gryffindor:52;Slytherin:26;Hufflepuff:12;Ravenclaw:10"],
 ["One of the seven dwarfs","Dopey:22;Grumpy:22;Doc:16;Sleepy:12;Happy:10;Sneezy:10;Bashful:8"],
 ["A member of the Fellowship of the Ring","Frodo:30;Gandalf:20;Aragorn:14:strider;Legolas:12;Sam:8:samwise;Gimli:6;Boromir:4;Merry:3:meriadoc;Pippin:3:peregrin"],
 ["One of the six original film Avengers","Iron Man:34:tonystark;Captain America:20:cap;Thor:16;Hulk:14:thehulk/incrediblehulk;Black Widow:10;Hawkeye:6"],
-["A Teenage Mutant Ninja Turtle","Leonardo:28:leo;Michelangelo:28:mikey;Donatello:22:donnie;Raphael:22:raph"],
 ["One of the six main Friends characters","Rachel:24;Joey:20;Ross:18;Chandler:16;Monica:12;Phoebe:10"],
 ["A Pixar film released before 2010","Toy Story:34;Finding Nemo:16;Monsters Inc:10:monstersinc;Cars:8;Up:8;WALL-E:6:walle;The Incredibles:6:incredibles;Ratatouille:5;Toy Story 2:4;A Bug's Life:3:bugslife"],
-["One of the Three Musketeers, or their friend","Athos:30;Porthos:26;Aramis:24;D'Artagnan:20"],
-["A Spice Girl","Posh:22:victoria/poshspice;Scary:22:melb/scaryspice;Baby:20:emma/babyspice;Ginger:20:geri/gingerspice;Sporty:16:melc/sportyspice"],
-["A member of Queen","Freddie Mercury:70:freddie/mercury;Brian May:18:brian/may;Roger Taylor:8:roger/taylor;John Deacon:4:john/deacon"],
 ["A note in do-re-mi","Do:30;Mi:18;Re:14;Fa:12;La:10;Sol:8:so;Ti:8:si"],
-["A section of the orchestra","Strings:36;Brass:22;Percussion:22;Woodwind:20:woodwinds"],
-["An instrument in a string quartet","Violin:60;Cello:26;Viola:14"],
 ["A men's football World Cup winner before 2026","Brazil:30;Germany:16;Argentina:16;France:12;Italy:10;Spain:7;England:7;Uruguay:2"],
 ["A Summer Olympics host city since 2000","London:22;Beijing:18;Sydney:14;Rio de Janeiro:14:rio;Athens:12;Tokyo:12;Paris:8"],
-["A men's golf major","The Masters:46:masters/augusta;The Open:22:open/britishopen/openchampionship;US Open:20;PGA Championship:12:pga"],
-["A swimming stroke","Freestyle:34:frontcrawl/crawl;Butterfly:26;Breaststroke:22;Backstroke:18"],
-["One of the big four US sports leagues","NFL:40;NBA:30;MLB:18;NHL:12"],
 ["A colour of snooker ball","Red:22;Black:22;White:12;Pink:12;Blue:10;Yellow:8;Green:7;Brown:7"],
-["A French mother sauce","Béchamel:36;Hollandaise:28;Tomato:14:saucetomate/tomate;Espagnole:12:espagnol/brown;Velouté:10"],
-["A flavour in Neapolitan ice cream","Chocolate:40;Vanilla:34;Strawberry:26"],
-["A primary colour of paint","Red:40;Blue:36;Yellow:24"],
-["A state of matter","Solid:34;Liquid:30;Gas:26;Plasma:10;Bose-Einstein condensate:0.5:bec"],
-["A base in DNA","Adenine:34;Guanine:22;Cytosine:22;Thymine:22"],
-["A planet with rings","Saturn:80;Uranus:8;Jupiter:6;Neptune:6"],
-["A giant planet","Jupiter:44;Saturn:30;Neptune:14;Uranus:12"],
-["A planet closer to the Sun than Earth","Mercury:55;Venus:45"],
-["A traffic light colour","Red:40;Green:36;Amber:24:yellow/orange"],
 ["A Roman numeral letter","X:26;I:22;V:22;M:12;C:8;L:6;D:4"],
-["A compass point","North:38;South:22;West:22;East:18"],
-["A time zone of the mainland US","Eastern:40:est;Pacific:30:pst;Central:18:cst;Mountain:12:mst"],
-["A leg bone between hip and ankle","Femur:46:thighbone;Tibia:22:shin/shinbone;Fibula:18;Patella:14:kneecap"],
-["A type of human tooth","Molar:36;Canine:28;Incisor:24;Premolar:12"],
-["A finger","Thumb:30;Index:22:pointer/forefinger/indexfinger;Middle:20:middlefinger;Pinky:16:little/littlefinger/pinkie;Ring:12:ringfinger"],
 ["One of the original thirteen US colonies","Virginia:18;Massachusetts:16;New York:16;Pennsylvania:10;Georgia:7;Maryland:6;New Jersey:6;Connecticut:5;North Carolina:4;South Carolina:4;Delaware:3;Rhode Island:3;New Hampshire:2"],
-["A permanent member of the UN Security Council","United States:34:usa/us/america;China:20;Russia:20;United Kingdom:14:uk/britain/greatbritain/england;France:12"],
-["A Nordic capital city","Stockholm:30;Oslo:26;Copenhagen:22;Helsinki:14;Reykjavik:8"],
 ["An Australian state or mainland territory","New South Wales:30:nsw;Queensland:24;Victoria:22;Western Australia:10:wa;Tasmania:8;South Australia:6:sa;Northern Territory:3:nt;Australian Capital Territory:2:act/canberra"],
-["A borough of New York City","Manhattan:40;Brooklyn:28;Queens:14;The Bronx:12;Staten Island:6"],
 ["An Ivy League university","Harvard:40;Yale:22;Princeton:12;Columbia:8;Cornell:6;Brown:4;Dartmouth:4;University of Pennsylvania:4:penn/upenn"],
-["A US state on the Gulf of Mexico","Florida:40;Texas:30;Louisiana:16;Alabama:7;Mississippi:7"],
 ["A country that starts with A","Australia:26;Argentina:16;Austria:10;Afghanistan:10;Algeria:6;Albania:6;Angola:5;Armenia:5;Azerbaijan:4;Andorra:4;Antigua and Barbuda:2:antigua"],
 ["A country that starts with C","Canada:28;China:26;Chile:8;Colombia:8;Cuba:8;Croatia:5;Cambodia:3;Costa Rica:3;Czech Republic:3:czechia;Cameroon:2.5;Cyprus:2.5;Chad:1.5;Congo:0.8:republicofthecongo/drc/democraticrepublicofthecongo;Central African Republic:0.5:car;Cape Verde:0.4:caboverde;Comoros:0.3;Côte d'Ivoire:0.3:ivorycoast"],
-["A face card","King:36;Jack:34:knave;Queen:30"],
-["A US coin in everyday use","Quarter:34;Penny:26:cent;Dime:20;Nickel:20"],
-["A colour on a Rubik's cube","Red:22;Blue:20;Green:16;Yellow:16;White:14;Orange:12"],
-["A month with exactly 30 days","June:30;September:26;April:24;November:20"]
+["A colour on a Rubik's cube","Red:22;Blue:20;Green:16;Yellow:16;White:14;Orange:12"]
+];
+const OPEN=[
+["Something your body makes","Sweat:22:perspiration/sweating;Saliva:12:spit/drool;Tears:10:tear;Earwax:8:wax;Snot:8:mucus/boogers/booger/bogeys;Blood:8;Urine:7:pee/wee;Poop:6:feces/faeces/stool/poo/excrement;Hair:3;Fart:3:gas/farts/wind;Burp:1.5:burps;Vomit:1.5:puke/sick;Phlegm:1.5;Skin:1.2:skincells/deadskin;Nails:1:fingernails;Oil:1:sebum/grease;Dandruff:0.8;Pus:0.8;Bile:0.6;Stomach acid:0.6:acid/gastricacid;Milk:0.6:breastmilk;Hormones:0.5:hormone;Adrenaline:0.4:adrenalin;Insulin:0.3;Body heat:0.4:heat;Carbon dioxide:0.4:co2;Cells:0.3;Antibodies:0.2;Enzymes:0.2:enzyme;Plasma:0.2;Red blood cells:0.2;Eye crust:0.3:eyeboogers/rheum/sleepydust;Scab:0.2:scabs;Breath:0.3;Pimples:0.2:pimple/zits/zit/acne;Body odor:0.2:bodyodour/smell/bo/odor;Gallstones:0.1:gallstone;Kidney stones:0.1:kidneystone;Cholesterol:0.1;Dopamine:0.15;Serotonin:0.1;Melatonin:0.1;Callus:0.1:calluses;Blister:0.15:blisters;Bones:0.15:bone"],
+["An animal with four legs","Dog:20:puppy;Cat:16:kitten;Horse:8:pony;Cow:7:cattle;Lion:5;Elephant:5;Pig:4;Tiger:3.5;Sheep:3:lamb;Goat:2.5;Giraffe:2.5;Bear:2;Zebra:2;Rabbit:2:bunny;Mouse:1.5:mice;Deer:1.5;Wolf:1.2;Fox:1.2;Donkey:1:mule;Rhinoceros:1:rhino;Hippopotamus:1:hippo;Camel:1;Cheetah:0.8;Leopard:0.8;Squirrel:0.7;Hamster:0.6;Rat:0.6;Crocodile:0.6;Alligator:0.5;Lizard:0.5;Turtle:0.5:tortoise;Frog:0.4;Panda:0.5;Koala:0.4;Raccoon:0.4;Moose:0.4;Guinea pig:0.4;Jaguar:0.3;Llama:0.4:alpaca;Hedgehog:0.3;Ferret:0.2;Skunk:0.2;Beaver:0.2;Otter:0.2;Badger:0.15;Buffalo:0.3:bison;Bull:0.3;Antelope:0.2;Gazelle:0.15;Hyena:0.2;Reindeer:0.2:caribou;Elk:0.1;Ox:0.1;Armadillo:0.1;Anteater:0.1;Chameleon:0.1;Gecko:0.1;Iguana:0.1;Komodo dragon:0.1;Meerkat:0.1;Porcupine:0.1;Cougar:0.1:puma/mountainlion;Gerbil:0.1;Salamander:0.08;Wombat:0.08;Platypus:0.08;Mole:0.08;Opossum:0.08:possum;Chinchilla:0.08;Lynx:0.08;Bobcat:0.08;Yak:0.06;Newt:0.05;Okapi:0.05;Tapir:0.05;Wolverine:0.05;Mongoose:0.05;Pangolin:0.05;Aardvark:0.05"],
+["Something in a kitchen","Fridge:16:refrigerator;Oven:10;Stove:7:cooker/hob;Microwave:7;Knife:5:knives;Sink:5;Spoon:3;Fork:3;Plate:3:plates/dish/dishes;Frying pan:3:pan/skillet;Pot:2.5:saucepan;Toaster:2.5;Kettle:2;Table:2;Cup:1.5:mug;Dishwasher:1.5;Blender:1.2;Bowl:1.2;Food:1;Glass:0.8:glasses;Cutting board:0.6:choppingboard;Spatula:0.6;Freezer:0.6;Cupboard:0.6:cabinet/cabinets/cupboards;Coffee maker:0.6:coffeemachine;Chair:0.5;Salt:0.4;Pepper:0.3;Sponge:0.4;Dish towel:0.3:teatowel/towel;Trash can:0.4:bin/garbagecan/trash/rubbishbin;Counter:0.4:countertop/worktop;Air fryer:0.3;Ladle:0.3;Whisk:0.3;Mixer:0.2;Tongs:0.2;Colander:0.2:strainer;Grater:0.2;Peeler:0.15;Rolling pin:0.15;Oven mitt:0.15:ovenglove;Napkin:0.15:napkins;Can opener:0.15:tinopener;Apron:0.1;Food processor:0.1;Chef:0.1:cook;Bottle opener:0.08;Corkscrew:0.08;Measuring cup:0.08;Rice cooker:0.08;Tupperware:0.08:container;Aluminum foil:0.08:foil/tinfoil;Cookbook:0.08:recipebook;Dish soap:0.08:washingupliquid;Slow cooker:0.06:crockpot;Timer:0.06;Scale:0.06:scales;Plastic wrap:0.05:clingfilm;Spice rack:0.05:spices;Fruit bowl:0.05;Fire extinguisher:0.04;Cockroach:0.03:roach"],
+["A fruit","Apple:24;Banana:16;Orange:10;Strawberry:7;Grape:5;Mango:4;Pineapple:4;Watermelon:3.5;Pear:3;Peach:2.5;Cherry:2.5;Kiwi:2;Blueberry:2;Lemon:1.5;Plum:1;Raspberry:1;Melon:0.8:cantaloupe/honeydew;Grapefruit:0.6;Coconut:0.6;Pomegranate:0.6;Apricot:0.5;Avocado:0.5;Lime:0.4;Papaya:0.4;Blackberry:0.4;Fig:0.3;Tomato:0.3;Nectarine:0.3;Tangerine:0.3:mandarin/clementine;Dragon fruit:0.3:pitaya;Passion fruit:0.2;Guava:0.15;Lychee:0.15:litchi;Date:0.15;Persimmon:0.1;Cranberry:0.1;Gooseberry:0.06;Starfruit:0.06:carambola;Durian:0.06;Jackfruit:0.06;Plantain:0.05;Pumpkin:0.05;Quince:0.04;Rambutan:0.04;Kumquat:0.04;Olive:0.04;Cucumber:0.04;Mulberry:0.04;Prickly pear:0.04:sabra/cactusfruit;Currant:0.04:blackcurrant/redcurrant;Mangosteen:0.03;Elderberry:0.03;Loquat:0.02;Feijoa:0.02;Yuzu:0.02;Boysenberry:0.02;Huckleberry:0.02"],
+["A vegetable","Carrot:22;Broccoli:12;Potato:8;Lettuce:6;Tomato:6;Cucumber:5;Onion:4;Pepper:3:bellpepper/capsicum;Spinach:3;Corn:3:sweetcorn/maize;Peas:3:pea;Cabbage:2;Cauliflower:2;Celery:1.5;Green beans:1.5:beans/stringbeans;Eggplant:1.2:aubergine;Zucchini:1.2:courgette;Garlic:1;Sweet potato:1:yam;Mushroom:0.8;Asparagus:0.8;Kale:0.6;Pumpkin:0.6;Beet:0.5:beetroot;Radish:0.5;Brussels sprouts:0.5:sprouts;Artichoke:0.3;Leek:0.3;Squash:0.3;Turnip:0.3;Okra:0.2;Parsnip:0.2;Avocado:0.2;Chili:0.15:chilli/chilipepper/jalapeno;Bok choy:0.1:pakchoi;Arugula:0.1:rocket;Fennel:0.1;Scallion:0.08:springonion/greenonion;Ginger:0.08;Kohlrabi:0.05;Rutabaga:0.05:swede;Chard:0.05:swisschard;Watercress:0.05;Shallot:0.05;Parsley:0.05;Endive:0.04;Collard greens:0.04:collards;Edamame:0.04;Lentils:0.04;Chickpeas:0.04;Jicama:0.03;Daikon:0.03;Taro:0.03;Cassava:0.03:yuca;Bean sprouts:0.03;Horseradish:0.03;Seaweed:0.03;Celeriac:0.02;Wasabi:0.02;Bamboo shoots:0.02;Water chestnut:0.02"],
+["Something you see at the beach","Sand:20;Sea:12:ocean/water/waves/wave;Shells:7:seashells/shell/seashell;Sun:6;Umbrella:5:parasol/beachumbrella;Towel:4:beachtowel;Sandcastle:4;Seagull:3:gull/seagulls;Crab:3;Lifeguard:2.5;Swimsuit:2:bikini/swimmingcostume/trunks;Sunscreen:2:suncream/sunblock;People:1.5:tourists;Surfer:1.5:surfboard;Boat:1.2;Rocks:1:rock/stones;Palm tree:1:palmtree;Starfish:1;Jellyfish:0.8;Seaweed:0.8;Fish:0.6;Ice cream:0.6;Beach chair:0.6:chair/deckchair;Sunglasses:0.6;Beach ball:0.5:ball;Bucket:0.4:spade;Dog:0.3;Pier:0.3;Lighthouse:0.3;Shark:0.3;Dolphin:0.3;Kite:0.3;Litter:0.3:trash/garbage/rubbish;Sunset:0.3;Hat:0.2;Footprints:0.2;Flip flops:0.2:sandals/thongs;Volleyball:0.2;Driftwood:0.15;Pebbles:0.15;Clouds:0.1;Cooler:0.1:icebox;Dunes:0.1:sanddune;Coral:0.1;Turtle:0.1;Seal:0.08;Snorkel:0.08;Jet ski:0.08;Sailboat:0.08;Pelican:0.06;Kayak:0.06;Sunburn:0.06;Sand dollar:0.04;Hermit crab:0.04;Bonfire:0.04;Boardwalk:0.04;Barnacles:0.03;Tide pool:0.03;Ice cream truck:0.03:icecreamvan;Message in a bottle:0.02:bottle;Metal detector:0.02"],
+["A job","Doctor:20:physician;Teacher:14;Nurse:7;Firefighter:5:fireman;Police officer:5:police/policeman/cop;Lawyer:4:attorney;Chef:3:cook;Engineer:3;Programmer:2:developer/softwareengineer/coder;Pilot:2;Dentist:2;Vet:1.5:veterinarian;Farmer:1.5;Accountant:1.2;Plumber:1.2;Electrician:1;Builder:1:constructionworker;Mechanic:1;Waiter:1:waitress/server;Cashier:0.8;Artist:0.8;Scientist:0.8;Actor:0.8:actress;Singer:0.6:musician;Soldier:0.6;Astronaut:0.6;Carpenter:0.5;Architect:0.5;Driver:0.5:taxidriver/busdriver/truckdriver;Banker:0.4;Writer:0.4:author;Hairdresser:0.4:barber;Surgeon:0.4;Journalist:0.3:reporter;Photographer:0.3;Pharmacist:0.3;Receptionist:0.3:secretary;Judge:0.3;Mail carrier:0.3:postman/mailman;Janitor:0.3:cleaner/custodian;Librarian:0.3;Baker:0.3;Butcher:0.2;Gardener:0.2;Therapist:0.2:psychologist;Designer:0.2;Manager:0.2;Salesperson:0.2:salesman;Athlete:0.2:footballer;Fisherman:0.15;Painter:0.15;Dancer:0.15;Tailor:0.1;Lifeguard:0.1;Flight attendant:0.1:stewardess;Paramedic:0.1;Zookeeper:0.08;Detective:0.08;Undertaker:0.06:mortician/funeraldirector;Priest:0.06:rabbi/pastor;Influencer:0.06:youtuber;Locksmith:0.05;Translator:0.05:interpreter;Clown:0.05;Magician:0.05;Gravedigger:0.04;Blacksmith:0.04;Dietitian:0.04:nutritionist;Optometrist:0.04;Spy:0.04;Lumberjack:0.04;Miner:0.04;Coroner:0.03;Taxidermist:0.02;Sommelier:0.02;Actuary:0.02"],
+["Something red","Apple:18;Fire truck:8:firetruck/fireengine;Strawberry:8;Blood:7;Rose:6:roses;Tomato:5;Stop sign:4;Heart:3;Cherry:3;Fire:2;Lipstick:2;Ladybug:1.5:ladybird;Santa:1.5:santaclaus;Red light:1:trafficlight/stoplight;Ketchup:1:tomatosauce;Mars:0.8;Lobster:0.8;Watermelon:0.6;Chili:0.6:chilli/redpepper;Crab:0.5;Cardinal:0.4;Flag:0.4;Raspberry:0.4;Brick:0.4:bricks;Wine:0.4:redwine;Lava:0.3;Ruby:0.3;Devil:0.3;Coke can:0.3:coke/cocacola;Clown nose:0.2;Valentine:0.2:valentinescard;Bus:0.2:londonbus;Ferrari:0.15:redcar;Mailbox:0.15:postbox;Phone box:0.1:telephonebox;Barn:0.1;Cranberry:0.1;Pomegranate:0.1;Beet:0.1:beetroot;Radish:0.1;Poppy:0.1;Tulip:0.1;Red carpet:0.1:carpet;Lips:0.1;Elmo:0.08;Mario:0.08;Cape:0.06;Fox:0.06;Red hair:0.06:ginger;Tongue:0.06;Robin:0.06;Fire extinguisher:0.06;Sunburn:0.05;Hood:0.04:redridinghood;Paprika:0.04;Fire alarm:0.04:alarm;Salmon:0.03;Exit sign:0.03"],
+["A musical instrument","Guitar:24;Piano:22;Drums:12:drum/drumkit;Violin:10:fiddle;Flute:5;Trumpet:5;Saxophone:3:sax;Cello:2;Clarinet:2;Harp:1.5;Bass:1.2:bassguitar/doublebass;Trombone:1;Ukulele:1;Keyboard:0.8;Harmonica:0.8;Tuba:0.6;Xylophone:0.6;Accordion:0.5;Banjo:0.4;Recorder:0.4;Viola:0.3;Oboe:0.3;French horn:0.3:horn;Tambourine:0.3;Triangle:0.3;Bagpipes:0.3;Organ:0.3;Bassoon:0.2;Cymbals:0.2;Mandolin:0.15;Sitar:0.1;Bongos:0.1:bongo;Maracas:0.1;Synthesizer:0.1:synth;Kazoo:0.08;Glockenspiel:0.05;Marimba:0.05;Harpsichord:0.05;Didgeridoo:0.05;Cowbell:0.05;Piccolo:0.05;Castanets:0.04;Lute:0.04;Gong:0.04;Bells:0.04:bell;Timpani:0.04;Theremin:0.03;Steel drum:0.03:steelpan;Djembe:0.03;Oud:0.03;Shofar:0.03;Euphonium:0.03;Bugle:0.03;Pan flute:0.03:panpipes;Ocarina:0.03;Tabla:0.02;Koto:0.02;Balalaika:0.02;Zither:0.02;Washboard:0.02;Melodica:0.02;Cornet:0.02"],
+["Something you wear","Shirt:16:tshirt/tee;Pants:10:trousers;Shoes:9:shoe/sneakers/trainers;Hat:6:cap;Socks:5;Jacket:4;Dress:4;Jeans:3;Coat:3;Sweater:2.5:jumper/hoodie/sweatshirt;Skirt:2;Shorts:2;Glasses:1.5:sunglasses;Underwear:1.5:boxers/briefs;Scarf:1;Gloves:1:mittens;Watch:1;Boots:1;Tie:0.8;Belt:0.8;Necklace:0.6;Ring:0.6;Suit:0.6;Pajamas:0.5:pyjamas;Earrings:0.4;Bra:0.4;Swimsuit:0.4:bikini;Bracelet:0.3;Uniform:0.3;Blouse:0.3;Sandals:0.3:flipflops;Mask:0.3;Vest:0.2:waistcoat;Leggings:0.2;Robe:0.2:bathrobe/dressinggown;Costume:0.2;Makeup:0.2;Perfume:0.15;Helmet:0.15;Crown:0.1;Apron:0.08;Beanie:0.08;Slippers:0.08;Smile:0.08;Cape:0.06;Gown:0.06;Tights:0.06:pantyhose/stockings;Headband:0.06;Cardigan:0.06;Overalls:0.05:dungarees;Bow tie:0.05;Blazer:0.05;Kilt:0.04;Poncho:0.04;Tuxedo:0.04:tux;Cufflinks:0.03;Tiara:0.03;Veil:0.03;Kippah:0.03:yarmulke;Hijab:0.03;Kimono:0.03;Earmuffs:0.03;Wig:0.03;Turban:0.02;Sari:0.02;Corset:0.02;Clogs:0.02"],
+["A sport","Football:20:soccer;Basketball:16;Tennis:8;Baseball:6;American football:5;Volleyball:4;Swimming:4;Hockey:3:icehockey;Golf:3;Running:2:athletics/track;Boxing:2;Cricket:1.5;Rugby:1.5;Cycling:1:biking;Table tennis:1:pingpong;Badminton:1;Skiing:0.8;Gymnastics:0.8;Wrestling:0.6;Surfing:0.5;Skateboarding:0.5;Snowboarding:0.4;Karate:0.4:martialarts;Handball:0.4;Bowling:0.4;Lacrosse:0.3;Softball:0.2;Archery:0.2;Fencing:0.2;Judo:0.2;Rowing:0.2;Climbing:0.2:rockclimbing;Figure skating:0.2:iceskating/skating;Sailing:0.15;Diving:0.15;Water polo:0.15;Formula 1:0.15:f1/racing/motorsport;Horse riding:0.1:equestrian;Triathlon:0.1;Marathon:0.1;Darts:0.1;Snooker:0.1:pool/billiards;Squash:0.1;Weightlifting:0.1;Curling:0.08;Polo:0.06;Taekwondo:0.06;MMA:0.06;Dodgeball:0.06;Netball:0.06;Pickleball:0.06;Bobsleigh:0.05:bobsled;Kickboxing:0.05;Frisbee:0.05:ultimate;Chess:0.05;Padel:0.04;Canoeing:0.04:kayaking;Luge:0.03;Sumo:0.03;Esports:0.03;Kabaddi:0.02;Biathlon:0.02;Pole vault:0.02;Javelin:0.02;Parkour:0.02;Hurling:0.02"],
+["Something you do in the morning","Brush teeth:16:brushmyteeth/brushingteeth/brushyourteeth/teeth;Shower:12:takeashower/showering;Eat breakfast:12:breakfast/eat;Drink coffee:8:coffee;Wake up:6:getup/wakingup;Get dressed:5:dress/getdress;Go to work:3:work/commute;Make the bed:2.5:makebed/makemybed;Go to school:2:school;Wash face:2:washmyface/washyourface;Exercise:2:workout/gym;Run:1.5:jog/jogging/running;Check phone:1.5:phone/scrollphone;Stretch:1;Pee:1:toilet/bathroom;Snooze:1:hitsnooze/sleepin;Brush hair:0.8:combhair/hair;Yawn:0.6;Read news:0.5:news;Drink tea:0.5:tea;Make coffee:0.5;Walk the dog:0.4:feedthedog/walkdog/feedpets;Pray:0.4;Shave:0.4;Put on makeup:0.4:makeup;Drink water:0.4:water;Meditate:0.3:yoga;Read:0.2;Check email:0.2:email;Cook:0.2;Listen to music:0.2:music;Pack lunch:0.2:packbag;Watch TV:0.2:tv;Alarm:0.2;Drive:0.1;Kiss:0.08;Take vitamins:0.08:vitamins/medicine;Catch the bus:0.08:bus;Wake the kids:0.08:kids;Open curtains:0.06:openblinds;Skincare:0.06;Water plants:0.05;Take out trash:0.05;Complain:0.05;Smile:0.05;Journal:0.04;Dream:0.04;Weigh myself:0.03;Iron clothes:0.03;Cry:0.03;Cold plunge:0.02"],
+["Something at school","Teacher:16;Desk:10:desks;Students:8:student/kids/children/pupils;Books:7:book/textbook;Pencil:5;Whiteboard:4:board/blackboard/chalkboard;Chair:3;Classroom:3:class;Backpack:2:bag/schoolbag;Pen:2;Homework:2;Principal:2:headteacher/headmaster;Computer:1.5:computers/laptop;Library:1.2;Notebook:1.2;Cafeteria:1:canteen/lunchroom;Gym:1:gymnasium;Lockers:1:locker;Eraser:0.8:rubber;Ruler:0.8;Bell:0.6;Playground:0.6;Tests:0.6:test/exams/exam;Paper:0.5;Chalk:0.4;Calculator:0.4;School bus:0.4:bus;Bathroom:0.3:toilets;Scissors:0.3;Glue:0.3;Lunch:0.3;Map:0.2;Clock:0.2;Friends:0.2;Nurse:0.15;Flag:0.1;Janitor:0.1;Bullies:0.1:bully;Projector:0.1;Crayons:0.1;Markers:0.1;Sharpener:0.1;Uniform:0.1;Recess:0.1:break;Detention:0.08;Globe:0.08;Lab:0.08:sciencelab;Report card:0.06;Grades:0.06;Sports field:0.06:field;Microscope:0.05;Auditorium:0.04:stage;Chewing gum:0.04:gum;Water fountain:0.04;Hall pass:0.03;Fire drill:0.03;Trophy:0.03;Graffiti:0.02;Lost and found:0.02;Spitballs:0.01"],
+["An animal that lives in the sea","Shark:14;Fish:12;Whale:12;Dolphin:12;Octopus:6;Jellyfish:5;Crab:4;Starfish:3:seastar;Sea turtle:3:turtle;Seal:2;Lobster:2;Squid:1.5;Shrimp:1.5:prawn;Seahorse:1.2;Clownfish:1;Sea lion:0.8;Stingray:0.8:ray;Eel:0.6;Orca:0.6:killerwhale;Walrus:0.5;Tuna:0.4;Salmon:0.4;Blue whale:0.4;Coral:0.3;Manta ray:0.3;Narwhal:0.3;Sea urchin:0.3;Pufferfish:0.3:blowfish;Swordfish:0.2;Clam:0.2;Oyster:0.2;Great white shark:0.2;Manatee:0.15;Hammerhead:0.15;Mussel:0.1;Sea cucumber:0.1;Sea otter:0.1:otter;Barracuda:0.1;Penguin:0.1;Humpback whale:0.1;Anglerfish:0.08;Anemone:0.08;Plankton:0.06;Krill:0.06;Cuttlefish:0.06;Beluga:0.06;Sardine:0.06;Cod:0.06;Nautilus:0.04;Dugong:0.04;Mackerel:0.04;Marlin:0.04;Flounder:0.04;Lionfish:0.04;Moray eel:0.04;Hermit crab:0.04;Sea slug:0.03:nudibranch;Sponge:0.03;Mermaid:0.03;Kraken:0.02;Megalodon:0.02"],
+["A food with cheese","Pizza:30;Mac and cheese:8:macaroni/macandcheese/macaronicheese;Cheeseburger:8:burger;Lasagna:6:lasagne;Grilled cheese:5:cheesetoastie/toastie;Nachos:4;Sandwich:3;Quesadilla:3;Cheesecake:2;Pasta:2:spaghetti;Omelette:1.5:omelet;Toast:1;Salad:1:caesarsalad/greeksalad;Fondue:1;Burrito:0.8;Tacos:0.8:taco;Cheese fries:0.6;Mozzarella sticks:0.5:cheesesticks;Bagel:0.4:creamcheesebagel;Quiche:0.4;Burekas:0.4:bourekas/boreka/borek/burek;Ravioli:0.4;Khachapuri:0.3;Enchiladas:0.3;Risotto:0.3;Alfredo:0.3:fettuccine/fettuccinealfredo;Carbonara:0.3;Calzone:0.3;Shakshuka:0.2;Cheese pie:0.2;Baked potato:0.2:potato;Gratin:0.15:dauphinoise;Eggplant parmesan:0.15:parmigiana/parmesan;Chicken parmesan:0.15:parmo;Cheesesteak:0.15:phillycheesesteak;Poutine:0.15;Onion soup:0.1:frenchonionsoup/soup;Hot dog:0.1;Crackers:0.1;Scrambled eggs:0.08:eggs;Cheese board:0.08:cheeseplatter;Raclette:0.08;Knafeh:0.08:kanafeh/kunafa;Pierogi:0.08;Tiramisu:0.06;Blintzes:0.06:blintz;Empanada:0.06;Garlic bread:0.06;Arepa:0.05;Spanakopita:0.05;Cheetos:0.05;Danish:0.04:cheesedanish;Moussaka:0.04;Cordon bleu:0.04;Doritos:0.04;Pasta bake:0.04;Croque monsieur:0.04;Welsh rarebit:0.03:rarebit;Pupusa:0.03;Stuffed peppers:0.03;Cheese scone:0.03"],
+["Something that scares people","Spiders:14:spider;Ghosts:8:ghost;Snakes:8:snake;Death:6:dying;The dark:6:dark/darkness;Clowns:5:clown;Heights:4;Horror movies:3:horrormovie/scarymovies/scarymovie;Monsters:2:monster;Sharks:2:shark;Being alone:1.5:alone/loneliness;Public speaking:1.5:speakinginpublic;Failure:1;Zombies:1:zombie;Dogs:1:dog;Thunder:1:lightning/storms/storm;Needles:1:injections/shots;Rats:0.8:rat/mice/mouse;Bugs:0.8:insects/cockroaches/roaches;Flying:0.6:planes;Dolls:0.6:creepydolls;Demons:0.5:devil/satan;Dentist:0.5;Witches:0.4:witch;Vampires:0.4:vampire;Blood:0.4;Fire:0.4;Skeletons:0.3;Werewolves:0.3;Loud noises:0.3:noise/jumpscare/jumpscares;Exams:0.3:tests;War:0.3;Nightmares:0.3;Bees:0.3:wasps;Small spaces:0.3:claustrophobia/tightspaces/elevators;Drowning:0.2:water;Hospitals:0.2:doctors;Masks:0.2;Strangers:0.2;Bats:0.2;Crowds:0.2;Graveyards:0.2:cemetery/graveyard;Haunted house:0.2;Basements:0.15:basement;Aliens:0.15;Police:0.1;Taxes:0.1;Shadows:0.1;Bills:0.08;Mom:0.08:mother;Earthquakes:0.08;Pain:0.08;Boss:0.06;Tornadoes:0.06;Getting old:0.05:aging/ageing;Mirrors:0.05;Silence:0.05;Germs:0.05;Deep water:0.05:deepsea/ocean;The unknown:0.05:unknown;Ex:0.05;The future:0.04:future;Rejection:0.04;Commitment:0.03;Change:0.03;Birds:0.03;Moths:0.03;Holes:0.02:trypophobia;Feet:0.01;Pigeons:0.01"],
+["Something in a graveyard","Graves:16:grave/tombstone/tombstones/headstone/headstones/gravestone/gravestones;Dead bodies:8:bodies/corpses/corpse/dead/deadpeople;Ghosts:7:ghost;Flowers:6:flower;Coffins:5:coffin/casket/caskets;Skeletons:3:skeleton/bones/skulls/skull;Zombies:2.5:zombie;Crosses:2:cross;Trees:1.5:tree/deadtrees;Fog:1.2:mist;Gate:1:fence/irongate;Crows:1:crow/ravens/raven;Bats:1:bat;Mourners:1:people/visitors;Grass:0.8;Candles:0.8:candle;Angel statues:0.6:angel/angels/statues/statue;Gravedigger:0.6;Shovel:0.6:spade;Mausoleum:0.5:crypt/tomb;Dirt:0.5:soil/mud;Full moon:0.4:moon;Priest:0.3:rabbi;Vampires:0.3:vampire;Owls:0.2:owl;Hearse:0.2;Wreaths:0.2:wreath;Black cat:0.2:cats/cat;Worms:0.2;Cobwebs:0.15:spiders/spiderwebs;Funeral:0.15;Epitaphs:0.1:names/inscriptions;Pumpkins:0.1;Rats:0.1;Silence:0.1;Darkness:0.1;Chapel:0.1:church;Grim Reaper:0.1:reaper/death;Stones:0.08:pebbles;Lantern:0.06;Moss:0.06;Witches:0.06;Benches:0.05:bench;Tears:0.05;Werewolf:0.05;Urn:0.04:urns/ashes;Groundskeeper:0.04:caretaker;Mummies:0.03;Ghoul:0.03;Banshee:0.02;Squirrels:0.02;Deer:0.02;Teenagers:0.02;Obelisk:0.02;Cherubs:0.02;Lawnmower:0.02"],
+["Something you buy at the supermarket","Milk:18;Bread:14;Eggs:8:egg;Fruit:4;Vegetables:3:veggies;Apples:3:apple;Bananas:3:banana;Cheese:3;Meat:2.5;Chicken:2;Water:2;Toilet paper:2:toiletroll/looroll;Rice:1.2;Pasta:1.2;Cereal:1.2;Butter:1;Chips:1:crisps;Chocolate:1:candy/sweets;Juice:0.8;Coffee:0.8;Soda:0.6:coke/softdrinks;Yogurt:0.6;Ice cream:0.6;Snacks:0.5;Beer:0.4;Wine:0.3;Shampoo:0.3;Soap:0.3;Tomatoes:0.3;Potatoes:0.3;Sugar:0.3;Flour:0.3;Cookies:0.3:biscuits;Onions:0.2;Fish:0.2;Oil:0.2:oliveoil;Detergent:0.2:laundrydetergent;Tea:0.2;Diapers:0.15:nappies;Frozen pizza:0.15:pizza;Toothpaste:0.15;Salt:0.1;Ketchup:0.1;Pet food:0.1:dogfood/catfood;Peanut butter:0.1;Hummus:0.08;Avocado:0.08;Cake:0.08;Batteries:0.06;Flowers:0.06;Gum:0.06;Bags:0.06:bag;Honey:0.06;Jam:0.06;Noodles:0.06:ramen;Canned food:0.06:cans/beans;Tofu:0.04;Sushi:0.04;Spices:0.04;Magazine:0.03;Lightbulbs:0.03;Trash bags:0.03:binbags;Sponges:0.02;Foil:0.02:aluminumfoil;Lottery ticket:0.02;Charcoal:0.02;Gift card:0.01"],
+["A vehicle","Car:24;Bus:12;Train:10;Bicycle:8:bike;Airplane:8:plane/aeroplane/jet;Motorcycle:5:motorbike;Truck:4:lorry;Boat:3;Taxi:2:cab;Helicopter:2;Ship:2;Scooter:1.5;Van:1.2;Subway:1:metro/underground/tube;Tram:0.8:streetcar/lightrail;Skateboard:0.6;Tractor:0.5;Ambulance:0.5;Fire truck:0.4:fireengine;Rocket:0.4:spaceship/spaceshuttle;Submarine:0.3;Hot air balloon:0.3:balloon;Jeep:0.2:suv;Limousine:0.2:limo;Canoe:0.2:kayak;Sailboat:0.2:yacht;Ferry:0.2;Cruise ship:0.15;Tank:0.15;Horse:0.15;Golf cart:0.1;Cable car:0.08:gondola/skilift;Sled:0.08:sleigh;Pickup truck:0.08:pickup;Segway:0.06;Snowmobile:0.06;Jet ski:0.06;Camper:0.06:rv/motorhome/caravan;Bulldozer:0.06;Electric scooter:0.06:escooter;Police car:0.06;Monorail:0.05;Rickshaw:0.05:tuktuk;Broomstick:0.05:broom;Hovercraft:0.04;Blimp:0.04:airship/zeppelin;Forklift:0.04;Unicycle:0.04;Roller skates:0.04:rollerblades;Carriage:0.04:stagecoach;Raft:0.04;Wheelchair:0.04;Garbage truck:0.04:bintruck;Glider:0.03;Wagon:0.03;Elevator:0.03:lift;Stroller:0.03:pram;Paraglider:0.02;Chariot:0.02;Magic carpet:0.02;Escalator:0.02;Steamroller:0.02"],
+["A part of the body","Arm:12;Leg:12;Hand:10;Head:10;Eye:7:eyes;Nose:6;Foot:5:feet;Heart:4;Finger:3:fingers;Mouth:3;Ear:3:ears;Brain:2;Toe:2:toes;Knee:2;Stomach:1.5:belly/tummy;Elbow:1.5;Shoulder:1.2;Neck:1.2;Hair:1;Back:1;Lungs:0.8:lung;Teeth:0.8:tooth;Lips:0.6:lip;Chest:0.6;Liver:0.6;Kidney:0.5:kidneys;Skin:0.5;Tongue:0.5;Face:0.5;Thumb:0.4;Ankle:0.4;Wrist:0.4;Butt:0.4:bum/bottom/buttocks;Hip:0.3;Chin:0.3;Cheek:0.3;Forehead:0.2;Eyebrow:0.2:eyebrows;Heel:0.2;Spine:0.2:backbone;Skull:0.2;Belly button:0.2:navel;Intestines:0.2:guts/bowel;Ribs:0.15:rib;Bladder:0.1;Thigh:0.1;Nail:0.1:fingernail/nails;Pancreas:0.08;Spleen:0.08;Appendix:0.08;Shin:0.08;Calf:0.08;Jaw:0.08;Throat:0.08;Pelvis:0.06;Femur:0.06;Palm:0.06;Knuckle:0.06;Eyelash:0.06:eyelashes;Armpit:0.06;Muscle:0.06:muscles/bicep/biceps;Gallbladder:0.04;Thyroid:0.04;Collarbone:0.04:clavicle;Eyelid:0.04;Nostril:0.04;Kneecap:0.04:patella;Veins:0.04:vein/arteries;Tibia:0.03;Tonsils:0.03;Earlobe:0.03;Uvula:0.02;Esophagus:0.02;Diaphragm:0.02;Achilles tendon:0.02:achilles;Cornea:0.02;Retina:0.02;Pupil:0.02;Iris:0.02;Cartilage:0.02"],
+["A Halloween costume","Witch:14;Ghost:12;Vampire:10:dracula;Zombie:8;Skeleton:6;Pumpkin:4;Devil:4;Werewolf:3;Mummy:3;Superhero:3:superman/batman/spiderman;Princess:3;Pirate:3;Black cat:2:cat;Clown:2;Frankenstein:2;Ninja:1.5;Angel:1;Grim Reaper:1:reaper/death;Bat:1;Fairy:1;Monster:0.8;Wizard:0.6;Doctor:0.5:nurse;Police officer:0.4:cop;Cowboy:0.4;Dinosaur:0.4;Alien:0.4;Scarecrow:0.4;Astronaut:0.3;Robot:0.3;Spider:0.3;Ghostface:0.3:scream;Joker:0.3;Elsa:0.3;Pennywise:0.2;Jason:0.2;Freddy Krueger:0.2:freddy;Harley Quinn:0.2;Mermaid:0.2;Michael Myers:0.15;Chucky:0.15;Minion:0.15;Unicorn:0.15;Dragon:0.15;Wednesday Addams:0.15:wednesday;Lion:0.1;Bride:0.1:corpsebride;Demon:0.1;Nun:0.08;Plague doctor:0.06;Goblin:0.06;Firefighter:0.06;Bed sheet:0.05;Troll:0.04;Medusa:0.04;Cleopatra:0.04;Ballerina:0.04;Hot dog:0.04;Banana:0.04;Shark:0.04;Bee:0.04;Banshee:0.03;Ladybug:0.03;Chef:0.03;Hippie:0.03;Gargoyle:0.02;Penguin:0.02"],
+["Something a witch has","Broom:22:broomstick;Hat:16:pointyhat/witchhat;Cauldron:12:pot;Black cat:10:cat;Wand:5;Spell book:4:spellbook/book/grimoire;Potion:4:potions;Wart:2:warts;Cloak:2:cape/robe;Green skin:1.5:greenface;Long nose:1:nose/crookednose;Crystal ball:1;Spells:1:spell/magic;Frog:0.8:toads/toad;Owl:0.5;Bat:0.5;Candles:0.5;Raven:0.4:crow;Poison apple:0.4:apple;Herbs:0.3;Eye of newt:0.3:newt;Cackle:0.3:laugh;House:0.2:gingerbreadhouse/cottage/hut;Coven:0.2:sisters;Curse:0.2;Long nails:0.2:claws/nails;Moon:0.15;Skull:0.15;Spider:0.15;Pumpkin:0.15;Boots:0.15;Mirror:0.1;Stripy socks:0.08:socks;Tarot cards:0.08:tarot;Ruby slippers:0.06;Bones:0.06;Pentagram:0.05;Familiar:0.05;Wrinkles:0.05;Grey hair:0.05:hair;Snake:0.04;Rat:0.04;Runes:0.03;Mandrake:0.03;Teeth:0.03;Blood:0.03;Lizard:0.03;Children:0.03:kids;Hump:0.02;Dragon:0.02;Wolf:0.02"],
+["A candy","Chocolate:16;Lollipop:8;Gummy bears:6:gummies/gummybear;Candy corn:5;Snickers:5;M&Ms:5:mms;Skittles:5;Kit Kat:4:kitkat;Reese's:4:reeses/peanutbuttercups;Twix:3;Starburst:2;Jelly beans:2;Licorice:2:liquorice;Marshmallow:2;Caramel:1.5;Toffee:1;Mars bar:1:mars;Hershey's:1:hersheys/kisses;Sour Patch Kids:1:sourpatch;Twizzlers:1;Milky Way:0.8;Nerds:0.8;Jolly Ranchers:0.6;Tootsie Roll:0.6:tootsie;Bubble gum:0.6:gum;Cotton candy:0.6:candyfloss;Candy cane:0.6;Haribo:0.6;Mints:0.4:mint;Gobstopper:0.4:jawbreaker;Smarties:0.4;Maltesers:0.4;Pop Rocks:0.3;Butterfinger:0.3;Swedish Fish:0.3;Almond Joy:0.2;Bounty:0.2;Milk Duds:0.2;Peeps:0.2;Fudge:0.2;Toblerone:0.2;Ferrero Rocher:0.2;Whoppers:0.15;Truffle:0.15;Taffy:0.15;Rolo:0.15;Kinder:0.15;Mentos:0.15;Nougat:0.1;Halva:0.1;Turkish delight:0.1;Rock candy:0.1;Bamba:0.1;Pez:0.1;Tic Tac:0.1;Candy apple:0.08:caramelapple/toffeeapple;Marzipan:0.06;Payday:0.05;Baby Ruth:0.05;Heath:0.05;Lindt:0.05;Werther's:0.05;Sherbet:0.04;Brittle:0.04:peanutbrittle;Praline:0.03"]
 ];
 const norm=s=>String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/&/g,"and").trim().replace(/^(the|lake|a|an)\s+/,"").replace(/[^a-z0-9]/g,"");
-const QS=BANK.map(([q,raw])=>{const answers=raw.split(";").map(s=>{const[name,p,al]=s.split(":");return{name,p:+p,keys:[norm(name),...(al?al.split("/").map(norm):[])]}});return{q,id:norm(q),sum:answers.reduce((t,a)=>t+a.p,0),answers}});
+const QS=[...BANK.map(x=>[...x,false]),...OPEN.map(x=>[...x,true])].map(([q,raw,open])=>{const answers=raw.split(";").map(s=>{const[name,p,al]=s.split(":");return{name,p:+p,keys:[norm(name),...(al?al.split("/").map(norm):[])]}});return{q,open,id:norm(q),sum:answers.reduce((t,a)=>t+a.p,0),answers}});
 function lev(a,b){const m=a.length,n=b.length;if(Math.abs(m-n)>2)return 9;let prev=Array.from({length:n+1},(_,i)=>i);for(let i=1;i<=m;i++){const cur=[i];for(let j=1;j<=n;j++)cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));prev=cur}return prev[n]}
+const forms=k=>[k,k+"s",k+"es",k.replace(/y$/,"ies"),k.replace(/s$/,""),k.replace(/es$/,"")];
+const JUNK=/^(idk|dunno|nothing|none|nope|anything|something|everything|whatever|asdf\w*|qwerty|test|stuff|thing|things|yes|no|lol|nah|ok|okay|hello|hi)$/;
+// a word that could be a real answer: letters only, has vowels, no key-mashing, at most four words
+function plausible(raw,t){
+  if(/\d/.test(raw)||t.length<3||t.length>30||JUNK.test(t))return false;
+  if(!/[aeiouy]/.test(t)||/(.)\1\1/.test(t)||/[^aeiouy]{5,}/.test(t))return false;
+  return raw.trim().split(/\s+/).length<=4;
+}
 function match(q,text){
   const t=norm(text);if(!t)return null;
-  for(const a of q.answers)if(a.keys.includes(t))return a;
-  const tol=t.length>=9?2:t.length>=5?1:0;if(!tol)return null;
-  let best=null,bd=9,tie=false;
-  for(const a of q.answers)for(const k of a.keys){if(k.length<4)continue;const d=lev(t,k);if(d<bd){bd=d;best=a;tie=false}else if(d===bd&&a!==best)tie=true}
-  return bd<=tol&&!tie?best:null;
+  for(const a of q.answers)for(const k of a.keys)if(forms(k).includes(t))return a;
+  const tol=t.length>=9?2:t.length>=5?1:0;
+  if(tol){
+    let best=null,bd=9,tie=false;
+    for(const a of q.answers)for(const k of a.keys){if(k.length<4)continue;const d=lev(t,k);if(d<bd){bd=d;best=a;tie=false}else if(d===bd&&a!==best)tie=true}
+    if(bd<=tol&&!tie)return best;
+  }
+  if(q.open&&plausible(text,t))return{name:text.trim().replace(/\s+/g," ").replace(/^./,c=>c.toUpperCase()),keys:[t],p:0,fresh:true};
+  return null;
 }
 
 
@@ -394,7 +375,7 @@ async function api(path,body){
 }
 async function loadStats(){const s=await api("/stats");if(s&&s.counts){stats=s.counts;online=true;const el=document.getElementById("live");if(el)el.hidden=false}}
 // estimate blended with what players really typed; real answers take over as they pile up
-function pct(q,a){const s=stats[q.id]||{};let n=0;for(const k in s)n+=s[k];return(a.p/q.sum*12+(s[a.keys[0]]||0))/(12+n)*100}
+function pct(q,a){const s=stats[q.id]||{};let n=0;for(const k in s)n+=s[k];const v=((a.fresh?0:a.p/q.sum*12)+(s[a.keys[0]]||0))/(12+n)*100;return a.fresh?Math.max(8,v):v}
 const show1=p=>p>=10?Math.round(p):Math.round(p*10)/10;
 const RANKS=["common","uncommon","rare","epic","legend"];
 const cleanName=s=>String(s||"").toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,10);
@@ -483,15 +464,17 @@ function later(){
     <div class="btns"><button class="big flat" data-act="home" type="button">Back</button></div>
   </section>`);
 }
-function draw7(rand){
-  let pool=QS.map((_,i)=>i).filter(i=>!G.used.has(i));
-  if(pool.length<7){G.used.clear();pool=QS.map((_,i)=>i)}
-  const qs=shuffle(pool,rand).slice(0,7);qs.forEach(i=>G.used.add(i));G.qs.push(...qs);
+function pickQs(rand,n,used){
+  const want=Math.ceil(n*5/7),idx=QS.map((_,i)=>i).filter(i=>!used.has(i)),o=idx.filter(i=>QS[i].open),c=idx.filter(i=>!QS[i].open);
+  if(o.length<want||c.length<n-want){used.clear();return pickQs(rand,n,used)}
+  const qs=shuffle([...shuffle(o,rand).slice(0,want),...shuffle(c,rand).slice(0,n-want)],rand);
+  qs.forEach(i=>used.add(i));return qs;
 }
+function draw7(rand){G.qs.push(...pickQs(rand,7,G.used))}
 const newRun=(mode,len,extra)=>Object.assign({mode,len,qs:[],used:new Set(),i:0,total:0,results:[],phase:"ask",lives:3,combo:0,peek:1,counted:false},extra);
 function start(mode){
   G=newRun(mode,7);
-  draw7(mode==="daily"?rng("phantom3-"+today()):Math.random);
+  draw7(mode==="daily"?rng("phantom4-"+today()):Math.random);
   tone(200,500,.25);question();
 }
 function more(){if(!G)return start("free");G.peek=1;draw7(Math.random);tone(200,500,.25);question()}
@@ -544,18 +527,18 @@ function reveal(a,why){
   G.phase="reveal";G.lockedAt=now;
   let rise=0,tier="miss",label=why||"Lost",rank=-1;const tags=[];
   if(a){
-    const p=pct(q,a);[tier,label]=tierFor(p);rank=RANKS.indexOf(tier);
-    const dbl=G.combo>=3;rise=Math.round(riseFor(p)*(dbl?2:1)*(1+.25*frac));
+    const p=pct(q,a);[tier,label]=tierFor(p);rank=RANKS.indexOf(tier);if(a.fresh){label="New answer";tags.push("Not on the list")}
+    const dbl=G.combo>=3&&!a.fresh;rise=Math.round(riseFor(p)*(dbl?2:1)*(1+.25*frac));
     if(dbl)tags.push("x2");if(frac>.6)tags.push("Fast");
     if(rank===0){rise=Math.max(0,rise-120);tags.push("Bat −120");fx={type:"bat",t:0,d:.9}}
     else if(rank===3){rise+=200;tags.push("Witch +200");fx={type:"witch",t:0,d:1.5}}
     else if(rank===4){rise+=400;tags.push("Star +400");fx={type:"star",t:0,d:1.1}}
-    G.combo=rank>=2?G.combo+1:0;
+    if(!a.fresh)G.combo=rank>=2?G.combo+1:0;
   }else G.combo=0;
   G.results[G.i]={tier,rise};G.total+=rise;target=G.total;
   const pip=document.querySelectorAll(".pip")[G.i%G.len];if(pip)pip.style.background=TCOL[tier];
   const sorted=[...q.answers].sort((x,y)=>pct(q,y)-pct(q,x)),rows=[...new Set([...sorted.slice(0,3),a,sorted[sorted.length-1]].filter(Boolean))].sort((x,y)=>pct(q,y)-pct(q,x));
-  document.getElementById("chips").innerHTML=rows.map((x,k)=>`<span class="chipx t-${tierFor(pct(q,x))[0]} ${x===a?"me":""}" style="--d:${k*.07}s">${esc(x.name)}<b>${show1(pct(q,x))}%</b></span>`).join("");
+  document.getElementById("chips").innerHTML=rows.map((x,k)=>`<span class="chipx t-${tierFor(pct(q,x))[0]} ${x===a?"me":""}" style="--d:${k*.07}s">${esc(x.name)}<b>${x.fresh?"new":show1(pct(q,x))+"%"}</b></span>`).join("");
   document.getElementById("combo").innerHTML=comboHtml();
   place();
   if(a){const key=a.keys[0],s=stats[q.id]=stats[q.id]||{};s[key]=(s[key]||0)+1;api("/answer",{q:q.id,a:key})}
@@ -670,7 +653,7 @@ function vsPlay(){
   let name=cleanName(document.getElementById("pname").value)||"ghost"+(10+Math.floor(Math.random()*90));
   if(V.st.scores[name]!=null)name=name.slice(0,9)+"2";
   save.name=name;persist();
-  G=newRun("vs",V.n,{name,counted:true,qs:shuffle(QS.map((_,i)=>i),rng("vs-"+V.seed)).slice(0,V.n)});
+  G=newRun("vs",V.n,{name,counted:true,qs:pickQs(rng("vs2-"+V.seed),V.n,new Set())});
   tone(200,500,.25);question();
 }
 function vsDone(){
