@@ -1,0 +1,387 @@
+<title>Fathom</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one flat card floating in a water column. The page background IS the depth gauge:
+   it darkens from surface aqua to trench navy as the total depth grows. Single look by choice. */
+:root{
+  color-scheme:light;
+  --ink:#0A2136; --panel:#FAFDFC; --mute:#587082; --line:#DBE6EA; --soft:#EEF4F5;
+  --coral:#FF6A45; --water:#9FE0DB; --on:#0A2136;
+  --t-common:#8FA3AF; --t-uncommon:#2FB37A; --t-rare:#2A8BE0; --t-epic:#8B5CF0; --t-legend:#F2B21B; --t-miss:#C3CED4;
+  --display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --body:"DM Sans","Segoe UI",system-ui,sans-serif;
+  --mono:"DM Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+html,body{height:100%}
+body{background:var(--water);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+*{box-sizing:border-box}
+#sea{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+.wrap{position:relative;z-index:1;max-width:560px;margin:0 auto;padding-block:18px 40px;display:flex;flex-direction:column;gap:18px;min-height:100%}
+
+.hud{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--on);transition:color .4s}
+.brand{display:flex;align-items:center;gap:10px;background:none;border:0;padding:4px;margin:-4px;color:inherit;cursor:pointer;font:800 22px/1 var(--display);letter-spacing:-.02em;border-radius:8px}
+.flag{width:26px;height:20px;border-radius:4px;background:var(--coral);position:relative;overflow:hidden;flex:none}
+.flag::after{content:"";position:absolute;left:-6px;top:7px;width:40px;height:6px;background:#fff;transform:rotate(37deg)}
+.gauge{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.gauge b{display:block;font-size:20px;font-weight:500;line-height:1.1}
+.gauge span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.75}
+
+.card{background:var(--panel);border-radius:22px;padding:26px 24px;display:flex;flex-direction:column;gap:20px;animation:rise .42s cubic-bezier(.2,.8,.2,1) both}
+.card.out{animation:leave .2s ease-in both}
+@keyframes rise{from{opacity:0;transform:translateY(46px)}to{opacity:1;transform:none}}
+@keyframes leave{to{opacity:0;transform:translateY(-40px)}}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mute);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+h1,h2{font-family:var(--display);font-weight:800;letter-spacing:-.025em;line-height:1.05;margin:0;text-wrap:balance}
+h1{font-size:clamp(34px,9vw,46px)}
+h2{font-size:clamp(26px,7vw,34px)}
+p{margin:0}
+.lede{color:var(--mute);font-size:17px;max-width:44ch}
+
+.btn{font:700 17px/1 var(--body);border:0;border-radius:14px;padding:17px 20px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;transition:transform .12s,background .15s}
+.btn small{font:500 12px/1 var(--mono);letter-spacing:.06em;opacity:.8}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--coral);color:var(--ink)}
+.btn.primary:hover{background:#ff7d5c}
+.btn.dark{background:var(--ink);color:#fff}
+.btn.dark:hover{background:#12314e}
+.btn.ghost{background:var(--soft);color:var(--ink)}
+.btn.ghost:hover{background:var(--line)}
+.btn.center{justify-content:center}
+.stack{display:flex;flex-direction:column;gap:10px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+:focus-visible{outline:3px solid var(--t-rare);outline-offset:2px}
+
+.tiers{display:flex;flex-wrap:wrap;gap:6px}
+.tier{border-radius:10px;padding:8px 11px;background:var(--soft);display:flex;align-items:center;gap:7px}
+.tier i{width:12px;height:12px;border-radius:4px;background:var(--c);flex:none}
+.tier b{font-size:13px;font-weight:700}
+.tier span{font:400 11px/1 var(--mono);color:var(--mute)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);border-top:2px solid var(--soft);padding-top:18px;gap:8px}
+.stat b{display:block;font:700 24px/1.1 var(--display);font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--mute)}
+.fine{font-size:12.5px;color:var(--mute)}
+
+.pips{display:flex;gap:6px}
+.pip{flex:1;height:8px;border-radius:4px;background:var(--line);transition:background .4s}
+.pip.now{background:var(--ink)}
+.ask{display:flex;gap:8px}
+.ask input{flex:1;min-width:0;font:500 18px/1 var(--body);color:var(--ink);background:var(--soft);border:2px solid transparent;border-radius:14px;padding:15px 16px}
+.ask input:focus{outline:0;border-color:var(--ink);background:#fff}
+.ask input::placeholder{color:#8fa1ad}
+.ask .btn{width:auto;flex:none;padding-inline:22px}
+.shake{animation:shake .36s}
+@keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+.under{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:24px;flex-wrap:wrap}
+.air{display:flex;align-items:center;gap:6px;font:500 12px/1 var(--mono);color:var(--mute);letter-spacing:.06em;text-transform:uppercase}
+.air i{width:14px;height:14px;border-radius:50%;border:2px solid var(--ink);background:var(--ink);transition:all .3s}
+.air i.gone{background:transparent;border-color:var(--line);transform:scale(.7)}
+.msg{font-size:14px;font-weight:500;color:#c2401f}
+.link{background:none;border:0;padding:4px;color:var(--mute);font:500 14px var(--body);text-decoration:underline;text-underline-offset:3px;cursor:pointer;border-radius:6px}
+
+.reveal{display:flex;flex-direction:column;gap:18px;animation:rise .35s both}
+.hit{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.hit .ans{font:700 24px/1.1 var(--display);overflow-wrap:anywhere}
+.hit .sub{font-size:14px;color:var(--mute);margin-top:4px}
+.plus{font:500 30px/1 var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.chip{display:inline-flex;align-items:center;gap:6px;font:500 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:6px 9px;border-radius:7px;background:var(--c);color:var(--ink);animation:pop .5s cubic-bezier(.3,1.6,.5,1) both .1s}
+.chip.t-epic,.chip.t-rare{color:#fff}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.t-common{--c:var(--t-common)}.t-uncommon{--c:var(--t-uncommon)}.t-rare{--c:var(--t-rare)}.t-epic{--c:var(--t-epic)}.t-legend{--c:var(--t-legend)}.t-miss{--c:var(--t-miss)}
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar{display:grid;grid-template-columns:minmax(0,38%) 1fr 44px;gap:10px;align-items:center;font-size:14px}
+.bar .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .track{height:14px;border-radius:5px;background:var(--soft);overflow:hidden}
+.bar .fill{display:block;height:100%;border-radius:5px;background:#BFCFD6;width:var(--w);transform-origin:left;animation:grow .6s cubic-bezier(.2,.8,.2,1) both;animation-delay:var(--d)}
+.bar.me{font-weight:700}
+.bar.me .fill{background:var(--c)}
+.bar .v{font:400 12px var(--mono);color:var(--mute);text-align:right;font-variant-numeric:tabular-nums}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+.total{font:800 clamp(54px,17vw,84px)/.95 var(--display);letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.total small{font:500 .3em var(--mono);letter-spacing:0;margin-left:.2em}
+.recap{display:flex;flex-direction:column}
+.rec{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 0;border-top:2px solid var(--soft);animation:rise .4s both;animation-delay:var(--d)}
+.rec i{width:14px;height:14px;border-radius:4px;background:var(--c)}
+.rec b{display:block;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rec span{display:block;font-size:12.5px;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rec em{font:500 14px var(--mono);font-style:normal;font-variant-numeric:tabular-nums}
+.copybox{width:100%;font:400 13px/1.5 var(--mono);border:2px solid var(--line);border-radius:12px;padding:12px;background:#fff;color:var(--ink);resize:none}
+@media (max-width:420px){.card{padding:22px 18px}.bar{grid-template-columns:minmax(0,34%) 1fr 40px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<canvas id="sea" aria-hidden="true"></canvas>
+<div class="wrap">
+  <header class="hud">
+    <button class="brand" id="home-btn" type="button" aria-label="Fathom, back to start"><span class="flag"></span>Fathom</button>
+    <div class="gauge" aria-live="off"><b id="depth-read">0 m</b><span id="zone-read">Surface</span></div>
+  </header>
+  <main id="stage"></main>
+</div>
+
+<script>
+(()=>{
+"use strict";
+/* ---------- question bank: "Answer:percent:alias/alias" ---------- */
+const BANK=[
+["Space","Name a planet in our solar system","Mars:24;Earth:22;Jupiter:14;Saturn:13;Venus:8;Mercury:7;Neptune:5;Uranus:4"],
+["Geography","Name a country in South America","Brazil:34:brasil;Argentina:20;Peru:10;Colombia:10;Chile:9;Venezuela:5;Ecuador:4;Bolivia:3;Uruguay:2.5;Paraguay:1.5;Guyana:0.6;Suriname:0.4"],
+["Colour","Name a colour of the rainbow","Red:30;Blue:22;Green:12;Yellow:11;Orange:9;Violet:6:purple;Indigo:5"],
+["Games","Name a chess piece","Queen:26;King:22;Knight:18:horse;Pawn:14;Rook:9:castle;Bishop:8"],
+["Geography","Name one of the Great Lakes","Superior:30;Michigan:28;Erie:18;Huron:12;Ontario:10"],
+["Geography","Name a continent","Europe:22;Asia:20;Africa:20;North America:14;South America:8;Australia:8:oceania/australasia;Antarctica:7:antartica"],
+["Geography","Name an ocean","Pacific:38;Atlantic:34;Indian:12;Arctic:10;Southern:4:antarctic"],
+["Science","Name a noble gas","Helium:34;Neon:30;Argon:16;Xenon:8;Krypton:8;Radon:3;Oganesson:0.3"],
+["Stars","Name a sign of the zodiac","Leo:14;Scorpio:11;Aries:10;Gemini:10;Virgo:9;Taurus:9;Cancer:8;Libra:8;Pisces:7;Capricorn:6;Aquarius:6;Sagittarius:5"],
+["Calendar","Name a month of the year","December:16;January:14;July:12;June:9;October:9;May:8;August:7;March:6;April:6;February:6;September:5;November:4"],
+["Calendar","Name a day of the week","Friday:28;Saturday:20;Monday:18;Sunday:16;Wednesday:8;Tuesday:6;Thursday:4"],
+["Geography","Name a US state with a Pacific coastline","California:55;Hawaii:14;Oregon:12;Washington:12;Alaska:7"],
+["Geography","Name a Nordic country","Sweden:32;Norway:28;Denmark:18;Finland:14;Iceland:8"],
+["Geography","Name a country that shares a land border with France","Spain:26;Germany:24;Italy:18;Belgium:12;Switzerland:10;Luxembourg:4;Monaco:4;Andorra:2;Brazil:0.4;Netherlands:0.3:holland;Suriname:0.2"],
+["Body","Name one of the five senses","Sight:34:vision/seeing/see;Smell:20;Taste:18;Hearing:15:sound/hear;Touch:13:feeling/feel"],
+["Food","Name one of the five basic tastes","Sweet:36;Sour:20;Salty:18:salt;Bitter:16;Umami:10:savory/savoury"],
+["Music","Name a member of The Beatles","John Lennon:36:john/lennon;Paul McCartney:30:paul/mccartney;Ringo Starr:20:ringo/starr;George Harrison:14:george/harrison"],
+["Games","Name a suit in a deck of cards","Hearts:34;Spades:30;Diamonds:20;Clubs:16:club"],
+["World","Name a G7 country","United States:30:usa/us/america/unitedstatesofamerica;Germany:16;France:14;United Kingdom:14:uk/britain/greatbritain/england;Japan:12;Canada:8;Italy:6"],
+["Science","Name an element with a one-letter chemical symbol","Oxygen:24;Hydrogen:22;Carbon:16;Nitrogen:10;Potassium:6;Sulfur:4:sulphur;Fluorine:3;Phosphorus:3;Iodine:3;Boron:2.5;Uranium:2.5;Tungsten:1.5;Vanadium:1;Yttrium:0.5"],
+["Culture","Name an animal of the Chinese zodiac","Dragon:22;Tiger:14;Rat:12;Monkey:9;Rabbit:8;Snake:8;Horse:6;Dog:6;Ox:5;Pig:4;Rooster:4;Goat:2:sheep/ram"],
+["Sport","Name a tennis Grand Slam tournament","Wimbledon:52;US Open:22;French Open:14:rolandgarros;Australian Open:12"],
+["Sport","Name a colour of the Olympic rings","Blue:28;Red:24;Yellow:18;Green:16;Black:14"],
+["Geography","Name a country of the United Kingdom","England:46;Scotland:28;Wales:16;Northern Ireland:10"],
+["Geography","Name a Canadian province","Ontario:28;Quebec:22;British Columbia:20:bc;Alberta:12;Manitoba:5;Nova Scotia:5;Saskatchewan:4;Newfoundland and Labrador:2:newfoundland;New Brunswick:1.2;Prince Edward Island:0.8:pei"],
+["Animals","Name a big cat in the genus Panthera","Lion:36;Tiger:30;Leopard:16;Jaguar:14;Snow Leopard:4"],
+["Geography","Name a country the equator crosses on land","Ecuador:30;Brazil:22;Kenya:16;Indonesia:10;Colombia:7;Uganda:5;Democratic Republic of the Congo:3:drc/drcongo/congo/congokinshasa;Somalia:2.5;Gabon:2;Republic of the Congo:1:congobrazzaville;Sao Tome and Principe:0.5:saotome"],
+["Geography","Name a country in Central America","Costa Rica:26;Panama:22;Guatemala:16;Honduras:12;Nicaragua:9;El Salvador:8;Belize:7"],
+["Language","Name a vowel in the English alphabet","A:38;E:24;I:14;O:14;U:10"],
+["Calendar","Name a season","Summer:38;Winter:24;Autumn:22:fall;Spring:16"],
+["Geography","Name one of the ten largest countries by area","Russia:30;Canada:16;China:16;United States:14:usa/us/america;Brazil:8;Australia:8;India:5;Argentina:1.5;Kazakhstan:1;Algeria:0.5"],
+["Geography","Name a Baltic state","Estonia:38;Latvia:32;Lithuania:30"],
+["Space","Name one of Jupiter's four Galilean moons","Europa:40;Ganymede:24;Io:22;Callisto:14"],
+["Body","Name an ABO blood group","O:38;A:26;B:18;AB:18"],
+["Geography","Name a US state that starts with M","Michigan:20;Massachusetts:16;Maine:12;Montana:12;Mississippi:12;Minnesota:10;Missouri:10;Maryland:8"],
+["Geography","Name a country that starts with I","Italy:28;India:24;Ireland:16;Iceland:9;Indonesia:8;Israel:6;Iran:5;Iraq:4"],
+["Numbers","Name a prime number below 30","2:22:two;7:20:seven;3:16:three;5:12:five;13:8:thirteen;11:7:eleven;17:5:seventeen;19:4:nineteen;23:4:twentythree;29:2:twentynine"],
+["Geography","Name an African country on the Mediterranean Sea","Egypt:44;Morocco:24;Tunisia:14;Libya:10;Algeria:8"],
+["Science","Name one of the five main layers of Earth's atmosphere","Stratosphere:34;Troposphere:24;Mesosphere:12;Thermosphere:10;Exosphere:8"]
+];
+const norm=s=>String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/&/g,"and").trim().replace(/^(the|lake)\s+/,"").replace(/[^a-z0-9]/g,"");
+const QS=BANK.map(([cat,q,raw])=>({cat,q,answers:raw.split(";").map(s=>{const[name,p,al]=s.split(":");return{name,p:+p,keys:[norm(name),...(al?al.split("/").map(norm):[])]}})}));
+
+const MAXQ=1562, DEEPEST=10935; // 7 x 1562 m is about the Challenger Deep
+const depthFor=p=>Math.max(40,Math.round(MAXQ*(1-Math.sqrt(Math.min(p,60)/60))));
+const tierFor=p=>p>=20?["common","Common"]:p>=10?["uncommon","Uncommon"]:p>=4?["rare","Rare"]:p>=1.5?["epic","Epic"]:["legend","Legendary"];
+const zoneFor=d=>d<1?"Surface":d<200?"Sunlight zone":d<1000?"Twilight zone":d<4000?"Midnight zone":d<6000?"Abyssal zone":"Hadal zone";
+const ZONE_LINE={"Surface":"You never left the boat.","Sunlight zone":"Still warm up here. Everyone says what you said.","Twilight zone":"The light is fading. A few uncommon answers in there.","Midnight zone":"No sunlight reaches this far. Solid dive.","Abyssal zone":"Deep, cold and quiet. Few people answer like you.","Hadal zone":"Trench territory. Almost nobody answers like you."};
+const fmt=n=>Math.round(n).toLocaleString("en-US");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const reduced=matchMedia("(prefers-reduced-motion:reduce)").matches;
+
+function lev(a,b){const m=a.length,n=b.length;if(Math.abs(m-n)>2)return 9;let prev=Array.from({length:n+1},(_,i)=>i);for(let i=1;i<=m;i++){const cur=[i];for(let j=1;j<=n;j++)cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));prev=cur}return prev[n]}
+function match(q,text){
+  const t=norm(text);if(!t)return null;
+  for(const a of q.answers)if(a.keys.includes(t))return a;
+  const tol=t.length>=9?2:t.length>=5?1:0;if(!tol)return null;
+  let best=null,bd=9,tie=false;
+  for(const a of q.answers)for(const k of a.keys){if(k.length<4)continue;const d=lev(t,k);if(d<bd){bd=d;best=a;tie=false}else if(d===bd&&a!==best)tie=true}
+  return bd<=tol&&!tie?best:null;
+}
+
+/* ---------- storage ---------- */
+const KEY="fathom.v1";
+let save={dives:0,best:0,streak:0,lastDaily:null,daily:null};
+try{Object.assign(save,JSON.parse(localStorage.getItem(KEY)||"{}"))}catch(e){}
+const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify(save))}catch(e){}};
+const dayKey=(d=new Date())=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const today=()=>dayKey();
+const diveNo=()=>Math.max(1,Math.round((new Date(today()+"T12:00")-new Date("2026-11-01T12:00"))/864e5)+1);
+function rng(seed){let h=1779033703;for(const c of seed)h=Math.imul(h^c.charCodeAt(0),3432918353),h=h<<13|h>>>19;return()=>{h=Math.imul(h^h>>>16,2246822507);h=Math.imul(h^h>>>13,3266489909);return((h^=h>>>16)>>>0)/4294967296}}
+function pick(rand,avoid=[]){const idx=QS.map((_,i)=>i).filter(i=>!avoid.includes(i));for(let i=idx.length-1;i>0;i--){const j=Math.floor(rand()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]]}return idx.slice(0,7)}
+
+/* ---------- water ---------- */
+const cv=document.getElementById("sea"),cx=cv.getContext("2d");
+const STOPS=[[0,[159,224,219]],[.08,[86,196,207]],[.28,[27,127,166]],[.55,[15,76,122]],[.8,[10,37,80]],[1,[5,11,31]]];
+let W=0,H=0,target=0,shown=0,rush=0,last=0;
+const bubbles=Array.from({length:34},()=>({x:Math.random(),y:Math.random(),r:2+Math.random()*7,v:.3+Math.random()*.7,ph:Math.random()*6}));
+const fish=Array.from({length:5},(_,i)=>({x:Math.random(),y:.12+Math.random()*.8,s:10+Math.random()*16,dir:i%2?1:-1,v:.15+Math.random()*.3}));
+function resize(){const d=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0)}
+function waterAt(t){t=Math.max(0,Math.min(1,t));for(let i=1;i<STOPS.length;i++){if(t<=STOPS[i][0]){const[a,ca]=STOPS[i-1],[b,cb]=STOPS[i],k=(t-a)/(b-a);return ca.map((v,j)=>Math.round(v+(cb[j]-v)*k))}}return STOPS[STOPS.length-1][1]}
+const depthRead=document.getElementById("depth-read"),zoneRead=document.getElementById("zone-read");
+let lastOn="";
+function frame(ts){
+  const dt=Math.min(3,(ts-last)/16.7||1);last=ts;
+  const gap=target-shown;
+  if(reduced)shown=target;else shown+=gap*Math.min(1,.045*dt);
+  if(Math.abs(target-shown)<.6)shown=target;
+  rush=reduced?0:Math.min(1,Math.abs(gap)/500);
+  const t=shown/DEEPEST,c=waterAt(t),on=t<.17?"#0A2136":"#EAF7F6";
+  const css=`rgb(${c})`;
+  if(on!==lastOn){document.documentElement.style.setProperty("--on",on);lastOn=on}
+  document.body.style.background=css;
+  depthRead.textContent=fmt(shown)+" m";zoneRead.textContent=zoneFor(shown);
+  cx.fillStyle=css;cx.fillRect(0,0,W,H);
+  const dir=gap>=0?1:-1;
+  // depth ruler on the left edge
+  cx.fillStyle=on;cx.strokeStyle=on;cx.font='500 11px "DM Mono",monospace';cx.textBaseline="middle";
+  const ppm=.5,mid=H/2;
+  for(let d=Math.ceil((shown-mid/ppm)/50)*50;d<shown+mid/ppm;d+=50){if(d<0)continue;const y=mid+(d-shown)*ppm,big=d%250===0;cx.globalAlpha=big?.5:.22;cx.fillRect(0,y,big?14:7,1.5);if(big&&W>760)cx.fillText(fmt(d),20,y)}
+  // fish
+  cx.globalAlpha=.13;
+  for(const f of fish){f.x+=f.dir*f.v*.0012*dt;f.y-=dir*rush*.02*dt;if(f.x>1.1)f.x=-.1;if(f.x<-.1)f.x=1.1;if(f.y<-.05)f.y=1.05;if(f.y>1.05)f.y=-.05;
+    const x=f.x*W,y=f.y*H,s=f.s;cx.beginPath();cx.ellipse(x,y,s,s*.42,0,0,7);cx.fill();cx.beginPath();cx.moveTo(x-f.dir*s*.8,y);cx.lineTo(x-f.dir*s*1.6,y-s*.45);cx.lineTo(x-f.dir*s*1.6,y+s*.45);cx.fill()}
+  // bubbles
+  cx.lineWidth=1.5;
+  for(const b of bubbles){b.y-=((b.v*.0016)+dir*rush*.03)*dt;b.ph+=.02*dt;if(b.y<-.03){b.y=1.03;b.x=Math.random()}if(b.y>1.04){b.y=-.02;b.x=Math.random()}
+    const x=b.x*W+Math.sin(b.ph)*8,y=b.y*H;cx.globalAlpha=.4;cx.beginPath();
+    if(rush>.15){cx.moveTo(x,y);cx.lineTo(x,y+dir*rush*b.r*7);cx.stroke()}else{cx.arc(x,y,b.r,0,7);cx.stroke();cx.globalAlpha=.5;cx.beginPath();cx.arc(x-b.r*.3,y-b.r*.3,b.r*.22,0,7);cx.fill()}}
+  cx.globalAlpha=1;
+  requestAnimationFrame(frame);
+}
+addEventListener("resize",resize);resize();requestAnimationFrame(frame);
+
+/* ---------- screens ---------- */
+const stage=document.getElementById("stage");
+let G=null,recent=[];
+function show(html,after){
+  const old=stage.firstElementChild,swap=()=>{stage.innerHTML=html;scrollTo({top:0});after&&after()};
+  if(old&&!reduced){old.classList.add("out");setTimeout(swap,190)}else swap();
+}
+function countUp(el,to,ms=900,prefix="+"){
+  if(reduced){el.textContent=prefix+fmt(to);return}
+  const t0=performance.now();(function step(now){const k=Math.min(1,(now-t0)/ms),e=1-Math.pow(1-k,3);el.textContent=prefix+fmt(to*e);if(k<1)requestAnimationFrame(step)})(t0);
+}
+
+function home(){
+  G=null;target=0;
+  const done=save.daily&&save.daily.date===today();
+  const legend=[["common","Common","20%+"],["uncommon","Uncommon","10–20%"],["rare","Rare","4–10%"],["epic","Epic","1.5–4%"],["legend","Legendary","under 1.5%"]];
+  show(`<section class="card">
+    <div class="eyebrow"><span>Daily Dive #${diveNo()}</span><span>${new Date().toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})}</span></div>
+    <h1>How rare is your answer?</h1>
+    <p class="lede">Seven questions. Any correct answer scores, and the fewer people who would say it, the deeper you dive.</p>
+    <div class="stack">
+      <button class="btn primary" data-act="${done?"daily-result":"daily"}" type="button">${done?"See today's result":"Start the Daily Dive"}<small>${done?fmt(save.daily.total)+" m":"7 questions"}</small></button>
+      <button class="btn dark" data-act="free" type="button">Free Dive<small>unlimited, always free</small></button>
+    </div>
+    <div class="tiers">${legend.map(([k,n,r])=>`<div class="tier t-${k}"><i></i><b>${n}</b><span>${r}</span></div>`).join("")}</div>
+    <p class="fine">The percentage is the share of people who give that answer. You get three breaths per question, and a wrong guess costs one. Reach ${fmt(DEEPEST)} m and you have touched the bottom of the Challenger Deep.</p>
+    <div class="stats">
+      <div class="stat"><b>${fmt(save.dives)}</b><span>dives</span></div>
+      <div class="stat"><b>${fmt(save.best)} m</b><span>deepest dive</span></div>
+      <div class="stat"><b>${save.streak}</b><span>daily streak</span></div>
+    </div>
+    <p class="fine">Rarity uses estimated answer popularity for now, not live player data.</p>
+  </section>`);
+}
+
+function start(mode){
+  let qs;
+  if(mode==="daily")qs=pick(rng("fathom-"+today()));
+  else{qs=pick(Math.random,recent);recent=qs.concat(recent).slice(0,21)}
+  G={mode,qs,i:0,total:0,air:3,results:[],locked:false};
+  question();
+}
+const pips=()=>`<div class="pips">${G.qs.map((_,k)=>{const r=G.results[k];return`<span class="pip ${r?"t-"+r.tier:k===G.i?"now":""}" ${r?'style="background:var(--c)"':""}></span>`}).join("")}</div>`;
+const airHtml=()=>`<span class="air" aria-label="${G.air} breaths left">${[0,1,2].map(k=>`<i class="${k<G.air?"":"gone"}"></i>`).join("")}<span>air</span></span>`;
+
+function question(){
+  const q=QS[G.qs[G.i]];G.air=3;G.locked=false;
+  show(`<section class="card">
+    ${pips()}
+    <div class="eyebrow"><span>${G.mode==="daily"?"Daily Dive #"+diveNo():"Free Dive"} · ${G.i+1} of 7</span><span>${esc(q.cat)}</span></div>
+    <h2>${esc(q.q)}</h2>
+    <div id="zone">
+      <form class="stack" id="ask-form" autocomplete="off">
+        <div class="ask"><input id="answer" type="text" placeholder="Type an answer" aria-label="Your answer" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go"><button class="btn primary" type="submit">Dive</button></div>
+        <div class="under"><span id="air-slot">${airHtml()}</span><span class="msg" id="msg" role="status"></span><button class="link" type="button" data-act="skip">Skip question</button></div>
+      </form>
+    </div>
+  </section>`,()=>{const i=document.getElementById("answer");i&&i.focus({preventScroll:true})});
+}
+
+function submit(){
+  if(!G||G.locked)return;
+  const input=document.getElementById("answer"),msg=document.getElementById("msg"),q=QS[G.qs[G.i]];
+  if(!input.value.trim()){input.focus();return}
+  const a=match(q,input.value);
+  if(a)return reveal(a);
+  G.air--;document.getElementById("air-slot").innerHTML=airHtml();
+  if(G.air<=0)return reveal(null);
+  msg.textContent=`Not on the list. ${G.air} ${G.air===1?"breath":"breaths"} left.`;
+  const box=input.parentElement;box.classList.remove("shake");void box.offsetWidth;box.classList.add("shake");
+  input.select();
+}
+
+function reveal(a,skipped){
+  G.locked=true;
+  const q=QS[G.qs[G.i]],depth=a?depthFor(a.p):0,[tier,label]=a?tierFor(a.p):["miss",skipped?"Skipped":"Out of air"];
+  G.results[G.i]={name:a?a.name:"",p:a?a.p:0,depth,tier,label,q:q.q};
+  G.total+=depth;target=G.total;
+  const sorted=[...q.answers].sort((x,y)=>y.p-x.p);let rows=sorted.slice(0,5);
+  if(a&&!rows.includes(a))rows=rows.slice(0,4).concat(a);
+  const max=sorted[0].p,last=G.i===6;
+  const zone=document.getElementById("zone");
+  zone.innerHTML=`<div class="reveal t-${tier}">
+    <div class="hit">
+      <div><span class="chip t-${tier}">${label}</span>
+        <div class="ans" style="margin-top:10px">${a?esc(a.name):"No answer"}</div>
+        <div class="sub">${a?`Said by about ${a.p}% of people`:"No depth gained on this one"}</div></div>
+      <div class="plus" id="plus">+0</div>
+    </div>
+    <div class="bars">${rows.map((r,k)=>`<div class="bar ${r===a?"me":""}"><span class="n">${esc(r.name)}</span><span class="track"><span class="fill" style="--w:${Math.max(3,r.p/max*100)}%;--d:${.15+k*.07}s"></span></span><span class="v">${r.p}%</span></div>`).join("")}</div>
+    <button class="btn dark center" id="next" type="button" data-act="next">${last?"Surface and see your dive":"Next question"}</button>
+  </div>`;
+  const pip=document.querySelectorAll(".pip")[G.i];if(pip){pip.className="pip t-"+tier;pip.style.background="var(--c)"}
+  countUp(document.getElementById("plus"),depth);
+  document.getElementById("next").focus({preventScroll:true});
+}
+
+function finish(){
+  save.dives++;save.best=Math.max(save.best,G.total);
+  if(G.mode==="daily"){
+    const y=new Date();y.setDate(y.getDate()-1);
+    save.streak=save.lastDaily===dayKey(y)?save.streak+1:1;save.lastDaily=today();
+    save.daily={date:today(),total:G.total,results:G.results};
+  }
+  persist();results(G.mode,G.total,G.results);
+}
+const SQ={common:"⬜",uncommon:"🟩",rare:"🟦",epic:"🟪",legend:"🟨",miss:"⬛"};
+let shareText="";
+function results(mode,total,res){
+  target=total;const zone=zoneFor(total);
+  shareText=`Fathom ${mode==="daily"?"Daily Dive #"+diveNo():"Free Dive"}\n${fmt(total)} m · ${zone}\n${res.map(r=>SQ[r.tier]).join("")}`;
+  show(`<section class="card">
+    <div class="eyebrow"><span>${mode==="daily"?"Daily Dive #"+diveNo():"Free Dive"} complete</span><span>${zone}</span></div>
+    <div><div class="total" id="total">0<small>m</small></div><p class="lede" style="margin-top:10px">${ZONE_LINE[zone]} ${total>=DEEPEST-600?"That is the bottom of the ocean.":`The Challenger Deep is ${fmt(DEEPEST-total)} m further down.`}</p></div>
+    <div class="recap">${res.map((r,k)=>`<div class="rec t-${r.tier}" style="--d:${.25+k*.08}s"><i></i><div style="min-width:0"><b>${r.name?esc(r.name):"No answer"}</b><span>${esc(r.q)}${r.name?` · ${r.p}%`:""}</span></div><em>+${fmt(r.depth)} m</em></div>`).join("")}</div>
+    <div class="stack">
+      <button class="btn primary" data-act="free" type="button">Dive again<small>free dive, new questions</small></button>
+      <div class="row2"><button class="btn ghost center" data-act="share" id="share" type="button">Copy result</button><button class="btn ghost center" data-act="home" type="button">Back to start</button></div>
+      <textarea class="copybox" id="copybox" rows="3" readonly hidden aria-label="Your result, ready to copy"></textarea>
+    </div>
+  </section>`,()=>{const el=document.getElementById("total");if(reduced){el.firstChild.textContent=fmt(total);return}
+    const t0=performance.now();(function step(now){const k=Math.min(1,(now-t0)/1400),e=1-Math.pow(1-k,3);el.firstChild.textContent=fmt(total*e);if(k<1&&el.isConnected)requestAnimationFrame(step)})(t0)});
+}
+function share(){
+  const btn=document.getElementById("share"),box=document.getElementById("copybox");
+  const fallback=()=>{box.hidden=false;box.value=shareText;box.focus();box.select();btn.textContent="Select and copy"};
+  try{navigator.clipboard.writeText(shareText).then(()=>{btn.textContent="Copied"},fallback)}catch(e){fallback()}
+}
+
+stage.addEventListener("submit",e=>{e.preventDefault();submit()});
+stage.addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]");if(!b)return;
+  const act=b.dataset.act;
+  if(act==="daily")start("daily");
+  else if(act==="free")start("free");
+  else if(act==="daily-result")results("daily",save.daily.total,save.daily.results);
+  else if(act==="skip"){if(G&&!G.locked)reveal(null,true)}
+  else if(act==="next"){G.i++;G.i>=7?finish():question()}
+  else if(act==="share")share();
+  else if(act==="home")home();
+});
+document.getElementById("home-btn").addEventListener("click",home);
+home();
+})();
+</script>
