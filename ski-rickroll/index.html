@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alpine Peak – אתר הסקי</title>
+<style>
+  :root{
+    --white:#ffffff; --snow:#f4f9ff; --ice:#e3f0fc;
+    --blue:#1d6fd6; --blue-dark:#0b3d91; --sky:#8ec9ff;
+    --yellow:#ffc928; --yellow-dark:#f0a800; --ink:#0c2547;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Segoe UI",Rubik,Arial,sans-serif;color:var(--ink);
+    background:linear-gradient(180deg,#bfe0ff 0,#e9f4ff 420px,#fff 700px);
+    min-height:100vh;overflow-x:hidden;
+  }
+  #snow{position:fixed;inset:0;pointer-events:none;z-index:50}
+
+  nav{
+    position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;
+    padding:14px 5vw;background:rgba(255,255,255,.85);backdrop-filter:blur(10px);
+    border-bottom:3px solid var(--yellow);
+  }
+  .logo{font-weight:800;font-size:1.4rem;color:var(--blue-dark);text-decoration:none}
+  .logo span{color:var(--yellow-dark)}
+  nav .links{display:flex;gap:10px;flex-wrap:wrap}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:12px 24px;border-radius:999px;font-weight:700;font-size:1rem;text-decoration:none;
+    background:var(--blue);color:#fff;border:2px solid transparent;
+    box-shadow:0 6px 16px rgba(29,111,214,.28);transition:.2s transform,.2s box-shadow,.2s background;
+    cursor:pointer;
+  }
+  .btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 12px 24px rgba(29,111,214,.35)}
+  .btn.yellow{background:var(--yellow);color:var(--ink);box-shadow:0 6px 16px rgba(240,168,0,.35)}
+  .btn.yellow:hover{box-shadow:0 12px 24px rgba(240,168,0,.45)}
+  .btn.ghost{background:#fff;color:var(--blue-dark);border-color:var(--ice);box-shadow:0 4px 12px rgba(12,37,71,.08)}
+  .btn.big{padding:16px 36px;font-size:1.2rem}
+
+  .hero{position:relative;text-align:center;padding:70px 5vw 190px;overflow:hidden}
+  .sun{position:absolute;top:30px;left:10%;width:110px;height:110px;border-radius:50%;
+    background:radial-gradient(circle,#ffe27a,var(--yellow));box-shadow:0 0 80px 30px rgba(255,201,40,.45);animation:pulse 5s ease-in-out infinite}
+  @keyframes pulse{50%{transform:scale(1.08)}}
+  .hero h1{font-size:clamp(2.4rem,7vw,4.6rem);line-height:1.1;color:var(--blue-dark);position:relative}
+  .hero h1 em{font-style:normal;background:linear-gradient(transparent 62%,var(--yellow) 62%)}
+  .hero p{margin:18px auto 30px;max-width:560px;font-size:1.2rem;color:#35537d;position:relative}
+  .hero .cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;position:relative}
+  .mountains{position:absolute;bottom:-2px;left:0;width:100%;height:210px}
+
+  main{max-width:1150px;margin:0 auto;padding:10px 5vw 60px}
+  h2{text-align:center;font-size:2rem;color:var(--blue-dark);margin:50px 0 6px}
+  .sub{text-align:center;color:#5c7396;margin-bottom:30px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:20px}
+  .card{
+    background:#fff;border-radius:22px;padding:26px 20px;text-align:center;
+    border:2px solid var(--ice);box-shadow:0 8px 24px rgba(12,37,71,.07);
+    display:flex;flex-direction:column;align-items:center;gap:12px;
+    transition:.25s transform,.25s box-shadow,.25s border-color;
+  }
+  .card:hover{transform:translateY(-6px);border-color:var(--yellow);box-shadow:0 18px 36px rgba(12,37,71,.14)}
+  .card .ico{font-size:2.8rem;width:76px;height:76px;display:grid;place-items:center;border-radius:50%;
+    background:linear-gradient(135deg,var(--ice),#fff);border:2px solid var(--ice)}
+  .card h3{font-size:1.15rem}
+  .card p{font-size:.92rem;color:#5c7396;min-height:2.6em}
+
+  .banner{
+    margin:60px 0 10px;border-radius:28px;padding:44px 24px;text-align:center;color:#fff;
+    background:linear-gradient(120deg,var(--blue-dark),var(--blue));position:relative;overflow:hidden;
+  }
+  .banner::after{content:"";position:absolute;inset:auto -40px -60px auto;width:220px;height:220px;border-radius:50%;background:rgba(255,201,40,.25)}
+  .banner h2{color:#fff;margin:0 0 8px}
+  .banner p{margin-bottom:22px;opacity:.9}
+
+  .pills{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+
+  footer{text-align:center;padding:30px;color:#5c7396;background:var(--snow);border-top:3px solid var(--yellow)}
+  footer .pills{margin-bottom:14px}
+</style>
+</head>
+<body>
+<canvas id="snow"></canvas>
+
+<nav>
+  <a class="logo" href="#" data-go>⛷️ Alpine<span>Peak</span></a>
+  <div class="links">
+    <a class="btn ghost" href="#" data-go>מסלולים</a>
+    <a class="btn ghost" href="#" data-go>כרטיסים</a>
+    <a class="btn yellow" href="#" data-go>🎁 הטבה חינם</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="sun"></div>
+  <h1>החורף שלך <em>מתחיל כאן</em> ❄️</h1>
+  <p>שלג טרי, מסלולים מושלמים ושוקו חם בפסגה. לחצו על כל כפתור וגלו את ההרפתקה.</p>
+  <div class="cta">
+    <a class="btn yellow big" href="#" data-go>🎿 קבלו סקי-פס חינם</a>
+    <a class="btn ghost big" href="#" data-go>🏔️ צפו במסלולים</a>
+  </div>
+  <svg class="mountains" viewBox="0 0 1440 210" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 210V120L180 40l140 90 150-110 170 120 150-80 190 100 170-120 140 90 150-60v210z" fill="#cfe6fb"/>
+    <path d="M0 210V150l200-70 150 80 180-90 200 100 170-70 200 80 340-100v240z" fill="#fff"/>
+    <path d="M180 40l-28 22 28-6 22 10zM530 30l-30 24 30-8 25 12zM1080 20l-26 20 26-6 24 10z" fill="#fff"/>
+  </svg>
+</header>
+
+<main>
+  <h2>מה תרצו לעשות היום?</h2>
+  <p class="sub">הרבה אפשרויות. כולן בלחיצה אחת.</p>
+
+  <div class="grid">
+    <div class="card"><div class="ico">🎟️</div><h3>כרטיס יומי</h3><p>גישה מלאה לכל המעליות</p><a class="btn" href="#" data-go>הזמנה</a></div>
+    <div class="card"><div class="ico">🚠</div><h3>רכבל לפסגה</h3><p>נוף עוצר נשימה ב-360°</p><a class="btn" href="#" data-go>עלו למעלה</a></div>
+    <div class="card"><div class="ico">⛷️</div><h3>שיעורי סקי</h3><p>מדריכים מקצועיים לכל רמה</p><a class="btn yellow" href="#" data-go>הרשמה</a></div>
+    <div class="card"><div class="ico">🏂</div><h3>סנובורד</h3><p>פארק טריקים ורמפות</p><a class="btn" href="#" data-go>קדימה</a></div>
+    <div class="card"><div class="ico">🌨️</div><h3>תחזית שלג</h3><p>עדכון חי מהפסגה</p><a class="btn ghost" href="#" data-go>בדקו עכשיו</a></div>
+    <div class="card"><div class="ico">🏨</div><h3>צימרים ומלונות</h3><p>שמיכות פוך ואח בוערת</p><a class="btn" href="#" data-go>הזמינו חדר</a></div>
+    <div class="card"><div class="ico">🧤</div><h3>השכרת ציוד</h3><p>מגפיים, מקלות ומשקפי שלג</p><a class="btn yellow" href="#" data-go>השכרה</a></div>
+    <div class="card"><div class="ico">☕</div><h3>שוקו חם</h3><p>עם מרשמלו, כמובן</p><a class="btn" href="#" data-go>אני רוצה</a></div>
+    <div class="card"><div class="ico">📸</div><h3>גלריית תמונות</h3><p>רגעים מושלגים מהאתר</p><a class="btn ghost" href="#" data-go>לגלריה</a></div>
+    <div class="card"><div class="ico">🎥</div><h3>סרטון תדמית</h3><p>שלוש דקות של חורף נקי</p><a class="btn" href="#" data-go>▶ הפעלה</a></div>
+    <div class="card"><div class="ico">🗺️</div><h3>מפת מסלולים</h3><p>ירוק, כחול, אדום ושחור</p><a class="btn" href="#" data-go>הורדת מפה</a></div>
+    <div class="card"><div class="ico">🏆</div><h3>תחרות השנה</h3><p>זכו בחופשה לשניים</p><a class="btn yellow" href="#" data-go>השתתפות</a></div>
+  </div>
+
+  <section class="banner">
+    <h2>🎉 הצעה מיוחדת רק היום!</h2>
+    <p>חבילת סקי מלאה במחיר שלא תאמינו.</p>
+    <a class="btn yellow big" href="#" data-go>לממש את ההטבה</a>
+  </section>
+
+  <h2>עוד קיצורי דרך</h2>
+  <div class="pills">
+    <a class="btn ghost" href="#" data-go>📞 צור קשר</a>
+    <a class="btn ghost" href="#" data-go>💬 צ׳אט</a>
+    <a class="btn ghost" href="#" data-go>📰 חדשות</a>
+    <a class="btn ghost" href="#" data-go>🎁 גיפט קארד</a>
+    <a class="btn ghost" href="#" data-go>👨‍👩‍👧 חבילות משפחה</a>
+    <a class="btn ghost" href="#" data-go>🎓 הנחת סטודנטים</a>
+    <a class="btn ghost" href="#" data-go>🌙 סקי לילה</a>
+    <a class="btn ghost" href="#" data-go>❓ שאלות נפוצות</a>
+  </div>
+</main>
+
+<footer>
+  <div class="pills">
+    <a class="btn" href="#" data-go>הצטרפו לניוזלטר</a>
+    <a class="btn yellow" href="#" data-go>הורידו את האפליקציה</a>
+  </div>
+  © Alpine Peak ❄️ כל הזכויות שמורות לשלג
+</footer>
+
+<script>
+  // כל לחצן באתר שולח ל-Never Gonna Give You Up
+  var RICK = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+  document.querySelectorAll("[data-go]").forEach(function(a){
+    a.setAttribute("href", RICK);
+    a.setAttribute("rel", "noopener");
+  });
+
+  // שלג יורד
+  var c = document.getElementById("snow"), x = c.getContext("2d"), flakes = [];
+  function size(){ c.width = innerWidth; c.height = innerHeight; }
+  addEventListener("resize", size); size();
+  for (var i = 0; i < 90; i++) flakes.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*3+1,s:Math.random()*1+.4,d:Math.random()*2*Math.PI});
+  (function tick(){
+    x.clearRect(0,0,c.width,c.height);
+    x.fillStyle = "rgba(255,255,255,.95)"; x.shadowColor = "rgba(29,111,214,.4)"; x.shadowBlur = 4;
+    flakes.forEach(function(f){
+      f.y += f.s; f.d += .01; f.x += Math.sin(f.d)*.6;
+      if (f.y > c.height){ f.y = -5; f.x = Math.random()*c.width; }
+      x.beginPath(); x.arc(f.x,f.y,f.r,0,7); x.fill();
+    });
+    requestAnimationFrame(tick);
+  })();
+</script>
+</body>
+</html>
